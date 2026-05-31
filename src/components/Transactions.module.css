@@ -1,0 +1,70 @@
+.wrap { display: flex; flex-direction: column; gap: 12px; padding-bottom: 16px; }
+
+.filters { display: flex; flex-direction: column; gap: 8px; }
+
+.search {
+  width: 100%; padding: 11px 14px;
+  border: 1.5px solid var(--c-border); border-radius: var(--radius-sm);
+  font-size: 14px; font-family: inherit; outline: none;
+  background: #fff; direction: rtl;
+}
+.search:focus { border-color: var(--c-primary); }
+
+.filterRow { display: flex; gap: 8px; }
+
+.sel {
+  flex: 1; padding: 9px 10px;
+  border: 1.5px solid var(--c-border); border-radius: var(--radius-sm);
+  font-size: 13px; font-family: inherit; outline: none;
+  background: #fff; color: var(--c-text); direction: rtl;
+}
+.sel:focus { border-color: var(--c-primary); }
+
+.summary {
+  display: flex; justify-content: center; align-items: center; gap: 12px;
+  background: #fff; border: 1px solid var(--c-border); border-radius: var(--radius-sm);
+  padding: 10px; font-weight: 700; font-size: 15px;
+}
+.divider { color: var(--c-border); }
+.inc { color: var(--c-green); }
+.exp { color: var(--c-red); }
+
+.list { display: flex; flex-direction: column; gap: 8px; }
+.empty { text-align: center; color: var(--c-text-2); padding: 32px; }
+
+.row {
+  display: flex; align-items: center; gap: 10px;
+  background: #fff; border: 1px solid var(--c-border);
+  border-radius: var(--radius-sm); padding: 12px;
+  box-shadow: var(--shadow);
+}
+
+.icon  { font-size: 22px; flex-shrink: 0; }
+.info  { flex: 1; min-width: 0; }
+.descRow { display: flex; align-items: center; gap: 6px; }
+.desc  { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; min-width: 0; }
+.meta  { font-size: 11px; color: var(--c-text-2); margin-top: 2px; }
+.userBadge {
+  font-size: 10px; font-weight: 800;
+  padding: 2px 6px; border-radius: 99px;
+  white-space: nowrap; flex-shrink: 0;
+}
+.amt   { font-size: 15px; font-weight: 700; white-space: nowrap; flex-shrink: 0; }
+.actions { display: flex; gap: 4px; flex-shrink: 0; }
+.editBtn, .deleteBtn { padding: 4px 6px; border-radius: 6px; font-size: 14px; transition: background .1s; }
+.editBtn:hover   { background: #eef2ff; }
+.deleteBtn:hover { background: #fee2e2; }
+
+/* inline edit */
+.editCard {
+  background: #fff; border: 2px solid var(--c-primary);
+  border-radius: var(--radius-sm); padding: 12px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.input {
+  padding: 9px 12px; border: 1.5px solid var(--c-border); border-radius: 8px;
+  font-size: 14px; font-family: inherit; direction: rtl; width: 100%;
+}
+.editActions { display: flex; gap: 8px; }
+.saveBtn   { flex:1; padding: 9px; background: var(--c-primary); color:#fff; border-radius:8px; font-weight:600; }
+.cancelBtn { flex:1; padding: 9px; border:1.5px solid var(--c-border); border-radius:8px; font-weight:600; color:var(--c-text-2); }

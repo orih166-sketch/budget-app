@@ -1,0 +1,81 @@
+.wrap {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(160deg, #1a2744 0%, #2c3e6b 100%);
+  padding: 20px;
+}
+
+.card {
+  background: #fff;
+  border-radius: 24px;
+  padding: 40px 28px 36px;
+  text-align: center;
+  width: 100%;
+  max-width: 360px;
+  box-shadow: 0 20px 60px rgba(26,39,68,.4);
+}
+
+.logo {
+  width: 64px; height: 64px;
+  background: linear-gradient(135deg, #1a2744, #2c3e6b);
+  border-radius: 18px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; color: #c9a84c;
+  margin: 0 auto 18px;
+  font-weight: 800;
+}
+
+.title { font-size: 26px; font-weight: 800; color: #1a2744; margin-bottom: 6px; }
+.sub   { color: #6b7280; margin-bottom: 24px; font-size: 14px; }
+
+/* mode toggle */
+.modeToggle {
+  display: flex;
+  background: #f1f5f9;
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 20px;
+  gap: 4px;
+}
+.modeBtn {
+  flex: 1; padding: 9px;
+  border-radius: 7px;
+  font-size: 14px; font-weight: 600; color: #6b7280;
+  transition: all .15s;
+}
+.modeActive { background: #fff; color: #1a2744; box-shadow: 0 1px 4px rgba(0,0,0,.1); }
+
+/* form */
+.form { display: flex; flex-direction: column; gap: 12px; }
+
+.input {
+  width: 100%; padding: 13px 14px;
+  border: 1.5px solid #e0d9d0;
+  border-radius: 12px;
+  font-size: 15px; font-family: inherit;
+  color: #1a2744; outline: none;
+  transition: border-color .15s;
+  background: #fafaf9;
+}
+.input:focus { border-color: #1a2744; background: #fff; }
+.input::placeholder { color: #9ca3af; }
+
+.error {
+  font-size: 13px; color: #c0392b;
+  background: #fdecea; border-radius: 8px;
+  padding: 8px 12px; text-align: right;
+  margin: 0;
+}
+
+.submit {
+  margin-top: 4px; padding: 14px;
+  background: #1a2744; color: #fff;
+  border-radius: 12px;
+  font-size: 15px; font-weight: 700;
+  transition: background .15s, transform .1s;
+  font-family: inherit;
+}
+.submit:hover:not(:disabled) { background: #243660; transform: translateY(-1px); }
+.submit:disabled { opacity: .6; cursor: default; }

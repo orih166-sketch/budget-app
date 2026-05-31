@@ -1,0 +1,17 @@
+.wrap { display: flex; flex-direction: column; gap: 14px; padding-bottom: 16px; }
+
+.kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.kpi  { background:#fff; border:1px solid var(--c-border); border-radius:var(--radius-sm); padding:14px; box-shadow:var(--shadow); }
+.kLabel { display:block; font-size:12px; color:var(--c-text-2); font-weight:600; margin-bottom:6px; }
+.kValue { font-size:20px; font-weight:800; }
+
+.card { background:#fff; border:1px solid var(--c-border); border-radius:var(--radius); padding:16px; box-shadow:var(--shadow); }
+.cardTitle { font-size:15px; font-weight:700; margin-bottom:14px; }
+
+.catRow   { display:flex; align-items:flex-start; gap:10px; margin-bottom:12px; font-size:20px; }
+.catInfo  { flex:1; min-width:0; }
+.catTop   { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:5px; }
+.catLabel { font-size:14px; font-weight:600; }
+.catAmt   { font-size:12px; color:var(--c-text-2); white-space:nowrap; margin-right:8px; }
+.barWrap  { height:6px; background:#f1f5f9; border-radius:99px; overflow:hidden; }
+.bar      { height:100%; border-radius:99px; transition:width .4s; }

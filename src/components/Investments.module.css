@@ -1,0 +1,64 @@
+.wrap { display: flex; flex-direction: column; gap: 14px; padding-bottom: 16px; }
+
+/* Hero */
+.hero {
+  background: var(--c-primary);
+  border-radius: var(--radius);
+  padding: 22px 20px;
+  box-shadow: var(--shadow-md);
+  display: flex; flex-direction: column; gap: 14px;
+}
+.heroTop  { display: flex; justify-content: space-between; align-items: flex-start; }
+.heroLabel { font-size: 12px; color: rgba(255,255,255,.6); font-weight: 500; margin-bottom: 3px; }
+.heroValue { font-size: 36px; font-weight: 900; line-height: 1; }
+.heroSub   { font-size: 13px; color: rgba(255,255,255,.5); margin-top: 4px; }
+.heroSmall { font-size: 20px; font-weight: 800; }
+.heroStats { display: flex; gap: 0; }
+.heroStat  { flex: 1; text-align: center; }
+.heroStat + .heroStat { border-right: 1px solid rgba(255,255,255,.1); }
+.heroStatLabel { font-size: 11px; color: rgba(255,255,255,.5); margin-bottom: 3px; }
+.heroStatVal   { font-size: 15px; font-weight: 700; }
+
+/* Card */
+.card {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: var(--shadow);
+}
+.cardHeader {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 14px;
+}
+.cardTitle { font-size: 15px; font-weight: 700; color: var(--c-text); }
+.editBtn {
+  padding: 7px 14px;
+  background: var(--c-primary); color: #fff;
+  border-radius: 10px; font-size: 13px; font-weight: 600;
+  transition: background .12s;
+}
+.editBtn:hover { background: #243660; }
+
+/* Goal */
+.goalEdit { display: flex; gap: 10px; }
+.goalInput {
+  flex: 1; padding: 10px 12px;
+  border: 1.5px solid var(--c-border); border-radius: 10px;
+  font-size: 15px; font-family: inherit; outline: none;
+  transition: border-color .15s;
+}
+.goalInput:focus { border-color: var(--c-primary); }
+.goalSave {
+  padding: 10px 18px;
+  background: var(--c-primary); color: #fff;
+  border-radius: 10px; font-size: 14px; font-weight: 700;
+  font-family: inherit;
+}
+.goalRow { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.goalLabel { font-size: 14px; font-weight: 600; color: var(--c-text); }
+.goalAmt   { font-size: 13px; color: var(--c-text-2); }
+.goalBar   { height: 8px; background: var(--c-border); border-radius: 99px; overflow: hidden; margin-bottom: 6px; }
+.goalFill  { height: 100%; border-radius: 99px; transition: width .4s; }
+.goalPct   { font-size: 12px; color: var(--c-text-2); }
+.noGoal    { font-size: 13px; color: var(--c-text-2); text-align: center; padding: 8px 0; }

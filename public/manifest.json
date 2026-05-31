@@ -1,0 +1,12 @@
+{
+  "name": "תקציב הבית",
+  "short_name": "תקציב",
+  "description": "ניהול תקציב הבית",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#6366f1",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

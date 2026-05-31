@@ -1,0 +1,144 @@
+.wrap { display: flex; flex-direction: column; gap: 16px; padding-bottom: 16px; }
+
+/* ── Cash flow card ──────────────────────────────────────────────────────── */
+.cashCard {
+  background: var(--c-primary);
+  border-radius: var(--radius);
+  padding: 20px 18px 14px;
+  box-shadow: var(--shadow-md);
+}
+.cashCardOver { background: #7f1d1d; }
+.cashTop { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; gap: 12px; }
+.cashLabel { font-size: 11px; color: rgba(255,255,255,.55); font-weight: 600; margin-bottom: 4px; letter-spacing: .04em; text-transform: uppercase; }
+.cashAmount { font-size: 44px; font-weight: 900; color: #4ade80; line-height: 1; letter-spacing: -.02em; }
+.cashAmountOver { color: #f87171; }
+.cashDaily { font-size: 12px; color: rgba(255,255,255,.5); margin-top: 6px; font-weight: 500; }
+.cashRight { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+.cashIncomeRow { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+.cashIncomeLabel { font-size: 10px; color: rgba(255,255,255,.4); font-weight: 600; text-transform: uppercase; }
+.cashIncomeVal { font-size: 17px; font-weight: 700; color: rgba(255,255,255,.85); }
+.cashEditBtn { font-size: 14px; padding: 2px 6px; border-radius: 6px; color: rgba(255,255,255,.55); margin-top: 2px; transition: background .1s; }
+.cashEditBtn:hover { background: rgba(255,255,255,.12); }
+.cashEditWrap { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
+.cashEditInput { width: 90px; padding: 6px 10px; border-radius: 8px; border: none; background: rgba(255,255,255,.15); color: #fff; font-size: 15px; font-weight: 700; text-align: center; outline: none; }
+.cashEditSave { background: rgba(255,255,255,.2); color: #fff; border-radius: 8px; padding: 6px 10px; font-size: 14px; font-weight: 700; transition: background .1s; }
+.cashEditSave:hover { background: rgba(255,255,255,.3); }
+.cashBarWrap { height: 6px; background: rgba(255,255,255,.15); border-radius: 99px; overflow: hidden; margin-bottom: 8px; }
+.cashBar { height: 100%; border-radius: 99px; transition: width .5s; }
+.cashBarOk   { background: #4ade80; }
+.cashBarWarn { background: #facc15; }
+.cashBarOver { background: #f87171; }
+.cashBarLabels { display: flex; justify-content: space-between; font-size: 11px; color: rgba(255,255,255,.4); font-weight: 500; }
+
+/* Hero card */
+.hero {
+  background: var(--c-primary);
+  border-radius: var(--radius);
+  padding: 24px 20px;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.heroTop { display: flex; justify-content: space-between; align-items: flex-start; }
+.heroGreet { font-size: 13px; color: rgba(255,255,255,.6); font-weight: 500; }
+.heroMonth { font-size: 15px; font-weight: 700; color: #fff; }
+
+.heroCenter { text-align: center; }
+.heroLabel { font-size: 12px; color: rgba(255,255,255,.6); margin-bottom: 4px; font-weight: 500; }
+.heroAmount { font-size: 38px; font-weight: 900; color: #fff; line-height: 1; }
+.heroBudget { font-size: 13px; color: rgba(255,255,255,.5); margin-top: 4px; }
+
+.heroBar { height: 6px; background: rgba(255,255,255,.15); border-radius: 99px; overflow: hidden; }
+.heroBarFill { height: 100%; border-radius: 99px; background: var(--c-gold); transition: width .5s; }
+
+.heroStats { display: flex; gap: 0; }
+.heroStat { flex: 1; text-align: center; }
+.heroStat + .heroStat { border-right: 1px solid rgba(255,255,255,.1); }
+.heroStatLabel { font-size: 11px; color: rgba(255,255,255,.5); margin-bottom: 3px; }
+.heroStatVal { font-size: 16px; font-weight: 700; }
+.heroInc { color: #4ade80; }
+.heroExp { color: #f87171; }
+
+/* KPIs */
+.kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.kpi {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-shadow: var(--shadow);
+}
+
+.kpiLabel { font-size: 11px; font-weight: 600; color: var(--c-text-2); text-transform: uppercase; letter-spacing: .05em; }
+.kpiValue { font-size: 22px; font-weight: 800; line-height: 1.1; }
+.kpiSub   { font-size: 11px; color: var(--c-text-2); }
+
+/* Generic card */
+.card {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: var(--shadow);
+}
+
+.cardTitle { font-size: 15px; font-weight: 700; color: var(--c-text); margin-bottom: 16px; }
+
+/* category rows */
+.catRow { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.catRow:last-child { margin-bottom: 0; }
+.catIconWrap {
+  width: 36px; height: 36px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0;
+}
+.catInfo { flex: 1; min-width: 0; }
+.catTop  { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+.catLabel { font-size: 14px; font-weight: 600; color: var(--c-text); }
+.catAmt   { font-size: 13px; color: var(--c-text-2); white-space: nowrap; }
+
+.bar { height: 5px; background: var(--c-border); border-radius: 99px; overflow: hidden; }
+.barFill { height: 100%; border-radius: 99px; transition: width .4s; }
+
+/* tx rows */
+.txRow { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--c-border); }
+.txRow:last-child { border-bottom: none; padding-bottom: 0; }
+.txIconWrap {
+  width: 38px; height: 38px; border-radius: 11px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0;
+  background: var(--c-bg);
+}
+.txInfo { flex: 1; min-width: 0; }
+.txDesc { display: block; font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--c-text); }
+.txDate { font-size: 12px; color: var(--c-text-2); margin-top: 2px; }
+.txAmt  { font-size: 15px; font-weight: 700; white-space: nowrap; }
+.inc { color: var(--c-green); }
+.exp { color: var(--c-red); }
+
+/* User split */
+.splitRow { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.splitCard {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+}
+.splitAvatar {
+  width: 40px; height: 40px; border-radius: 99px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 800; color: #fff;
+}
+.splitName { font-size: 14px; font-weight: 700; color: var(--c-text); }
+.splitAmt  { font-size: 22px; font-weight: 900; line-height: 1; }
+.splitSub  { font-size: 11px; color: var(--c-text-2); }
+.splitBar  { width: 100%; height: 4px; background: var(--c-border); border-radius: 99px; overflow: hidden; margin-top: 4px; }
+.splitFill { height: 100%; border-radius: 99px; transition: width .4s; }
