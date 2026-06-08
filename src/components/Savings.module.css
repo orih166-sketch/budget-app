@@ -1,0 +1,151 @@
+.wrap { display: flex; flex-direction: column; gap: 14px; padding-bottom: 16px; }
+
+/* Hero summary */
+.hero {
+  background: linear-gradient(135deg, var(--c-primary) 0%, #2c3e6b 100%);
+  border-radius: var(--radius);
+  padding: 20px;
+  color: #fff;
+}
+.heroRow { display: flex; justify-content: space-between; margin-bottom: 4px; }
+.heroLabel { font-size: 12px; opacity: .75; }
+.heroAmt { font-size: 20px; font-weight: 800; }
+.heroBarWrap { height: 8px; background: rgba(255,255,255,.25); border-radius: 99px; overflow: hidden; margin: 14px 0 8px; }
+.heroBar { height: 100%; background: var(--c-gold); border-radius: 99px; transition: width .6s cubic-bezier(.4,0,.2,1); }
+.heroPct { font-size: 12px; opacity: .8; text-align: center; }
+
+/* Header */
+.listHeader { display: flex; align-items: center; justify-content: space-between; }
+.title { font-size: 17px; font-weight: 700; }
+.addBtn {
+  padding: 8px 14px; background: var(--c-primary); color: #fff;
+  border-radius: 10px; font-size: 14px; font-weight: 600;
+}
+
+/* Empty */
+.empty { text-align: center; padding: 48px 16px; }
+.emptyIcon { font-size: 48px; display: block; margin-bottom: 12px; }
+.emptyTitle { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
+.emptySub { font-size: 14px; color: var(--c-text-2); margin-bottom: 20px; }
+.emptyBtn {
+  padding: 12px 24px; background: var(--c-primary); color: #fff;
+  border-radius: 12px; font-size: 15px; font-weight: 600;
+}
+
+/* Goal card */
+.list { display: flex; flex-direction: column; gap: 12px; }
+.card {
+  background: #fff; border: 1px solid var(--c-border);
+  border-radius: var(--radius-sm); padding: 16px;
+  box-shadow: var(--shadow);
+  transition: border-color .2s;
+}
+.cardDone { border-color: #43A047; background: #f0fdf4; }
+
+.cardTop { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.goalIcon { font-size: 28px; flex-shrink: 0; }
+.goalInfo { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.goalName { font-size: 15px; font-weight: 700; }
+
+.doneBadge {
+  display: inline-block; font-size: 12px; font-weight: 600;
+  color: #43A047; background: #dcfce7; padding: 2px 8px; border-radius: 99px;
+  width: fit-content;
+}
+.dateBadge {
+  display: inline-block; font-size: 12px; font-weight: 600;
+  color: var(--c-text-2); background: #f1f5f9; padding: 2px 8px; border-radius: 99px;
+  width: fit-content;
+}
+.dateSoon { color: #FB8C00; background: #fff3e0; }
+.dateLate { color: var(--c-red); background: var(--c-red-light); }
+
+.cardActions { display: flex; gap: 6px; }
+.actBtn {
+  width: 30px; height: 30px; border-radius: 8px; background: #f8fafc;
+  font-size: 14px; color: var(--c-text-2);
+  display: flex; align-items: center; justify-content: center;
+  transition: background .1s, color .1s;
+}
+.actBtn:hover { background: #f1f5f9; color: var(--c-text); }
+
+/* Progress bar */
+.barWrap { height: 10px; background: #f1f5f9; border-radius: 99px; overflow: hidden; margin-bottom: 12px; }
+.bar { height: 100%; border-radius: 99px; transition: width .5s cubic-bezier(.4,0,.2,1); }
+
+.cardBottom { display: flex; align-items: center; justify-content: space-between; }
+.amtGroup { display: flex; align-items: baseline; gap: 6px; }
+.amtCurrent { font-size: 16px; font-weight: 800; }
+.amtSep { font-size: 12px; color: var(--c-text-2); }
+.amtTarget { font-size: 14px; font-weight: 600; color: var(--c-text-2); }
+.rightGroup { display: flex; align-items: center; gap: 8px; }
+.pctLabel { font-size: 13px; font-weight: 700; color: var(--c-text-2); }
+
+.depositBtn {
+  padding: 6px 12px; color: #fff; border-radius: 8px;
+  font-size: 13px; font-weight: 700;
+}
+
+.remaining { font-size: 12px; color: var(--c-text-2); margin-top: 8px; }
+
+/* Loading */
+.loading { padding: 48px; text-align: center; color: var(--c-text-2); }
+
+/* Modal */
+.modalBg {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(0,0,0,.45);
+  display: flex; align-items: flex-end;
+}
+.modal {
+  width: 100%; max-width: 480px; margin: 0 auto;
+  background: #fff; border-radius: 24px 24px 0 0;
+  padding: 24px 20px calc(20px + env(safe-area-inset-bottom));
+  max-height: 90dvh; overflow-y: auto;
+  animation: slideUp .28s cubic-bezier(0.32, 0.72, 0, 1);
+}
+@keyframes slideUp { from { transform: translateY(100%) } to { transform: translateY(0) } }
+
+.modalHeader { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.modalHeader h3 { font-size: 17px; font-weight: 700; }
+.closeBtn { font-size: 18px; color: var(--c-text-2); width: 32px; height: 32px; border-radius: 8px; }
+.closeBtn:hover { background: #f1f5f9; }
+
+.form { display: flex; flex-direction: column; gap: 12px; }
+.label { font-size: 13px; font-weight: 600; color: var(--c-text-2); margin-bottom: -6px; }
+.input {
+  padding: 12px 14px; border: 1.5px solid var(--c-border);
+  border-radius: 10px; font-size: 15px; font-family: inherit;
+  background: #fafafa; width: 100%;
+}
+.input:focus { border-color: var(--c-primary); background: #fff; outline: none; }
+
+.row2 { display: flex; gap: 10px; }
+.col { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+
+/* Icon grid */
+.iconGrid { display: flex; flex-wrap: wrap; gap: 8px; }
+.iconBtn {
+  width: 42px; height: 42px; font-size: 22px;
+  border-radius: 10px; border: 2px solid transparent; background: #f8fafc;
+  display: flex; align-items: center; justify-content: center;
+  transition: border-color .1s, background .1s;
+}
+.iconActive { border-color: var(--c-primary); background: var(--c-primary-light); }
+
+/* Color grid */
+.colorGrid { display: flex; flex-wrap: wrap; gap: 10px; }
+.colorDot {
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 3px solid transparent; transition: transform .1s, border-color .1s;
+}
+.colorDot:hover { transform: scale(1.15); }
+.colorActive { border-color: #fff; box-shadow: 0 0 0 3px var(--c-primary); transform: scale(1.15); }
+
+.saveBtn {
+  margin-top: 8px; padding: 14px; background: var(--c-primary); color: #fff;
+  border-radius: 12px; font-size: 16px; font-weight: 700;
+}
+
+/* Deposit modal */
+.depositSub { font-size: 14px; color: var(--c-text-2); margin-top: -4px; }

@@ -1,15 +1,14 @@
 import { useState } from 'react'
-import { firebaseConfigured } from './firebase.js'
 import Login from './components/Login.jsx'
 import Dashboard from './components/Dashboard.jsx'
 import Transactions from './components/Transactions.jsx'
 import Budget from './components/Budget.jsx'
 import Reports from './components/Reports.jsx'
-import Investments from './components/Investments.jsx'
+import Savings from './components/Savings.jsx'
 import AddTransaction from './components/AddTransaction.jsx'
 import MonthNav from './components/MonthNav.jsx'
 import { useTransactions } from './hooks/useTransactions.js'
-import { useInvestments } from './hooks/useInvestments.js'
+import { useSavingsGoals } from './hooks/useSavingsGoals.js'
 import { useAuth } from './hooks/useAuth.js'
 import { USERS, CURRENT_MONTH, CURRENT_YEAR } from './data.js'
 import styles from './App.module.css'
@@ -18,17 +17,12 @@ const TABS = [
   { id: 'dashboard',    label: 'בית',        icon: '⌂' },
   { id: 'transactions', label: 'עסקאות',     icon: '↕' },
   { id: 'budget',       label: 'תקציב',      icon: '◎' },
-  { id: 'investments',  label: 'השקעות',     icon: '▲' },
+  { id: 'savings',      label: 'חיסכון',     icon: '🎯' },
   { id: 'reports',      label: 'דוחות',      icon: '▦' },
 ]
 
 export default function App() {
-  const { user: firebaseUser, login, register, logout } = useAuth()
-
-  // Legacy local user (used when Firebase not configured)
-  const [localUser, setLocalUser] = useState(null)
-
-  const user = firebaseConfigured ? firebaseUser : localUser
+  const { user, login, register, logout, sendResetCode, verifyResetCode } = useAuth()
 
   const [tab, setTab]           = useState('dashboard')
   const [sideOpen, setSide]     = useState(false)
@@ -41,7 +35,7 @@ export default function App() {
 
   const { transactions, budget, expectedIncome, setExpectedIncome, addTransaction, updateTransaction, deleteTransaction, updateBudget } =
     useTransactions()
-  const { investments, addInvestment, updateInvestment, deleteInvestment } = useInvestments()
+  const { goals, loading: goalsLoading, addGoal, updateGoal, depositToGoal, deleteGoal } = useSavingsGoals()
 
   function closeSide() {
     setClosing(true)
@@ -54,12 +48,11 @@ export default function App() {
   }
 
   function handleLogout() {
-    if (firebaseConfigured) logout()
-    else setLocalUser(null)
+    logout()
     closeSide()
   }
 
-  // Firebase initializing
+  // Supabase auth initializing
   if (user === undefined) {
     return (
       <div className={styles.loading}>
@@ -70,27 +63,8 @@ export default function App() {
 
   // Not logged in
   if (!user) {
-    if (firebaseConfigured) {
-      return <Login onLogin={login} onRegister={register} />
-    }
-    // Legacy user-picker when Firebase not set up
-    return (
-      <div className={styles.legacyWrap}>
-        <div className={styles.legacyCard}>
-          <div className={styles.legacyLogo}>₪</div>
-          <h1 className={styles.legacyTitle}>תקציב הבית</h1>
-          <p className={styles.legacySub}>בחר משתמש להמשך</p>
-          <div className={styles.legacyUsers}>
-            {USERS.map(u => (
-              <button key={u.id} className={styles.legacyBtn} onClick={() => setLocalUser(u)}>
-                <span className={styles.legacyAvatar}>{u.avatar}</span>
-                <span className={styles.legacyName}>{u.name}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-    )
+    return <Login onLogin={login} onRegister={register}
+      onSendResetCode={sendResetCode} onVerifyCode={verifyResetCode} />
   }
 
   return (
@@ -103,7 +77,7 @@ export default function App() {
       </header>
 
       {/* Month navigator */}
-      {tab !== 'reports' && tab !== 'investments' && (
+      {tab !== 'reports' && tab !== 'investments' && tab !== 'savings' && (
         <MonthNav
           month={selectedMonth} year={selectedYear} onChange={handleMonthChange}
           selectedUser={selectedUser} onUserChange={setSelectedUser}
@@ -139,7 +113,7 @@ export default function App() {
         {tab === 'dashboard'    && <Dashboard transactions={transactions} budget={budget} user={user} selectedMonth={selectedMonth} selectedYear={selectedYear} selectedUser={selectedUser} expectedIncome={expectedIncome} onSetExpectedIncome={setExpectedIncome} />}
         {tab === 'transactions' && <Transactions transactions={transactions} onDelete={deleteTransaction} onUpdate={updateTransaction} selectedMonth={selectedMonth} selectedYear={selectedYear} onMonthChange={handleMonthChange} selectedUser={selectedUser} />}
         {tab === 'budget'       && <Budget transactions={transactions} budget={budget} onUpdateBudget={updateBudget} selectedMonth={selectedMonth} selectedYear={selectedYear} />}
-        {tab === 'investments'  && <Investments transactions={transactions} />}
+        {tab === 'savings'      && <Savings goals={goals} loading={goalsLoading} onAdd={addGoal} onUpdate={updateGoal} onDeposit={depositToGoal} onDelete={deleteGoal} />}
         {tab === 'reports'      && <Reports transactions={transactions} />}
       </main>
 

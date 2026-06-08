@@ -79,3 +79,64 @@
 }
 .submit:hover:not(:disabled) { background: #243660; transform: translateY(-1px); }
 .submit:disabled { opacity: .6; cursor: default; }
+
+/* Step indicators */
+.steps {
+  display: flex; justify-content: center; align-items: center;
+  gap: 12px; margin-bottom: 20px;
+}
+.step {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700;
+  background: #f1f5f9; color: #9ca3af;
+  border: 2px solid #e5e7eb;
+  transition: all .2s;
+}
+.stepActive { background: #1a2744; color: #fff; border-color: #1a2744; }
+.stepDone { background: #c9a84c; color: #fff; border-color: #c9a84c; }
+
+/* Code input */
+.codeSub { font-size: 13px; color: #6b7280; text-align: center; margin: -4px 0 0; }
+.codeInput {
+  text-align: center; font-size: 28px; font-weight: 700; letter-spacing: 10px;
+  padding: 14px 10px !important;
+}
+
+.resendBtn {
+  margin-top: 8px;
+  font-size: 12px; color: #9ca3af;
+  text-decoration: underline; text-underline-offset: 3px;
+}
+.resendBtn:hover { color: #6b7280; }
+
+/* Success / done screen */
+.successIcon {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: #dcfce7; color: #166534;
+  font-size: 30px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 18px;
+}
+.doneSub {
+  font-size: 15px; color: #374151; line-height: 1.6;
+  margin-bottom: 12px;
+}
+.doneNote { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+
+.success {
+  font-size: 13px; color: #166534;
+  background: #dcfce7; border-radius: 8px;
+  padding: 8px 12px; text-align: right;
+  margin: 0;
+}
+
+.forgotBtn {
+  margin-top: 16px;
+  font-size: 13px; font-weight: 600;
+  color: #6b7280;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color .15s;
+}
+.forgotBtn:hover { color: #1a2744; }
