@@ -1,4 +1,4 @@
-const CACHE_NAME = 'budget-app-v1'
+const CACHE_NAME = 'budget-app-v2'
 const urlsToCache = [
   '/',
   '/index.html',
@@ -31,7 +31,17 @@ self.addEventListener('activate', event => {
 
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return
-  
+
+  // Always network-first for HTML so new deployments are picked up immediately
+  const url = new URL(event.request.url)
+  const isHtml = event.request.headers.get('accept')?.includes('text/html') || url.pathname === '/' || url.pathname.endsWith('.html')
+  if (isHtml) {
+    event.respondWith(
+      fetch(event.request).catch(() => caches.match('/'))
+    )
+    return
+  }
+
   event.respondWith(
     caches.match(event.request).then(response => {
       if (response) return response
