@@ -26,8 +26,6 @@ export function HouseholdProvider({ user, children }) {
         .eq('user_id', user.uid)
         .single()
 
-      console.log('[HH] loadHousehold result:', JSON.stringify({ data, error }))
-
       if (error || !data?.households) {
         // No household yet — create one now (handles users who registered before the DB trigger)
         await bootstrapHousehold()
