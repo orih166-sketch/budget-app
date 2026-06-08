@@ -1,12 +1,47 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import { CATEGORIES, MONTHS, USERS } from '../data.js'
+import { useCategoryBudgets } from '../hooks/useCategoryBudgets.js'
+import AlertBanner from './AlertBanner.jsx'
+import Insights from './Insights.jsx'
 import styles from './Dashboard.module.css'
 
 const fmt = n => '₪' + n.toLocaleString('he-IL', { maximumFractionDigits: 0 })
 const cat = id => [...CATEGORIES.expenses, ...CATEGORIES.income].find(c => c.id === id)
 
 export default function Dashboard({ transactions, budget, user, selectedMonth, selectedYear, selectedUser = 'family', expectedIncome = 1690, onSetExpectedIncome }) {
+  const [lastSync, setLastSync] = useState(new Date())
+  const { budgets: categoryBudgets } = useCategoryBudgets()
+
+  useEffect(() => {
+    setLastSync(new Date())
+  }, [transactions])
+
+  const alerts = useMemo(() => {
+    const monthTx = transactions.filter(t => {
+      const d = new Date(t.date)
+      return d.getMonth() === selectedMonth && d.getFullYear() === selectedYear && t.type === 'expense'
+    })
+
+    const actual = {}
+    monthTx.forEach(t => { actual[t.category] = (actual[t.category] || 0) + t.amount })
+
+    const result = []
+    Object.entries(actual).forEach(([catId, spent]) => {
+      const budgeted = categoryBudgets[catId] || budget[catId] || 0
+      if (budgeted > 0 && spent > budgeted) {
+        const overage = spent - budgeted
+        const cat = [...CATEGORIES.expenses, ...CATEGORIES.income].find(c => c.id === catId)
+        result.push({
+          id: catId,
+          severity: spent > budgeted * 1.2 ? 'critical' : 'warning',
+          message: `${cat?.label || catId}: חרגת ב-${fmt(overage)}`
+        })
+      }
+    })
+    return result
+  }, [transactions, selectedMonth, selectedYear, categoryBudgets, budget])
+
   const monthTx = useMemo(() =>
     transactions.filter(t => {
       const d = new Date(t.date)
@@ -96,6 +131,16 @@ export default function Dashboard({ transactions, budget, user, selectedMonth, s
 
   return (
     <div className={styles.wrap}>
+      {/* Sync indicator */}
+      <div className={styles.syncBar}>
+        🔄 עודכן לאחרונה: {lastSync.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })}
+      </div>
+
+      {/* Alerts */}
+      <AlertBanner alerts={alerts} />
+
+      {/* Insights */}
+      <Insights transactions={transactions} selectedMonth={selectedMonth} selectedYear={selectedYear} />
 
       {/* ── Cash flow card ── */}
       <div className={`${styles.cashCard} ${isOverBudget ? styles.cashCardOver : ''}`}>

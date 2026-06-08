@@ -1,10 +1,12 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { CATEGORIES, MONTHS } from '../data.js'
+import { useCategoryBudgets } from '../hooks/useCategoryBudgets.js'
 import styles from './Budget.module.css'
 
 const fmt = n => '₪' + n.toLocaleString('he-IL', { maximumFractionDigits: 0 })
 
 export default function Budget({ transactions, budget, onUpdateBudget, selectedMonth, selectedYear }) {
+  const { budgets: categoryBudgets, setBudget } = useCategoryBudgets()
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState({ ...budget })
 
@@ -25,7 +27,10 @@ export default function Budget({ transactions, budget, onUpdateBudget, selectedM
 
   function save() {
     const clean = {}
-    Object.entries(draft).forEach(([k, v]) => { clean[k] = parseFloat(v) || 0 })
+    Object.entries(draft).forEach(([k, v]) => {
+      clean[k] = parseFloat(v) || 0
+      setBudget(k, clean[k])
+    })
     onUpdateBudget(clean)
     setEditing(false)
   }

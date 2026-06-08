@@ -2,13 +2,36 @@
 
 .filters { display: flex; flex-direction: column; gap: 8px; }
 
+.searchRow {
+  display: flex; gap: 8px; align-items: center;
+}
+
 .search {
-  width: 100%; padding: 11px 14px;
+  flex: 1; padding: 11px 14px;
   border: 1.5px solid var(--c-border); border-radius: var(--radius-sm);
   font-size: 14px; font-family: inherit; outline: none;
   background: #fff; direction: rtl;
 }
 .search:focus { border-color: var(--c-primary); }
+
+.exportBtn {
+  padding: 9px 11px; border: 1.5px solid var(--c-border); border-radius: var(--radius-sm);
+  background: #fff; font-size: 16px; cursor: pointer; transition: all .2s;
+}
+.exportBtn:hover { background: #f9fafb; border-color: var(--c-primary); }
+
+.periodRow {
+  display: flex; gap: 6px;
+}
+
+.periodBtn {
+  flex: 1; padding: 8px 10px;
+  border: 1.5px solid var(--c-border); border-radius: var(--radius-sm);
+  background: #fff; color: var(--c-text-2); font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all .2s;
+}
+.periodBtn:hover { border-color: var(--c-primary); color: var(--c-primary); }
+.periodActive { background: var(--c-primary); color: #fff; border-color: var(--c-primary); }
 
 .filterRow { display: flex; gap: 8px; }
 

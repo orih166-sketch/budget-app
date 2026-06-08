@@ -7,24 +7,78 @@ const allCats = [...CATEGORIES.expenses, ...CATEGORIES.income]
 const cat = id => allCats.find(c => c.id === id)
 const userInfo = id => USERS.find(u => u.id === id)
 
+function getPeriodDates(period, year) {
+  const today = new Date()
+  const start = new Date(year, today.getMonth(), today.getDate())
+
+  if (period === 'today') return [start, start]
+  if (period === 'week') {
+    const weekStart = new Date(start)
+    weekStart.setDate(start.getDate() - start.getDay())
+    return [weekStart, start]
+  }
+  if (period === 'month') {
+    return [new Date(year, today.getMonth(), 1), start]
+  }
+  if (period === 'year') {
+    return [new Date(year, 0, 1), start]
+  }
+  return null
+}
+
+function exportToCSV(transactions) {
+  const headers = ['תאריך', 'תיאור', 'קטגוריה', 'סכום', 'סוג']
+  const rows = transactions.map(t => [
+    t.date,
+    t.desc,
+    cat(t.category)?.label || t.category,
+    t.amount,
+    t.type === 'income' ? 'הכנסה' : 'הוצאה'
+  ])
+
+  const csv = [headers, ...rows]
+    .map(row => row.map(cell => `"${cell}"`).join(','))
+    .join('\n')
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+  const link = document.createElement('a')
+  link.href = URL.createObjectURL(blob)
+  link.download = `transactions-${new Date().toISOString().split('T')[0]}.csv`
+  link.click()
+}
+
 export default function Transactions({ transactions, onDelete, onUpdate, selectedMonth, selectedYear, onMonthChange, selectedUser = 'family' }) {
   const [search, setSearch]   = useState('')
   const [filterCat, setCat]   = useState('')
   const [filterType, setType] = useState('')
+  const [periodFilter, setPeriod] = useState('')
   const [editId, setEditId]   = useState(null)
   const [editForm, setForm]   = useState({})
 
   const filtered = useMemo(() => {
-    return transactions.filter(t => {
-      const d = new Date(t.date)
-      if (d.getMonth() !== selectedMonth || d.getFullYear() !== selectedYear) return false
+    let result = transactions
+
+    if (periodFilter) {
+      const [start, end] = getPeriodDates(periodFilter, selectedYear)
+      result = result.filter(t => {
+        const d = new Date(t.date)
+        return d >= start && d <= end
+      })
+    } else {
+      result = result.filter(t => {
+        const d = new Date(t.date)
+        return d.getMonth() === selectedMonth && d.getFullYear() === selectedYear
+      })
+    }
+
+    return result.filter(t => {
       if (selectedUser !== 'family' && t.user !== selectedUser) return false
       if (filterType && t.type !== filterType) return false
       if (filterCat  && t.category !== filterCat) return false
-      if (search && !t.desc.includes(search)) return false
+      if (search && !t.desc.toLowerCase().includes(search.toLowerCase())) return false
       return true
     }).sort((a,b) => b.date.localeCompare(a.date))
-  }, [transactions, selectedMonth, selectedYear, selectedUser, filterType, filterCat, search])
+  }, [transactions, selectedMonth, selectedYear, selectedUser, filterType, filterCat, search, periodFilter])
 
   const totalIncome   = filtered.filter(t=>t.type==='income').reduce((a,t)=>a+t.amount,0)
   const totalExpenses = filtered.filter(t=>t.type==='expense').reduce((a,t)=>a+t.amount,0)
@@ -42,12 +96,26 @@ export default function Transactions({ transactions, onDelete, onUpdate, selecte
   return (
     <div className={styles.wrap}>
       <div className={styles.filters}>
-        <input className={styles.search} placeholder="חיפוש..." value={search} onChange={e=>setSearch(e.target.value)} />
+        <div className={styles.searchRow}>
+          <input className={styles.search} placeholder="חיפוש..." value={search} onChange={e=>setSearch(e.target.value)} />
+          <button className={styles.exportBtn} onClick={() => exportToCSV(filtered)} title="הורד CSV">📥</button>
+        </div>
+        <div className={styles.periodRow}>
+          {['today', 'week', 'month', 'year'].map(p => (
+            <button
+              key={p}
+              className={`${styles.periodBtn} ${periodFilter === p ? styles.periodActive : ''}`}
+              onClick={() => setPeriod(periodFilter === p ? '' : p)}
+            >
+              {p === 'today' ? 'היום' : p === 'week' ? 'שבוע' : p === 'month' ? 'חודש' : 'שנה'}
+            </button>
+          ))}
+        </div>
         <div className={styles.filterRow}>
-          <select className={styles.sel} value={selectedMonth} onChange={e => onMonthChange(+e.target.value, selectedYear)}>
+          <select className={styles.sel} value={selectedMonth} onChange={e => { setPeriod(''); onMonthChange(+e.target.value, selectedYear) }}>
             {MONTHS.map((m,i) => <option key={i} value={i}>{m}</option>)}
           </select>
-          <select className={styles.sel} value={selectedYear} onChange={e => onMonthChange(selectedMonth, +e.target.value)}>
+          <select className={styles.sel} value={selectedYear} onChange={e => { setPeriod(''); onMonthChange(selectedMonth, +e.target.value) }}>
             {[2024,2025,2026,2027].map(y => <option key={y}>{y}</option>)}
           </select>
           <select className={styles.sel} value={filterType} onChange={e=>setType(e.target.value)}>

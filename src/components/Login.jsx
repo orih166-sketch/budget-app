@@ -1,13 +1,12 @@
 import { useState } from 'react'
 import styles from './Login.module.css'
 
-export default function Login({ onLogin, onRegister, onSendResetCode, onVerifyCode }) {
+export default function Login({ onLogin, onRegister, onSendResetCode }) {
   const [mode, setMode]       = useState('login')
   const [name, setName]       = useState('')
   const [email, setEmail]     = useState('')
   const [pass, setPass]       = useState('')
-  const [code, setCode]       = useState('')
-  const [error, setError]     = useState('')
+const [error, setError]     = useState('')
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -25,10 +24,6 @@ export default function Login({ onLogin, onRegister, onSendResetCode, onVerifyCo
         await onRegister(email, pass, name.trim())
       } else if (mode === 'reset-email') {
         await onSendResetCode(email)
-        switchMode('reset-code')
-      } else if (mode === 'reset-code') {
-        if (code.length !== 6) { setError('הקוד חייב להיות 6 ספרות'); return }
-        await onVerifyCode(email, code)
         switchMode('reset-done')
       }
     } catch (err) {
@@ -47,10 +42,10 @@ export default function Login({ onLogin, onRegister, onSendResetCode, onVerifyCo
           <div className={styles.successIcon}>✓</div>
           <h1 className={styles.title}>הזהות אומתה!</h1>
           <p className={styles.doneSub}>
-            שלחנו לכתובת <strong dir="ltr">{email}</strong> לינק לשינוי הסיסמה.<br/>
-            לחץ על הלינק במייל כדי לקבוע סיסמה חדשה.
+            שלחנו לכתובת <strong dir="ltr">{email}</strong> קישור לאיפוס הסיסמה.<br/>
+            לחץ על הקישור במייל כדי לקבוע סיסמה חדשה.
           </p>
-          <p className={styles.doneNote}>לא קיבלת? בדוק ספאם</p>
+          <p className={styles.doneNote}>לא קיבלת? בדוק ספאם או נסה שוב</p>
           <button className={styles.submit} onClick={() => switchMode('login')}>
             חזרה לכניסה
           </button>
@@ -82,15 +77,6 @@ export default function Login({ onLogin, onRegister, onSendResetCode, onVerifyCo
           </div>
         )}
 
-        {isReset && (
-          <div className={styles.steps}>
-            {['reset-email','reset-code'].map((s, i) => (
-              <div key={s} className={`${styles.step} ${mode===s ? styles.stepActive : ''} ${stepDone(mode, s) ? styles.stepDone : ''}`}>
-                {stepDone(mode, s) ? '✓' : i + 1}
-              </div>
-            ))}
-          </div>
-        )}
 
         <form className={styles.form} onSubmit={submit}>
           {mode === 'register' && (
@@ -112,26 +98,15 @@ export default function Login({ onLogin, onRegister, onSendResetCode, onVerifyCo
               required dir="ltr" />
           )}
 
-          {mode === 'reset-code' && (
-            <>
-              <p className={styles.codeSub}>שלחנו קוד 6 ספרות אל <strong dir="ltr">{email}</strong></p>
-              <input className={`${styles.input} ${styles.codeInput}`}
-                type="text" inputMode="numeric" pattern="[0-9]{6}"
-                placeholder="000000" maxLength={6}
-                value={code} onChange={e => setCode(e.target.value.replace(/\D/g, ''))}
-                autoComplete="one-time-code" dir="ltr" autoFocus required />
-            </>
-          )}
 
-          {error && <p className={styles.error}>{error}</p>}
+{error && <p className={styles.error}>{error}</p>}
           {success && <p className={styles.success}>{success}</p>}
 
           <button className={styles.submit} type="submit" disabled={loading}>
             {loading ? '...'
               : mode === 'login' ? 'כניסה'
               : mode === 'register' ? 'יצירת חשבון'
-              : mode === 'reset-email' ? 'שלח קוד למייל'
-              : 'אמת קוד'}
+              : 'שלח קישור לאיפוס'}
           </button>
         </form>
 
@@ -145,23 +120,11 @@ export default function Login({ onLogin, onRegister, onSendResetCode, onVerifyCo
             ← חזרה לכניסה
           </button>
         )}
-        {mode === 'reset-code' && (
-          <button type="button" className={styles.resendBtn}
-            onClick={async () => {
-              try { await onSendResetCode(email); setSuccess('קוד חדש נשלח') }
-              catch { setError('שגיאה בשליחה') }
-            }}>
-            לא קיבלתי — שלח שוב
-          </button>
-        )}
       </div>
     </div>
   )
 }
 
-function stepDone(current, step) {
-  return ['reset-email','reset-code'].indexOf(current) > ['reset-email','reset-code'].indexOf(step)
-}
 
 function hebrewError(msg = '') {
   if (msg.includes('Invalid login credentials') || msg.includes('invalid_credentials')) return 'מייל או סיסמה שגויים'

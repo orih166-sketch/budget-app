@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase.js'
-
-const FAMILY_ID = '2ccdb3f5-9750-40a8-ae01-e00adbadd32f'
+import { useHousehold } from '../context/HouseholdContext.jsx'
 
 function rowToGoal(row) {
   return {
@@ -16,33 +15,37 @@ function rowToGoal(row) {
 }
 
 export function useSavingsGoals() {
+  const { household } = useHousehold()
   const [goals, setGoals] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    async function fetch() {
-      setLoading(true)
-      const { data, error } = await supabase
-        .from('savings_goals')
-        .select('*')
-        .eq('family_id', FAMILY_ID)
-        .order('created_at', { ascending: true })
-      if (error) console.error('[Supabase] savings_goals fetch:', error)
-      else setGoals(data.map(rowToGoal))
-      setLoading(false)
-    }
-    fetch()
-  }, [])
+    if (!household) return
+    loadGoals()
+  }, [household?.id])
+
+  async function loadGoals() {
+    setLoading(true)
+    const { data, error } = await supabase
+      .from('savings_goals')
+      .select('*')
+      .order('created_at', { ascending: true })
+    // RLS auto-filters to this household
+
+    if (error) console.error('[Supabase] savings_goals:', error)
+    else setGoals(data.map(rowToGoal))
+    setLoading(false)
+  }
 
   async function addGoal(goal) {
+    if (!household) return
     const tempId = 'tmp_' + Date.now()
-    const temp = { ...goal, id: tempId }
-    setGoals(prev => [...prev, temp])
+    setGoals(prev => [...prev, { ...goal, id: tempId }])
 
     const { data, error } = await supabase
       .from('savings_goals')
       .insert({
-        family_id:      FAMILY_ID,
+        household_id:   household.id,
         name:           goal.name,
         icon:           goal.icon,
         target_amount:  goal.targetAmount,
@@ -62,7 +65,7 @@ export function useSavingsGoals() {
   }
 
   async function updateGoal(id, changes) {
-    const prev = goals
+    const snap = goals
     setGoals(p => p.map(g => g.id === id ? { ...g, ...changes } : g))
 
     const patch = {}
@@ -73,15 +76,8 @@ export function useSavingsGoals() {
     if (changes.targetDate    !== undefined) patch.target_date    = changes.targetDate || null
     if (changes.color         !== undefined) patch.color          = changes.color
 
-    const { error } = await supabase
-      .from('savings_goals')
-      .update(patch)
-      .eq('id', id)
-
-    if (error) {
-      console.error('[Supabase] updateGoal:', error)
-      setGoals(prev)
-    }
+    const { error } = await supabase.from('savings_goals').update(patch).eq('id', id)
+    if (error) { console.error('[Supabase] updateGoal:', error); setGoals(snap) }
   }
 
   async function depositToGoal(id, amount) {
@@ -92,18 +88,10 @@ export function useSavingsGoals() {
   }
 
   async function deleteGoal(id) {
-    const prev = goals
+    const snap = goals
     setGoals(p => p.filter(g => g.id !== id))
-
-    const { error } = await supabase
-      .from('savings_goals')
-      .delete()
-      .eq('id', id)
-
-    if (error) {
-      console.error('[Supabase] deleteGoal:', error)
-      setGoals(prev)
-    }
+    const { error } = await supabase.from('savings_goals').delete().eq('id', id)
+    if (error) { console.error('[Supabase] deleteGoal:', error); setGoals(snap) }
   }
 
   return { goals, loading, addGoal, updateGoal, depositToGoal, deleteGoal }

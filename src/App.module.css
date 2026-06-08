@@ -13,6 +13,38 @@
 }
 @keyframes spin { to { transform: rotate(360deg) } }
 
+/* Password recovery screen */
+.pwdRecoveryWrap {
+  min-height: 100dvh;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(160deg, #1a2744 0%, #2c3e6b 100%);
+  padding: 20px;
+}
+.pwdRecoveryCard {
+  background: #fff;
+  border-radius: 20px;
+  padding: 32px 24px;
+  width: 100%;
+  max-width: 380px;
+  text-align: center;
+}
+.logo { font-size: 48px; margin-bottom: 8px; }
+.pwdRecoveryTitle { font-size: 20px; font-weight: 700; color: #1a2744; margin: 0 0 20px; }
+.pwdRecoveryForm { display: flex; flex-direction: column; gap: 12px; }
+.pwdRecoveryInput {
+  width: 100%; padding: 12px 14px;
+  border: 1.5px solid #e5e7eb; border-radius: 12px;
+  font-size: 15px; outline: none; box-sizing: border-box;
+}
+.pwdRecoveryInput:focus { border-color: #6366f1; }
+.pwdError { color: #dc2626; font-size: 13px; margin: 0; }
+.pwdRecoveryBtn {
+  padding: 13px; background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #fff; border: none; border-radius: 12px;
+  font-size: 15px; font-weight: 600; cursor: pointer;
+}
+.pwdRecoveryBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+
 /* Legacy login (when Firebase not configured) */
 .legacyWrap {
   min-height: 100dvh; display: flex; align-items: center; justify-content: center;
@@ -148,13 +180,12 @@
 .fab {
   position: fixed;
   bottom: calc(68px + env(safe-area-inset-bottom, 0px));
-  right: 0; left: 0;
-  margin: 0 auto;
-  width: 56px; height: 56px;
+  left: 16px;
+  width: 45px; height: 45px;
   background: var(--c-gold); color: var(--c-primary);
-  border-radius: 50%; font-size: 28px;
+  border-radius: 50%; font-size: 24px;
   display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 4px 16px rgba(201,168,76,.5);
+  box-shadow: 0 4px 12px rgba(201,168,76,.4);
   z-index: 90;
   transition: transform .15s, box-shadow .15s;
   font-weight: 700;
