@@ -135,9 +135,10 @@ function DepositModal({ goal, onDeposit, onClose }) {
 }
 
 export default function Savings({ goals, loading, onAdd, onUpdate, onDeposit, onDelete }) {
-  const [addOpen,     setAddOpen]     = useState(false)
-  const [editGoal,    setEditGoal]    = useState(null)
-  const [depositGoal, setDepositGoal] = useState(null)
+  const [addOpen,       setAddOpen]       = useState(false)
+  const [editGoal,      setEditGoal]      = useState(null)
+  const [depositGoal,   setDepositGoal]   = useState(null)
+  const [deleteConfirm, setDeleteConfirm] = useState(null)
 
   const totalTarget  = goals.reduce((a, g) => a + g.targetAmount,  0)
   const totalCurrent = goals.reduce((a, g) => a + g.currentAmount, 0)
@@ -206,7 +207,7 @@ export default function Savings({ goals, loading, onAdd, onUpdate, onDeposit, on
                 </div>
                 <div className={styles.cardActions}>
                   <button className={styles.actBtn} onClick={() => setEditGoal(g)} title="ערוך">✎</button>
-                  <button className={styles.actBtn} onClick={() => onDelete(g.id)} title="מחק">✕</button>
+                  <button className={styles.actBtn} onClick={() => setDeleteConfirm(g.id)} title="מחק">✕</button>
                 </div>
               </div>
 
@@ -235,6 +236,16 @@ export default function Savings({ goals, loading, onAdd, onUpdate, onDeposit, on
 
               {!done && (
                 <p className={styles.remaining}>נשאר לצבור: {fmt(g.targetAmount - g.currentAmount)}</p>
+              )}
+
+              {deleteConfirm === g.id && (
+                <div className={styles.deleteConfirm}>
+                  <span className={styles.deleteMsg}>למחוק את "{g.name}"?</span>
+                  <div className={styles.deleteActions}>
+                    <button className={styles.deleteCancelBtn} onClick={() => setDeleteConfirm(null)}>ביטול</button>
+                    <button className={styles.deleteOkBtn} onClick={() => { onDelete(g.id); setDeleteConfirm(null) }}>מחק</button>
+                  </div>
+                </div>
               )}
             </div>
           )

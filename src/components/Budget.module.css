@@ -5,10 +5,17 @@
 .title { font-size: 17px; font-weight: 700; }
 .sub   { font-size: 13px; color: var(--c-text-2); margin-top: 4px; }
 
+.headerBtns { display: flex; gap: 8px; flex-shrink: 0; }
+
 .editBtn {
   padding: 9px 16px; background: var(--c-primary); color: #fff;
   border-radius: 10px; font-size: 14px; font-weight: 600; white-space: nowrap;
-  flex-shrink: 0;
+}
+
+.cancelBtn {
+  padding: 9px 16px; background: #fff; color: var(--c-text);
+  border: 1.5px solid var(--c-border); border-radius: 10px;
+  font-size: 14px; font-weight: 600; white-space: nowrap;
 }
 
 .list { display: flex; flex-direction: column; gap: 10px; }

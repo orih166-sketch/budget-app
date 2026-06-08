@@ -35,6 +35,11 @@ export default function Budget({ transactions, budget, onUpdateBudget, selectedM
     setEditing(false)
   }
 
+  function cancelEdit() {
+    setDraft({ ...budget })
+    setEditing(false)
+  }
+
   return (
     <div className={styles.wrap}>
       <div className={styles.header}>
@@ -42,9 +47,14 @@ export default function Budget({ transactions, budget, onUpdateBudget, selectedM
           <h2 className={styles.title}>תכנון תקציב — {MONTHS[selectedMonth]} {selectedYear}</h2>
           <p className={styles.sub}>מתוכנן: {fmt(totalBudget)} | בפועל: {fmt(totalActual)}</p>
         </div>
-        <button className={styles.editBtn} onClick={() => editing ? save() : setEditing(true)}>
-          {editing ? 'שמור' : 'ערוך'}
-        </button>
+        <div className={styles.headerBtns}>
+          {editing && (
+            <button className={styles.cancelBtn} onClick={cancelEdit}>ביטול</button>
+          )}
+          <button className={styles.editBtn} onClick={() => editing ? save() : setEditing(true)}>
+            {editing ? 'שמור' : 'ערוך'}
+          </button>
+        </div>
       </div>
 
       <div className={styles.list}>

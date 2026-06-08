@@ -149,3 +149,20 @@
 
 /* Deposit modal */
 .depositSub { font-size: 14px; color: var(--c-text-2); margin-top: -4px; }
+
+/* Delete confirmation inline */
+.deleteConfirm {
+  margin-top: 12px; padding: 12px 14px;
+  background: #fff5f5; border: 1px solid #fca5a5; border-radius: 10px;
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+}
+.deleteMsg { font-size: 13px; font-weight: 600; color: #dc2626; }
+.deleteActions { display: flex; gap: 8px; flex-shrink: 0; }
+.deleteCancelBtn {
+  padding: 7px 14px; border: 1.5px solid var(--c-border); border-radius: 8px;
+  font-size: 13px; font-weight: 600; background: #fff;
+}
+.deleteOkBtn {
+  padding: 7px 14px; background: #dc2626; color: #fff;
+  border-radius: 8px; font-size: 13px; font-weight: 600;
+}

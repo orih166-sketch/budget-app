@@ -78,6 +78,16 @@
 .editBtn:hover   { background: #eef2ff; }
 .deleteBtn:hover { background: #fee2e2; }
 
+.deleteConfirmBtn {
+  padding: 4px 10px; background: #dc2626; color: #fff;
+  border-radius: 6px; font-size: 13px; font-weight: 600;
+}
+.deleteCancelBtn {
+  padding: 4px 10px; border: 1.5px solid var(--c-border);
+  border-radius: 6px; font-size: 13px; font-weight: 600; color: var(--c-text-2);
+  background: #fff;
+}
+
 /* inline edit */
 .editCard {
   background: #fff; border: 2px solid var(--c-primary);

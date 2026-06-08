@@ -52,8 +52,9 @@ export default function Transactions({ transactions, onDelete, onUpdate, selecte
   const [filterCat, setCat]   = useState('')
   const [filterType, setType] = useState('')
   const [periodFilter, setPeriod] = useState('')
-  const [editId, setEditId]   = useState(null)
-  const [editForm, setForm]   = useState({})
+  const [editId,     setEditId]     = useState(null)
+  const [editForm,   setForm]       = useState({})
+  const [deleteId,   setDeleteId]   = useState(null)
 
   const filtered = useMemo(() => {
     let result = transactions
@@ -171,8 +172,17 @@ export default function Transactions({ transactions, onDelete, onUpdate, selecte
                 {t.type==='income' ? '+' : '-'}{fmt(t.amount)}
               </span>
               <div className={styles.actions}>
-                <button className={styles.editBtn}   onClick={() => startEdit(t)}>✏️</button>
-                <button className={styles.deleteBtn} onClick={() => { if (confirm('למחוק?')) onDelete(t.id) }}>🗑️</button>
+                {deleteId === t.id ? (
+                  <>
+                    <button className={styles.deleteConfirmBtn} onClick={() => { onDelete(t.id); setDeleteId(null) }}>מחק</button>
+                    <button className={styles.deleteCancelBtn}  onClick={() => setDeleteId(null)}>ביטול</button>
+                  </>
+                ) : (
+                  <>
+                    <button className={styles.editBtn}   onClick={() => startEdit(t)} aria-label="ערוך עסקה">✏️</button>
+                    <button className={styles.deleteBtn} onClick={() => setDeleteId(t.id)} aria-label="מחק עסקה">🗑️</button>
+                  </>
+                )}
               </div>
             </div>
           )
