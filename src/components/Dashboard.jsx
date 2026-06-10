@@ -246,6 +246,53 @@ export default function Dashboard({
         </div>
       </div>
 
+      {/* ── BALANCE CARD ── */}
+      <div className={styles.card}>
+        <h3 className={`${styles.cardTitle} ${styles.cardTitleStandalone}`}>מאזן הכנסות והוצאות</h3>
+
+        <div className={styles.balanceRow}>
+          <span className={styles.balanceLabel}>
+            <span className={styles.balanceDot} style={{ background: GREEN }} />
+            הכנסות
+          </span>
+          <div className={styles.balanceBarWrap}>
+            <div className={styles.balanceBar} style={{
+              width: `${income >= expenses ? 100 : income > 0 ? Math.round((income / Math.max(expenses, 1)) * 100) : 0}%`,
+              background: 'linear-gradient(90deg, #16a34a, #4ade80)'
+            }} />
+          </div>
+          <span className={styles.balanceAmt} style={{ color: GREEN }}>{fmt(income)}</span>
+        </div>
+
+        <div className={styles.balanceRow}>
+          <span className={styles.balanceLabel}>
+            <span className={styles.balanceDot} style={{ background: RED }} />
+            הוצאות
+          </span>
+          <div className={styles.balanceBarWrap}>
+            <div className={styles.balanceBar} style={{
+              width: `${expenses >= income ? 100 : expenses > 0 ? Math.round((expenses / Math.max(income, 1)) * 100) : 0}%`,
+              background: 'linear-gradient(90deg, #dc2626, #f87171)'
+            }} />
+          </div>
+          <span className={styles.balanceAmt} style={{ color: RED }}>{fmt(expenses)}</span>
+        </div>
+
+        <div className={styles.balanceDivider} />
+
+        <div className={styles.balanceResult}>
+          <div>
+            <div className={styles.balanceResultLabel}>יתרה נטו</div>
+            {income > 0 && (
+              <div className={styles.balanceResultSub}>שיעור חיסכון {savingsPct}%</div>
+            )}
+          </div>
+          <span className={styles.balanceResultAmt} style={{ color: balance >= 0 ? GREEN : RED }}>
+            {balance >= 0 ? '+' : ''}{fmt(balance)}
+          </span>
+        </div>
+      </div>
+
       {/* ── USER SPLIT ── */}
       {userSplit.some(u => u.total > 0) && (
         <div className={styles.splitRow}>
