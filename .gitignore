@@ -5,3 +5,5 @@ dist/
 .vercel
 *.log
 .claude/
+*.DS_Store
+public/Gemini_Generated_Image_*.png
