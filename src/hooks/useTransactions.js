@@ -27,6 +27,8 @@ export function useTransactions() {
     const tempId = 'tmp_' + Date.now()
     setTransactions(prev => [{ ...tx, id: tempId }, ...prev])
 
+    const { data: { user: authUser } } = await supabase.auth.getUser()
+
     const { data, error } = await supabase
       .from('transactions')
       .insert({
@@ -36,7 +38,8 @@ export function useTransactions() {
         amount: tx.amount,
         type: tx.type,
         category_id: tx.category,
-        user_id: tx.user || 'family',
+        user_id: authUser?.id ?? null,
+        member: tx.user || 'family',
       })
       .select()
       .single()
@@ -96,6 +99,6 @@ function mapRow(t) {
     amount: t.amount,
     type: t.type,
     category: t.category_id,
-    user: t.user_id || 'family',
+    user: t.member || t.user_id || 'family',
   }
 }
