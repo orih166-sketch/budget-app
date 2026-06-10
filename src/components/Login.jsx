@@ -72,7 +72,7 @@ export default function Login({ onLogin, onRegister, onSendResetCode, onLoginWit
 
       <div className={styles.card}>
         <div className={styles.logoWrap}>
-          <AppLogo size={110} />
+          <AppLogo size={130} />
         </div>
         <p className={styles.sub}>
           {mode === 'login'     ? 'ברוך הבא'
