@@ -32,6 +32,7 @@ function AppShell({ user, isPasswordRecovery, logout, updatePassword }) {
     useSavingsGoals()
 
   const [tab, setTab]             = useState('dashboard')
+  const [tabKey, setTabKey]       = useState(0)
   const [sideOpen, setSide]       = useState(false)
   const [sideClosing, setClosing] = useState(false)
   const [addOpen, setAdd]         = useState(false)
@@ -147,11 +148,13 @@ function AppShell({ user, isPasswordRecovery, logout, updatePassword }) {
 
       <main className={styles.main}>
         <ErrorBoundary>
-          {tab === 'dashboard'    && <Dashboard transactions={transactions} budget={budget} user={user} selectedMonth={selectedMonth} selectedYear={selectedYear} selectedUser={selectedUser} expectedIncome={expectedIncome} onSetExpectedIncome={setExpectedIncome} />}
-          {tab === 'transactions' && <Transactions transactions={transactions} onDelete={deleteTransaction} onUpdate={updateTransaction} selectedMonth={selectedMonth} selectedYear={selectedYear} onMonthChange={(m, y) => { setSelectedMonth(m); setSelectedYear(y) }} selectedUser={selectedUser} />}
-          {tab === 'budget'       && <Budget transactions={transactions} budget={budget} onUpdateBudget={updateBudget} selectedMonth={selectedMonth} selectedYear={selectedYear} />}
-          {tab === 'savings'      && <Savings goals={goals} loading={goalsLoading} onAdd={addGoal} onUpdate={updateGoal} onDeposit={depositToGoal} onDelete={deleteGoal} />}
-          {tab === 'reports'      && <Reports transactions={transactions} />}
+          <div key={tabKey} className={styles.tabPane}>
+            {tab === 'dashboard'    && <Dashboard transactions={transactions} budget={budget} user={user} selectedMonth={selectedMonth} selectedYear={selectedYear} selectedUser={selectedUser} expectedIncome={expectedIncome} onSetExpectedIncome={setExpectedIncome} />}
+            {tab === 'transactions' && <Transactions transactions={transactions} onDelete={deleteTransaction} onUpdate={updateTransaction} selectedMonth={selectedMonth} selectedYear={selectedYear} onMonthChange={(m, y) => { setSelectedMonth(m); setSelectedYear(y) }} selectedUser={selectedUser} />}
+            {tab === 'budget'       && <Budget transactions={transactions} budget={budget} onUpdateBudget={updateBudget} selectedMonth={selectedMonth} selectedYear={selectedYear} />}
+            {tab === 'savings'      && <Savings goals={goals} loading={goalsLoading} onAdd={addGoal} onUpdate={updateGoal} onDeposit={depositToGoal} onDelete={deleteGoal} />}
+            {tab === 'reports'      && <Reports transactions={transactions} />}
+          </div>
         </ErrorBoundary>
       </main>
 
@@ -159,7 +162,7 @@ function AppShell({ user, isPasswordRecovery, logout, updatePassword }) {
 
       <nav className={styles.bottomNav}>
         {TABS.map(t => (
-          <button key={t.id} className={`${styles.navItem} ${tab===t.id ? styles.navActive : ''}`} onClick={() => setTab(t.id)}>
+          <button key={t.id} className={`${styles.navItem} ${tab===t.id ? styles.navActive : ''}`} onClick={() => { setTab(t.id); setTabKey(k => k+1) }}>
             <span className={styles.navIcon}>{t.icon}</span>
             <span className={styles.navLabel}>{t.label}</span>
           </button>
