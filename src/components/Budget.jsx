@@ -1,14 +1,15 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo } from 'react'
 import { CATEGORIES, MONTHS } from '../data.js'
 import { useCategoryBudgets } from '../hooks/useCategoryBudgets.js'
 import styles from './Budget.module.css'
 
-const fmt = n => '₪' + n.toLocaleString('he-IL', { maximumFractionDigits: 0 })
+const fmt  = n => '₪' + n.toLocaleString('he-IL', { maximumFractionDigits: 0 })
+const fmtK = v => v >= 1000 ? `${(v/1000).toFixed(0)}K` : v
 
 export default function Budget({ transactions, budget, onUpdateBudget, selectedMonth, selectedYear }) {
   const { budgets: categoryBudgets, setBudget } = useCategoryBudgets()
   const [editing, setEditing] = useState(false)
-  const [draft, setDraft] = useState({ ...budget })
+  const [draft, setDraft] = useState({})
 
   const monthTx = useMemo(() =>
     transactions.filter(t => {
@@ -22,52 +23,101 @@ export default function Budget({ transactions, budget, onUpdateBudget, selectedM
     return m
   }, [monthTx])
 
-  const totalBudget = Object.values(budget).reduce((a, v) => a + v, 0)
-  const totalActual = Object.values(actual).reduce((a, v) => a + v, 0)
+  const totalPlanned = CATEGORIES.expenses.reduce((a, c) => a + (categoryBudgets[c.id] || 0), 0)
+  const totalActual  = Object.values(actual).reduce((a, v) => a + v, 0)
+  const totalRemain  = totalPlanned - totalActual
+  const overallPct   = totalPlanned > 0 ? Math.min(100, Math.round((totalActual / totalPlanned) * 100)) : 0
+  const isOverall    = totalActual > totalPlanned && totalPlanned > 0
 
-  function save() {
-    const clean = {}
-    Object.entries(draft).forEach(([k, v]) => {
-      clean[k] = parseFloat(v) || 0
-      setBudget(k, clean[k])
-    })
-    onUpdateBudget(clean)
-    setEditing(false)
+  function startEdit() {
+    const d = {}
+    CATEGORIES.expenses.forEach(c => { d[c.id] = categoryBudgets[c.id] ?? 0 })
+    setDraft(d)
+    setEditing(true)
   }
 
-  function cancelEdit() {
-    setDraft({ ...budget })
+  function save() {
+    Object.entries(draft).forEach(([k, v]) => setBudget(k, parseFloat(v) || 0))
     setEditing(false)
   }
 
   return (
     <div className={styles.wrap}>
-      <div className={styles.header}>
-        <div className={styles.headerInfo}>
-          <h2 className={styles.title}>תכנון תקציב — {MONTHS[selectedMonth]} {selectedYear}</h2>
-          <p className={styles.sub}>מתוכנן: {fmt(totalBudget)} | בפועל: {fmt(totalActual)}</p>
+
+      {/* ── Hero ── */}
+      <div className={`${styles.hero} ${isOverall ? styles.heroOver : ''}`}>
+        <div className={styles.heroHeader}>
+          <div>
+            <div className={styles.heroGreet}>תכנון תקציב</div>
+            <div className={styles.heroMonth}>{MONTHS[selectedMonth]} {selectedYear}</div>
+          </div>
+          <div className={styles.heroBtns}>
+            {editing && (
+              <button className={styles.heroCancelBtn} onClick={() => setEditing(false)}>ביטול</button>
+            )}
+            <button className={styles.heroEditBtn} onClick={editing ? save : startEdit}>
+              {editing ? 'שמור ✓' : 'ערוך'}
+            </button>
+          </div>
         </div>
-        <div className={styles.headerBtns}>
-          {editing && (
-            <button className={styles.cancelBtn} onClick={cancelEdit}>ביטול</button>
-          )}
-          <button className={styles.editBtn} onClick={() => editing ? save() : setEditing(true)}>
-            {editing ? 'שמור' : 'ערוך'}
-          </button>
+
+        <div className={styles.heroStats}>
+          <div className={styles.heroStat}>
+            <div className={styles.heroStatLbl}>מתוכנן</div>
+            <div className={`${styles.heroStatVal} ${styles.gold}`}>{fmt(totalPlanned)}</div>
+          </div>
+          <div className={styles.heroStatDivider} />
+          <div className={styles.heroStat}>
+            <div className={styles.heroStatLbl}>בפועל</div>
+            <div className={`${styles.heroStatVal} ${isOverall ? styles.red : styles.green}`}>{fmt(totalActual)}</div>
+          </div>
+          <div className={styles.heroStatDivider} />
+          <div className={styles.heroStat}>
+            <div className={styles.heroStatLbl}>{totalRemain >= 0 ? 'נותר' : 'חריגה'}</div>
+            <div className={`${styles.heroStatVal} ${totalRemain >= 0 ? styles.green : styles.red}`}>{fmt(Math.abs(totalRemain))}</div>
+          </div>
+        </div>
+
+        <div className={styles.heroBarWrap}>
+          <div
+            className={`${styles.heroBar} ${isOverall ? styles.heroBarRed : overallPct > 80 ? styles.heroBarYellow : styles.heroBarGreen}`}
+            style={{ width: `${overallPct}%` }}
+          />
+        </div>
+        <div className={styles.heroBarRow}>
+          <span>0</span>
+          <span>{overallPct}% נוצל</span>
+          <span>{fmtK(totalPlanned)}</span>
         </div>
       </div>
 
+      {/* ── Category list ── */}
       <div className={styles.list}>
-        {CATEGORIES.expenses.map(c => {
-          const plan = budget[c.id] || 0
+        {CATEGORIES.expenses.map((c, i) => {
+          const plan = categoryBudgets[c.id] || 0
           const done = actual[c.id] || 0
           const pct  = plan > 0 ? Math.min(100, Math.round((done / plan) * 100)) : (done > 0 ? 100 : 0)
           const over = done > plan && plan > 0
+          const barColor = over ? '#ef4444' : pct > 80 ? '#f59e0b' : c.color
+
           return (
-            <div key={c.id} className={`${styles.card} ${over ? styles.over : ''}`}>
+            <div
+              key={c.id}
+              className={`${styles.card} ${over ? styles.cardOver : ''} ${done === 0 && plan === 0 ? styles.cardEmpty : ''}`}
+              style={{ animationDelay: `${i * 0.03}s` }}
+            >
+              <div className={styles.cardAccent} style={{ background: c.color }} />
+
               <div className={styles.cardTop}>
-                <span className={styles.icon}>{c.icon}</span>
-                <span className={styles.label}>{c.label}</span>
+                <div className={styles.iconWrap} style={{ background: c.color + '18' }}>
+                  <span className={styles.icon}>{c.icon}</span>
+                </div>
+                <div className={styles.cardInfo}>
+                  <span className={styles.label}>{c.label}</span>
+                  <div className={styles.barWrap}>
+                    <div className={styles.bar} style={{ width: `${pct}%`, background: barColor }} />
+                  </div>
+                </div>
                 <div className={styles.amounts}>
                   {editing ? (
                     <input
@@ -77,21 +127,26 @@ export default function Budget({ transactions, budget, onUpdateBudget, selectedM
                       onChange={e => setDraft(d => ({ ...d, [c.id]: e.target.value }))}
                     />
                   ) : (
-                    <span className={styles.plan}>{fmt(plan)}</span>
+                    <div className={styles.amtStack}>
+                      <span className={styles.actual} style={{ color: over ? '#ef4444' : done > 0 ? 'var(--c-text)' : 'var(--c-text-2)' }}>
+                        {fmt(done)}
+                      </span>
+                      <span className={styles.plan}>{plan > 0 ? `מתוך ${fmt(plan)}` : 'לא מוגדר'}</span>
+                    </div>
                   )}
-                  <span className={`${styles.actual} ${over ? styles.overText : ''}`}>{fmt(done)}</span>
                 </div>
               </div>
-              <div className={styles.barWrap}>
-                <div
-                  className={styles.bar}
-                  style={{ width:`${pct}%`, background: over ? 'var(--c-red)' : pct > 75 ? 'var(--c-yellow)' : c.color }}
-                />
-              </div>
-              <div className={styles.pctRow}>
-                <span className={`${styles.pct} ${over ? styles.overText : ''}`}>{pct}% נוצל</span>
-                {over && <span className={styles.overBadge}>חריגה {fmt(done - plan)}</span>}
-              </div>
+
+              {(over || pct > 0) && (
+                <div className={styles.cardFooter}>
+                  <span className={styles.pct} style={{ color: over ? '#ef4444' : pct > 80 ? '#f59e0b' : 'var(--c-text-2)' }}>
+                    {pct}% נוצל
+                  </span>
+                  {over && (
+                    <span className={styles.overBadge}>חריגה {fmt(done - plan)}</span>
+                  )}
+                </div>
+              )}
             </div>
           )
         })}
