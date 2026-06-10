@@ -51,7 +51,25 @@ export function useAuth() {
     setIsPasswordRecovery(false)
   }
 
-  return { user, isPasswordRecovery, login, register, logout, sendResetCode, updatePassword }
+  async function loginWithGoogle() {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: window.location.origin },
+    })
+    if (error) throw error
+  }
+
+  async function sendPhoneOtp(phone) {
+    const { error } = await supabase.auth.signInWithOtp({ phone })
+    if (error) throw error
+  }
+
+  async function verifyPhoneOtp(phone, token) {
+    const { error } = await supabase.auth.verifyOtp({ phone, token, type: 'sms' })
+    if (error) throw error
+  }
+
+  return { user, isPasswordRecovery, login, register, logout, sendResetCode, updatePassword, loginWithGoogle, sendPhoneOtp, verifyPhoneOtp }
 }
 
 function formatUser(u) {

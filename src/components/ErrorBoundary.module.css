@@ -19,7 +19,7 @@
 .title {
   font-size: 20px;
   font-weight: 700;
-  color: #1a2744;
+  color: #0d2b1a;
   margin: 0 0 8px 0;
 }
 
@@ -31,7 +31,7 @@
 
 .btn {
   padding: 10px 20px;
-  background: #1a2744;
+  background: #0d2b1a;
   color: #fff;
   border-radius: 8px;
   font-weight: 600;
@@ -41,5 +41,5 @@
 }
 
 .btn:hover {
-  background: #243660;
+  background: #16402a;
 }

@@ -38,7 +38,7 @@
   border-radius: 10px; font-size: 13px; font-weight: 600;
   transition: background .12s;
 }
-.editBtn:hover { background: #243660; }
+.editBtn:hover { background: #16402a; }
 
 /* Goal */
 .goalEdit { display: flex; gap: 10px; }

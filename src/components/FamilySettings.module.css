@@ -40,7 +40,7 @@
 .title {
   font-size: 18px;
   font-weight: 700;
-  color: #1a2744;
+  color: #0d2b1a;
   margin: 0;
 }
 
@@ -67,7 +67,7 @@
   margin-bottom: 20px;
   font-size: 15px;
   font-weight: 600;
-  color: #1a2744;
+  color: #0d2b1a;
 }
 
 .householdIcon { font-size: 20px; }
@@ -121,7 +121,7 @@
 .memberName {
   font-size: 15px;
   font-weight: 600;
-  color: #1a2744;
+  color: #0d2b1a;
 }
 
 .memberRole {

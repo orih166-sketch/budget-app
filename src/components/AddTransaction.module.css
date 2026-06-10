@@ -161,7 +161,7 @@
   font-size: 15px; font-weight: 700;
   transition: all .15s;
 }
-.submit:hover:not(:disabled)       { background: #243660; }
+.submit:hover:not(:disabled)       { background: #16402a; }
 .submit:disabled                   { opacity: .45; cursor: not-allowed; }
 .submit.submitGreen                { background: var(--c-green); }
 .submit.submitGreen:hover:not(:disabled) { background: #0a7c52; }

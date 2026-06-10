@@ -173,7 +173,7 @@ function AppShell({ user, isPasswordRecovery, logout, updatePassword }) {
 }
 
 export default function App() {
-  const { user, isPasswordRecovery, login, register, logout, sendResetCode, updatePassword } = useAuth()
+  const { user, isPasswordRecovery, login, register, logout, sendResetCode, updatePassword, loginWithGoogle, sendPhoneOtp, verifyPhoneOtp } = useAuth()
 
   if (user === undefined) {
     return (
@@ -184,7 +184,7 @@ export default function App() {
   }
 
   if (!user) {
-    return <Login onLogin={login} onRegister={register} onSendResetCode={sendResetCode} />
+    return <Login onLogin={login} onRegister={register} onSendResetCode={sendResetCode} onLoginWithGoogle={loginWithGoogle} onSendPhoneOtp={sendPhoneOtp} onVerifyPhoneOtp={verifyPhoneOtp} />
   }
 
   return (
