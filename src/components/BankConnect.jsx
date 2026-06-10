@@ -1,5 +1,4 @@
 import { useState, useRef } from 'react'
-import * as XLSX from 'xlsx'
 import { supabase } from '../lib/supabase.js'
 import { useHousehold } from '../context/HouseholdContext.jsx'
 import styles from './BankConnect.module.css'
@@ -84,79 +83,94 @@ export default function BankConnect({ onClose, onImported }) {
     const file = e.target.files?.[0]
     if (!file) return
     setFileName(file.name)
+    const isCSV = file.name.toLowerCase().endsWith('.csv')
     const reader = new FileReader()
     reader.onload = ev => {
       try {
-        const wb = XLSX.read(ev.target.result, { type: 'array', cellDates: true })
-        const sheet = wb.Sheets[wb.SheetNames[0]]
-        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' })
+        let rows
+        if (isCSV) {
+          rows = parseCSV(ev.target.result)
+        } else {
+          // For Excel files, read as text with UTF-8 (works for many banks' exports)
+          rows = parseCSV(ev.target.result)
+        }
         const parsed = parseRows(rows, file.name)
-        setPreview(parsed)
-        setError('')
+        if (parsed.total === 0) {
+          setError('לא נמצאו עסקאות בקובץ. נסה לשמור כ-CSV מתוך Excel.')
+          setPreview(null)
+        } else {
+          setPreview(parsed)
+          setError('')
+        }
       } catch (err) {
         setError('לא ניתן לקרוא את הקובץ: ' + err.message)
         setPreview(null)
       }
     }
-    reader.readAsArrayBuffer(file)
+    reader.readAsText(file, 'utf-8')
+  }
+
+  function parseCSV(text) {
+    // Handle Windows line endings, split into lines
+    const lines = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n')
+    return lines.map(line => {
+      // Split by comma or tab, handle quoted fields
+      const cells = []
+      let cur = '', inQ = false
+      for (let i = 0; i < line.length; i++) {
+        const c = line[i]
+        if (c === '"') { inQ = !inQ }
+        else if ((c === ',' || c === '\t') && !inQ) { cells.push(cur.trim()); cur = '' }
+        else cur += c
+      }
+      cells.push(cur.trim())
+      return cells
+    })
   }
 
   function parseRows(rows, filename) {
     const txns = []
-    // Try to detect bank format from filename or header row
-    const header = (rows[0] || []).join(' ').toLowerCase()
-    const isLeumi    = filename.includes('leumi') || header.includes('לאומי')
-    const isHapoalim = filename.includes('hapoalim') || header.includes('הפועלים')
-
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i]
       if (!row || row.length < 3) continue
-
-      // Try to parse each row as a transaction
-      const txn = parseRow(row, isLeumi, isHapoalim)
+      const txn = parseRow(row)
       if (txn) txns.push(txn)
     }
     return { txns, total: txns.length }
   }
 
-  function parseRow(row, isLeumi, isHapoalim) {
-    // Find a date-like cell
+  function parseRow(row) {
     let dateStr = '', desc = '', amount = 0
 
     for (let i = 0; i < row.length; i++) {
-      const cell = row[i]
-      if (!cell && cell !== 0) continue
+      const cell = String(row[i] ?? '').trim()
+      if (!cell) continue
 
-      // Date detection
+      // Date detection (DD/MM/YYYY or DD.MM.YYYY)
       if (!dateStr) {
-        if (cell instanceof Date) {
-          dateStr = cell.toISOString().substring(0, 10)
-        } else if (typeof cell === 'string') {
-          const m = cell.match(/(\d{1,2})[./\-](\d{1,2})[./\-](\d{2,4})/)
-          if (m) {
-            const y = m[3].length === 2 ? '20' + m[3] : m[3]
-            dateStr = `${y}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`
-          }
+        const m = cell.match(/^(\d{1,2})[./\-](\d{1,2})[./\-](\d{2,4})$/)
+        if (m) {
+          const y = m[3].length === 2 ? '20' + m[3] : m[3]
+          dateStr = `${y}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`
+          continue
         }
-        if (dateStr) continue
       }
 
-      // Description: longest Hebrew/text cell
-      if (typeof cell === 'string' && cell.length > 2 && isNaN(cell.replace(/[,.-]/g,'')) && !cell.match(/^\d{1,2}[./]\d{1,2}[./]\d{2,4}$/)) {
-        if (cell.length > desc.length) desc = cell.trim()
+      // Amount: numeric-looking cell (may have commas, minus)
+      const numStr = cell.replace(/,/g, '').replace(/\s/g, '')
+      const n = parseFloat(numStr)
+      if (!isNaN(n) && Math.abs(n) > 0 && Math.abs(n) < 10_000_000 && !cell.match(/^\d{5,}$/)) {
+        if (!amount) amount = n
+        continue
       }
 
-      // Amount: numeric cell
-      if (!amount && (typeof cell === 'number' || (typeof cell === 'string' && !isNaN(cell.replace(',',''))))) {
-        const n = parseFloat(String(cell).replace(',',''))
-        if (!isNaN(n) && Math.abs(n) > 0 && Math.abs(n) < 1_000_000) {
-          amount = n
-        }
+      // Description: non-numeric text longer than 2 chars
+      if (cell.length > 2 && isNaN(numStr)) {
+        if (cell.length > desc.length) desc = cell
       }
     }
 
     if (!dateStr || !amount) return null
-    // Skip header rows
     if (dateStr < '2010-01-01' || dateStr > '2030-12-31') return null
 
     return {
@@ -302,16 +316,16 @@ export default function BankConnect({ onClose, onImported }) {
           <div className={styles.form}>
             <div className={styles.notice}>
               <span className={styles.noticeIcon}>📋</span>
-              <p>הורד תנועות חשבון מאתר הבנק כ-Excel ועלה אותן כאן. עובד עם כל הבנקים.</p>
+              <p>הורד תנועות חשבון מאתר הבנק כ-<strong>CSV</strong> ועלה אותן כאן. עובד עם כל הבנקים.</p>
             </div>
 
             <div className={styles.fieldWrap}>
-              <label className={styles.label}>קובץ Excel / CSV מהבנק</label>
+              <label className={styles.label}>קובץ CSV מהבנק</label>
               <button type="button" className={styles.fileBtn}
                 onClick={() => fileRef.current?.click()}>
-                📂 {fileName || 'בחר קובץ...'}
+                📂 {fileName || 'בחר קובץ CSV...'}
               </button>
-              <input ref={fileRef} type="file" accept=".xlsx,.xls,.csv"
+              <input ref={fileRef} type="file" accept=".csv,.txt"
                 style={{ display: 'none' }} onChange={handleFile} />
             </div>
 
@@ -346,10 +360,10 @@ export default function BankConnect({ onClose, onImported }) {
               <div className={styles.importHint}>
                 <p className={styles.importHintTitle}>איך להוריד מהבנק?</p>
                 <ul className={styles.importHintList}>
-                  <li>דיסקונט: תנועות חשבון → ייצוא לאקסל</li>
-                  <li>לאומי: תנועות בחשבון → הורדת נתונים</li>
-                  <li>הפועלים: פעולות בחשבון → Excel</li>
-                  <li>מזרחי: תנועות בחשבון → ייצוא</li>
+                  <li>דיסקונט: תנועות חשבון → ייצוא → CSV</li>
+                  <li>לאומי: תנועות בחשבון → הורדת נתונים → CSV</li>
+                  <li>הפועלים: פעולות בחשבון → CSV/Excel → שמור כ-CSV</li>
+                  <li>מזרחי: תנועות בחשבון → ייצוא → CSV</li>
                 </ul>
               </div>
             )}
