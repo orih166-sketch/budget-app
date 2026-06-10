@@ -12,6 +12,7 @@ export default function Login({ onLogin, onRegister, onSendResetCode, onLoginWit
   const [error, setError]   = useState('')
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
+  const [showPass, setShowPass] = useState(false)
 
   function switchMode(m) { setMode(m); setError(''); setSuccess(''); setOtp('') }
 
@@ -128,11 +129,17 @@ export default function Login({ onLogin, onRegister, onSendResetCode, onLoginWit
           {(mode === 'login' || mode === 'register') && (
             <div className={styles.fieldWrap}>
               <label className={styles.label}>סיסמה</label>
-              <input className={styles.input} type="password"
-                placeholder="לפחות 6 תווים"
-                value={pass} onChange={e => setPass(e.target.value)}
-                autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
-                required dir="ltr" />
+              <div className={styles.passWrap}>
+                <input className={styles.input} type={showPass ? 'text' : 'password'}
+                  placeholder="לפחות 6 תווים"
+                  value={pass} onChange={e => setPass(e.target.value)}
+                  autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+                  required dir="ltr" />
+                <button type="button" className={styles.eyeBtn} onClick={() => setShowPass(v => !v)}
+                  tabIndex={-1} aria-label={showPass ? 'הסתר סיסמה' : 'הצג סיסמה'}>
+                  {showPass ? <EyeOff /> : <EyeOn />}
+                </button>
+              </div>
             </div>
           )}
 
@@ -188,6 +195,25 @@ export default function Login({ onLogin, onRegister, onSendResetCode, onLoginWit
         </div>
       </div>
     </div>
+  )
+}
+
+function EyeOn() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+      <circle cx="12" cy="12" r="3"/>
+    </svg>
+  )
+}
+
+function EyeOff() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/>
+      <path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/>
+      <line x1="1" y1="1" x2="23" y2="23"/>
+    </svg>
   )
 }
 

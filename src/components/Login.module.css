@@ -144,6 +144,16 @@
 }
 .input::placeholder { color: #9ca3af; }
 
+/* Password eye toggle */
+.passWrap { position: relative; }
+.passWrap .input { padding-left: 44px; }
+.eyeBtn {
+  position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+  color: #9ca3af; display: flex; align-items: center; justify-content: center;
+  padding: 4px; border-radius: 6px; transition: color .15s;
+}
+.eyeBtn:hover { color: #374151; }
+
 /* OTP input */
 .otpSub {
   font-size: 13px; color: #6b7280; text-align: center; margin: 0;
