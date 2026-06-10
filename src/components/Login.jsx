@@ -102,10 +102,6 @@ export default function Login({ onLogin, onRegister, onSendResetCode, onLoginWit
               <GoogleIcon />
               המשך עם Google
             </button>
-            <button type="button" className={styles.phoneBtn} onClick={() => switchMode('phone')}>
-              <span className={styles.phoneBtnIcon}>📱</span>
-              כניסה עם SMS
-            </button>
           </div>
         )}
 
