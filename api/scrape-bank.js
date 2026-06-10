@@ -53,9 +53,11 @@ export default async function handler(req, res) {
 
     // Credentials no longer needed
     if (!result.success) {
-      return res.status(401).json({
-        error: result.errorMessage || 'כניסה לבנק דיסקונט נכשלה',
-      })
+      const errMsg = typeof result.errorMessage === 'string'
+        ? result.errorMessage
+        : result.errorMessage?.message ?? JSON.stringify(result.errorMessage) ?? 'כניסה לבנק דיסקונט נכשלה'
+      console.error('scrape-bank login failed:', errMsg, 'errorType:', result.errorType)
+      return res.status(401).json({ error: errMsg, errorType: result.errorType })
     }
 
     // Reuse an existing family_id (legacy NOT NULL constraint)
