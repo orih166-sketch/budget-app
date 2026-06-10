@@ -10,6 +10,7 @@ import MonthNav from './components/MonthNav.jsx'
 import ErrorBoundary from './components/ErrorBoundary.jsx'
 import Toast from './components/Toast.jsx'
 import FamilySettings from './components/FamilySettings.jsx'
+import BankConnect from './components/BankConnect.jsx'
 import { HouseholdProvider, useHousehold } from './context/HouseholdContext.jsx'
 import { useTransactions } from './hooks/useTransactions.js'
 import { useSavingsGoals } from './hooks/useSavingsGoals.js'
@@ -38,6 +39,7 @@ function AppShell({ user, isPasswordRecovery, logout, updatePassword }) {
   const [sideClosing, setClosing] = useState(false)
   const [addOpen, setAdd]         = useState(false)
   const [familyOpen, setFamily]   = useState(false)
+  const [bankOpen,   setBank]     = useState(false)
 
   const [selectedMonth, setSelectedMonth] = useState(CURRENT_MONTH)
   const [selectedYear,  setSelectedYear]  = useState(CURRENT_YEAR)
@@ -138,6 +140,10 @@ function AppShell({ user, isPasswordRecovery, logout, updatePassword }) {
                 </button>
               ))}
               <button className={styles.sideItem}
+                onClick={() => { setBank(true); closeSide() }}>
+                <span>🏦</span><span>סנכרון בנק</span>
+              </button>
+              <button className={styles.sideItem}
                 onClick={() => { setFamily(true); closeSide() }}>
                 <span>👨‍👩‍👧</span><span>הגדרות משפחה</span>
               </button>
@@ -172,6 +178,7 @@ function AppShell({ user, isPasswordRecovery, logout, updatePassword }) {
 
       {addOpen && <AddTransaction onAdd={addTransaction} onClose={() => setAdd(false)} user={user} />}
       {familyOpen && <FamilySettings user={user} onClose={() => setFamily(false)} />}
+      {bankOpen   && <BankConnect onClose={() => setBank(false)} onImported={() => { setBank(false) }} />}
       <Toast message={txError} onClose={clearTxError} />
     </div>
   )
