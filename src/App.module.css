@@ -79,10 +79,11 @@
 
 .app {
   display: flex; flex-direction: column;
-  min-height: 100dvh;
+  height: 100dvh;
   max-width: 480px;
   margin: 0 auto;
   position: relative;
+  overflow: hidden;
 }
 
 /* Header */
@@ -91,7 +92,9 @@
   display: flex; align-items: center; gap: 12px;
   background: var(--c-primary);
   padding: 14px 16px;
+  padding-top: calc(14px + env(safe-area-inset-top, 0px));
   box-shadow: 0 2px 12px rgba(26,39,68,.25);
+  flex-shrink: 0;
 }
 
 .menuBtn {
@@ -173,7 +176,10 @@
   flex: 1;
   padding: 16px 16px 0;
   overflow-y: auto;
-  padding-bottom: 80px;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
 }
 
 /* FAB */
