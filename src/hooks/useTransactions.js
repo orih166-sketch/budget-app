@@ -43,6 +43,7 @@ export function useTransactions() {
 
     if (error) {
       console.error('addTransaction:', error)
+      alert('שגיאה בהוספת עסקה: ' + error.message)
       setTransactions(prev => prev.filter(t => t.id !== tempId))
     } else {
       setTransactions(prev => prev.map(t => t.id === tempId ? mapRow(data) : t))
