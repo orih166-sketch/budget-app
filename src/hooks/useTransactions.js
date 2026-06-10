@@ -31,10 +31,8 @@ export function useTransactions() {
     const tempId = 'tmp_' + Date.now()
     setTransactions(prev => [{ ...tx, id: tempId }, ...prev])
 
-    const [{ data: { user: authUser } }, { data: fRow }] = await Promise.all([
-      supabase.auth.getUser(),
-      supabase.from('transactions').select('family_id').not('family_id', 'is', null).limit(1).single(),
-    ])
+    const { data: fRow } = await supabase
+      .from('transactions').select('family_id').not('family_id', 'is', null).limit(1).single()
     const familyId = fRow?.family_id ?? legacyFamilyId
 
     const { data, error } = await supabase
@@ -47,7 +45,6 @@ export function useTransactions() {
         amount: tx.amount,
         type: tx.type,
         category_id: tx.category,
-        user_id: authUser?.id ?? null,
         member: tx.user || 'family',
       })
       .select()
