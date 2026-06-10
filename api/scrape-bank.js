@@ -2,9 +2,9 @@ import chromium from '@sparticuz/chromium-min'
 import { createScraper, CompanyTypes } from 'israeli-bank-scrapers'
 import { createClient } from '@supabase/supabase-js'
 
-// Chromium binary compatible with puppeteer v24 / Chrome 131
+// Chromium binary must match @sparticuz/chromium-min version (149) and puppeteer's expected Chrome (149)
 const CHROMIUM_URL =
-  'https://github.com/Sparticuz/chromium/releases/download/v131.0.0/chromium-v131.0.0-pack.tar'
+  'https://github.com/Sparticuz/chromium/releases/download/v149.0.0/chromium-v149.0.0-pack.tar'
 
 export const config = { maxDuration: 300 }
 
