@@ -38,28 +38,11 @@
 
 /* Logo */
 .logoWrap {
-  width: 68px; height: 68px;
-  background: linear-gradient(145deg, #0d2b1a 0%, #1a4a2a 100%);
-  border-radius: 22px;
   display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 20px;
-  box-shadow: 0 8px 24px rgba(13,43,26,.35), 0 2px 4px rgba(0,0,0,.2);
-}
-.logoSymbol {
-  font-size: 30px; font-weight: 900;
-  background: linear-gradient(135deg, #c9a84c 0%, #e8c96a 50%, #c9a84c 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  line-height: 1;
+  margin: 0 auto 16px;
+  filter: drop-shadow(0 8px 24px rgba(201,168,76,.25));
 }
 
-.title {
-  font-size: 26px; font-weight: 800;
-  color: #0d2b1a;
-  margin: 0 0 4px;
-  letter-spacing: -.5px;
-}
 .sub {
   font-size: 14px; color: #6b7280;
   margin: 0 0 22px;

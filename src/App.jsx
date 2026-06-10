@@ -107,7 +107,7 @@ function AppShell({ user, isPasswordRecovery, logout, updatePassword }) {
     <div className={styles.app}>
       <header className={styles.header}>
         <button className={styles.menuBtn} onClick={() => setSide(o => !o)}>☰</button>
-        <h1 className={styles.title}>תקציב הבית</h1>
+        <h1 className={styles.title}>כלכלת בית</h1>
         <span className={styles.userChip}>{user.name}</span>
       </header>
 
