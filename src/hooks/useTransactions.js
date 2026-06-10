@@ -31,15 +31,19 @@ export function useTransactions() {
     const tempId = 'tmp_' + Date.now()
     setTransactions(prev => [{ ...tx, id: tempId }, ...prev])
 
-    const { data: { user: authUser } } = await supabase.auth.getUser()
+    const [{ data: { user: authUser } }, { data: fRow }] = await Promise.all([
+      supabase.auth.getUser(),
+      supabase.from('transactions').select('family_id').not('family_id', 'is', null).limit(1).single(),
+    ])
+    const familyId = fRow?.family_id ?? legacyFamilyId
 
     const { data, error } = await supabase
       .from('transactions')
       .insert({
         household_id: household.id,
-        family_id: legacyFamilyId,
+        family_id: familyId,
         date: tx.date,
-        description: tx.desc,
+        description: tx.desc || '',
         amount: tx.amount,
         type: tx.type,
         category_id: tx.category,

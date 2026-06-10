@@ -31,7 +31,7 @@ export default function AddTransaction({ onAdd, onClose, user, users = USER_OPTI
 
   function submit(e) {
     e.preventDefault()
-    if (!form.desc || !form.amount || !form.category) return
+    if (!form.amount || !form.category) return
     onAdd({ ...form, amount: parseFloat(form.amount), type })
     onClose()
   }
@@ -78,7 +78,6 @@ export default function AddTransaction({ onAdd, onClose, user, users = USER_OPTI
               value={form.desc}
               onChange={e => setForm(f => ({ ...f, desc: e.target.value }))}
               placeholder="לדוגמה: רמי לוי"
-              required
             />
           </label>
 
