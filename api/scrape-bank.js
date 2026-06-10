@@ -17,9 +17,15 @@ export default async function handler(req, res) {
   }
 
   // Authenticated Supabase client — RLS applies, no service key needed
+  // Use server-side env var names (VITE_ prefix is build-time only, not available at runtime)
+  const supabaseUrl  = process.env.SUPABASE_URL  || process.env.VITE_SUPABASE_URL
+  const supabaseKey  = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY
+  if (!supabaseUrl || !supabaseKey) {
+    return res.status(500).json({ error: 'Supabase env vars not configured on server' })
+  }
   const supabase = createClient(
-    process.env.VITE_SUPABASE_URL,
-    process.env.VITE_SUPABASE_ANON_KEY,
+    supabaseUrl,
+    supabaseKey,
     { global: { headers: { Authorization: `Bearer ${authToken}` } } }
   )
 
