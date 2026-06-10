@@ -1,3 +1,35 @@
+diff --git a/node_modules/israeli-bank-scrapers/lib/helpers/fetch.js b/node_modules/israeli-bank-scrapers/lib/helpers/fetch.js
+index 6207ec9..f61588f 100644
+--- a/node_modules/israeli-bank-scrapers/lib/helpers/fetch.js
++++ b/node_modules/israeli-bank-scrapers/lib/helpers/fetch.js
+@@ -54,19 +54,14 @@ async function fetchGraphql(url, query, variables = {}, extraHeaders = {}) {
+   return result.data;
+ }
+ async function fetchGetWithinPage(page, url, ignoreErrors = false) {
+-  const [result, status] = await page.evaluate(async innerUrl => {
+-    let response;
+-    try {
+-      response = await fetch(innerUrl, {
+-        credentials: 'include'
+-      });
+-      if (response.status === 204) {
+-        return [null, response.status];
+-      }
+-      return [await response.text(), response.status];
+-    } catch (e) {
+-      throw new Error(`fetchGetWithinPage error: ${e instanceof Error ? `${e.message}\n${e.stack}` : String(e)}, url: ${innerUrl}, status: ${response?.status}`);
+-    }
++  // Use .then() chains instead of async/await inside page.evaluate for Chrome 149 compatibility
++  const [result, status] = await page.evaluate(function(innerUrl) {
++    return fetch(innerUrl, { credentials: 'include' }).then(function(response) {
++      if (response.status === 204) return [null, response.status];
++      return response.text().then(function(text) { return [text, response.status]; });
++    }).catch(function(e) {
++      throw new Error('fetchGetWithinPage error: ' + (e instanceof Error ? e.message : String(e)) + ', url: ' + innerUrl);
++    });
+   }, url);
+   if (result !== null) {
+     try {
 diff --git a/node_modules/israeli-bank-scrapers/lib/scrapers/discount.js b/node_modules/israeli-bank-scrapers/lib/scrapers/discount.js
 index 630d930..fee4e64 100644
 --- a/node_modules/israeli-bank-scrapers/lib/scrapers/discount.js

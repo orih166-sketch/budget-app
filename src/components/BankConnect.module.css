@@ -143,3 +143,72 @@
   background: #fef2f2; border: 1px solid #fecaca;
   border-radius: 10px; padding: 10px 14px; width: 100%; margin: 0;
 }
+
+/* Mode tabs */
+.modeTabs {
+  display: flex; gap: 8px; margin-bottom: 16px;
+}
+.modeTab {
+  flex: 1; padding: 9px 8px; border-radius: 10px;
+  border: 1.5px solid #e2e8f0; background: #f8fafc;
+  font-size: 13px; font-weight: 600; color: var(--c-text-2);
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
+  transition: all .15s;
+}
+.modeTabActive {
+  border-color: var(--c-primary); background: #f0fdf4; color: var(--c-primary);
+}
+
+/* Bank grid */
+.bankGrid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+}
+.bankBtn {
+  padding: 10px 6px; border-radius: 10px;
+  border: 1.5px solid #e2e8f0; background: #f8fafc;
+  font-size: 12px; font-weight: 600; color: var(--c-text-2);
+  cursor: pointer; display: flex; flex-direction: column;
+  align-items: center; gap: 4px; transition: all .15s;
+}
+.bankBtnActive {
+  border-color: var(--c-primary); background: #f0fdf4; color: var(--c-primary);
+}
+
+/* File button */
+.fileBtn {
+  width: 100%; padding: 12px 14px; border-radius: 10px;
+  border: 2px dashed #cbd5e1; background: #f8fafc;
+  font-size: 14px; font-weight: 600; color: var(--c-text-2);
+  cursor: pointer; text-align: center; transition: all .15s;
+  box-sizing: border-box;
+}
+.fileBtn:hover { border-color: var(--c-primary); background: #f0fdf4; color: var(--c-primary); }
+
+/* Preview */
+.previewBox {
+  display: flex; flex-direction: column; gap: 10px;
+  background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px;
+}
+.previewHeader { font-size: 13px; font-weight: 700; color: var(--c-text); }
+.previewRows { display: flex; flex-direction: column; gap: 6px; }
+.previewRow {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12px; padding: 6px 8px;
+  background: #fff; border-radius: 8px; border: 1px solid #f1f5f9;
+}
+.previewDate { color: var(--c-text-2); flex-shrink: 0; font-size: 11px; }
+.previewDesc { flex: 1; color: var(--c-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.previewAmt { font-weight: 700; flex-shrink: 0; }
+.expense { color: #dc2626; }
+.income  { color: #16a34a; }
+.previewMore { font-size: 12px; color: var(--c-text-2); text-align: center; margin: 0; }
+
+/* Import hint */
+.importHint {
+  background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px;
+}
+.importHintTitle { font-size: 13px; font-weight: 700; color: var(--c-text); margin: 0 0 8px; }
+.importHintList {
+  margin: 0; padding-right: 16px;
+  font-size: 12px; color: var(--c-text-2); line-height: 1.8;
+}
