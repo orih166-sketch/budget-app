@@ -8,6 +8,7 @@ import Savings from './components/Savings.jsx'
 import AddTransaction from './components/AddTransaction.jsx'
 import MonthNav from './components/MonthNav.jsx'
 import ErrorBoundary from './components/ErrorBoundary.jsx'
+import Toast from './components/Toast.jsx'
 import FamilySettings from './components/FamilySettings.jsx'
 import { HouseholdProvider, useHousehold } from './context/HouseholdContext.jsx'
 import { useTransactions } from './hooks/useTransactions.js'
@@ -26,7 +27,7 @@ const TABS = [
 
 function AppShell({ user, isPasswordRecovery, logout, updatePassword }) {
   const { household, acceptInvitation } = useHousehold()
-  const { transactions, budget, expectedIncome, setExpectedIncome, addTransaction, updateTransaction, deleteTransaction, updateBudget } =
+  const { transactions, budget, expectedIncome, setExpectedIncome, addTransaction, updateTransaction, deleteTransaction, updateBudget, txError, clearTxError } =
     useTransactions()
   const { goals, loading: goalsLoading, addGoal, updateGoal, depositToGoal, deleteGoal } =
     useSavingsGoals()
@@ -171,6 +172,7 @@ function AppShell({ user, isPasswordRecovery, logout, updatePassword }) {
 
       {addOpen && <AddTransaction onAdd={addTransaction} onClose={() => setAdd(false)} user={user} />}
       {familyOpen && <FamilySettings user={user} onClose={() => setFamily(false)} />}
+      <Toast message={txError} onClose={clearTxError} />
     </div>
   )
 }

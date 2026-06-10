@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabase.js'
 import { useHousehold } from '../context/HouseholdContext.jsx'
 
@@ -7,6 +7,14 @@ export function useTransactions() {
   const [transactions, setTransactions] = useState([])
   const [expectedIncome, setExpectedIncomeState] = useState(0)
   const [legacyFamilyId, setLegacyFamilyId] = useState(null)
+  const [txError, setTxError] = useState(null)
+
+  // Load expected income from localStorage (household-specific)
+  useEffect(() => {
+    if (!household?.id) return
+    const saved = localStorage.getItem(`expected_income_${household.id}`)
+    if (saved) setExpectedIncomeState(Number(saved))
+  }, [household?.id])
 
   useEffect(() => {
     if (!household) return
@@ -17,10 +25,10 @@ export function useTransactions() {
     const { data, error } = await supabase
       .from('transactions')
       .select('*')
+      .eq('household_id', household.id)   // ← Fix 1: filter by household
       .order('date', { ascending: false })
 
     if (error) { console.error('loadTransactions:', error); return }
-    // Capture the legacy family_id from existing rows so new inserts can reuse it
     const firstWithFamily = data?.find(t => t.family_id)
     if (firstWithFamily) setLegacyFamilyId(firstWithFamily.family_id)
     setTransactions((data || []).map(mapRow))
@@ -30,6 +38,7 @@ export function useTransactions() {
     if (!household) return
     const tempId = 'tmp_' + Date.now()
     setTransactions(prev => [{ ...tx, id: tempId }, ...prev])
+    setTxError(null)
 
     const { data: fRow } = await supabase
       .from('transactions').select('family_id').not('family_id', 'is', null).limit(1).single()
@@ -52,7 +61,7 @@ export function useTransactions() {
 
     if (error) {
       console.error('addTransaction:', error)
-      alert('שגיאה בהוספת עסקה: ' + error.message)
+      setTxError('שגיאה בהוספת עסקה: ' + error.message)
       setTransactions(prev => prev.filter(t => t.id !== tempId))
     } else {
       setTransactions(prev => prev.map(t => t.id === tempId ? mapRow(data) : t))
@@ -69,20 +78,34 @@ export function useTransactions() {
     if (changes.type !== undefined)     patch.type = changes.type
     if (changes.category !== undefined) patch.category_id = changes.category
     if (changes.date !== undefined)     patch.date = changes.date
-    if (changes.user !== undefined)     patch.user_id = changes.user
+    if (changes.user !== undefined)     patch.member = changes.user  // ← Fix 3: member not user_id
 
     const { error } = await supabase.from('transactions').update(patch).eq('id', id)
-    if (error) { console.error('updateTransaction:', error); setTransactions(snap) }
+    if (error) {
+      console.error('updateTransaction:', error)
+      setTxError('שגיאה בעדכון עסקה')
+      setTransactions(snap)
+    }
   }
 
   async function deleteTransaction(id) {
     const snap = transactions
     setTransactions(prev => prev.filter(t => t.id !== id))
     const { error } = await supabase.from('transactions').delete().eq('id', id)
-    if (error) { console.error('deleteTransaction:', error); setTransactions(snap) }
+    if (error) {
+      console.error('deleteTransaction:', error)
+      setTxError('שגיאה במחיקת עסקה')
+      setTransactions(snap)
+    }
   }
 
-  function setExpectedIncome(amount) { setExpectedIncomeState(amount) }
+  // Fix 2: persist expected income to localStorage
+  function setExpectedIncome(amount) {
+    const val = Math.max(0, Number(amount) || 0)
+    setExpectedIncomeState(val)
+    if (household?.id) localStorage.setItem(`expected_income_${household.id}`, val)
+  }
+
   function updateBudget() {}
 
   return {
@@ -94,6 +117,8 @@ export function useTransactions() {
     updateTransaction,
     deleteTransaction,
     updateBudget,
+    txError,
+    clearTxError: () => setTxError(null),
   }
 }
 
@@ -105,6 +130,6 @@ function mapRow(t) {
     amount: t.amount,
     type: t.type,
     category: t.category_id,
-    user: t.member || t.user_id || 'family',
+    user: t.member || 'family',
   }
 }
