@@ -4,7 +4,7 @@
   align-items: center;
   justify-content: center;
   background: #060f09;
-  padding: 80px 20px 20px;
+  padding: 20px;
   position: relative;
   overflow: hidden;
 }
@@ -24,8 +24,7 @@
 .card {
   background: #fff;
   border-radius: 28px;
-  padding: 68px 28px 32px;
-  position: relative;
+  padding: 40px 28px 32px;
   width: 100%;
   max-width: 380px;
   box-shadow:
@@ -39,15 +38,9 @@
 
 /* Logo */
 .logoWrap {
-  position: absolute;
-  top: -60px; left: 50%; transform: translateX(-50%);
-  z-index: 2;
-}
-.logoImg {
-  width: 118px; height: 118px;
-  object-fit: contain;
-  border-radius: 50%;
-  filter: drop-shadow(0 4px 20px rgba(201,168,76,.6));
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 16px;
+  filter: drop-shadow(0 8px 24px rgba(201,168,76,.25));
 }
 
 .sub {

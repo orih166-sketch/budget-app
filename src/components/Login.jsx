@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import styles from './Login.module.css'
+import AppLogo from './AppLogo.jsx'
 
 export default function Login({ onLogin, onRegister, onSendResetCode, onLoginWithGoogle, onSendPhoneOtp, onVerifyPhoneOtp }) {
   const [mode, setMode]     = useState('login') // login | register | reset-email | reset-done | phone | phone-otp
@@ -71,7 +72,7 @@ export default function Login({ onLogin, onRegister, onSendResetCode, onLoginWit
 
       <div className={styles.card}>
         <div className={styles.logoWrap}>
-          <img src="/Gemini_Generated_Image_36zavc36zavc36za.png" alt="כלכלת בית" className={styles.logoImg} />
+          <AppLogo size={110} />
         </div>
         <p className={styles.sub}>
           {mode === 'login'     ? 'ברוך הבא'
