@@ -8,7 +8,7 @@
     "build": "vite build",
     "preview": "vite preview --port 4173",
     "lint": "eslint src",
-    "postinstall": "patch-package"
+    "postinstall": "patch-package || true"
   },
   "dependencies": {
     "@sparticuz/chromium-min": "^149.0.0",
