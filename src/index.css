@@ -33,8 +33,11 @@ body {
   background: var(--c-bg);
   color: var(--c-text);
   direction: rtl;
+  position: fixed;
+  width: 100%;
   height: 100%;
   overflow: hidden;
+  overscroll-behavior: none;
   -webkit-font-smoothing: antialiased;
 }
 
