@@ -6,6 +6,7 @@ export function useTransactions() {
   const { household } = useHousehold()
   const [transactions, setTransactions] = useState([])
   const [expectedIncome, setExpectedIncomeState] = useState(0)
+  const [legacyFamilyId, setLegacyFamilyId] = useState(null)
 
   useEffect(() => {
     if (!household) return
@@ -19,6 +20,9 @@ export function useTransactions() {
       .order('date', { ascending: false })
 
     if (error) { console.error('loadTransactions:', error); return }
+    // Capture the legacy family_id from existing rows so new inserts can reuse it
+    const firstWithFamily = data?.find(t => t.family_id)
+    if (firstWithFamily) setLegacyFamilyId(firstWithFamily.family_id)
     setTransactions((data || []).map(mapRow))
   }
 
@@ -33,6 +37,7 @@ export function useTransactions() {
       .from('transactions')
       .insert({
         household_id: household.id,
+        family_id: legacyFamilyId,
         date: tx.date,
         description: tx.desc,
         amount: tx.amount,
