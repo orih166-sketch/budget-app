@@ -7,7 +7,7 @@ const fmt  = n => '₪' + n.toLocaleString('he-IL', { maximumFractionDigits: 0 }
 const fmtK = v => v >= 1000 ? `${(v/1000).toFixed(0)}K` : v
 
 export default function Budget({ transactions, budget, onUpdateBudget, selectedMonth, selectedYear }) {
-  const { budgets: categoryBudgets, setBudget } = useCategoryBudgets()
+  const { budgets: categoryBudgets, saveAllBudgets } = useCategoryBudgets()
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState({})
 
@@ -37,7 +37,9 @@ export default function Budget({ transactions, budget, onUpdateBudget, selectedM
   }
 
   function save() {
-    Object.entries(draft).forEach(([k, v]) => setBudget(k, parseFloat(v) || 0))
+    const parsed = {}
+    Object.entries(draft).forEach(([k, v]) => { parsed[k] = parseFloat(v) || 0 })
+    saveAllBudgets(parsed)
     setEditing(false)
   }
 
