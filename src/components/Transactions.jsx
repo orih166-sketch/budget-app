@@ -7,39 +7,33 @@ const allCats = [...CATEGORIES.expenses, ...CATEGORIES.income]
 const cat = id => allCats.find(c => c.id === id)
 const userInfo = id => USERS.find(u => u.id === id)
 
-function getPeriodDates(period, year) {
+function formatDateLabel(dateStr) {
+  const d = new Date(dateStr)
   const today = new Date()
-  const start = new Date(year, today.getMonth(), today.getDate())
+  const yesterday = new Date(today); yesterday.setDate(today.getDate() - 1)
+  if (d.toDateString() === today.toDateString()) return 'היום'
+  if (d.toDateString() === yesterday.toDateString()) return 'אתמול'
+  return d.toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' })
+}
 
-  if (period === 'today') return [start, start]
-  if (period === 'week') {
-    const weekStart = new Date(start)
-    weekStart.setDate(start.getDate() - start.getDay())
-    return [weekStart, start]
-  }
-  if (period === 'month') {
-    return [new Date(year, today.getMonth(), 1), start]
-  }
-  if (period === 'year') {
-    return [new Date(year, 0, 1), start]
-  }
-  return null
+function groupByDate(txs) {
+  const groups = {}
+  txs.forEach(t => {
+    if (!groups[t.date]) groups[t.date] = []
+    groups[t.date].push(t)
+  })
+  return Object.entries(groups).sort((a, b) => b[0].localeCompare(a[0]))
 }
 
 function exportToCSV(transactions) {
   const headers = ['תאריך', 'תיאור', 'קטגוריה', 'סכום', 'סוג']
   const rows = transactions.map(t => [
-    t.date,
-    t.desc,
+    t.date, t.desc,
     cat(t.category)?.label || t.category,
     t.amount,
     t.type === 'income' ? 'הכנסה' : 'הוצאה'
   ])
-
-  const csv = [headers, ...rows]
-    .map(row => row.map(cell => `"${cell}"`).join(','))
-    .join('\n')
-
+  const csv = [headers, ...rows].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n')
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
   const link = document.createElement('a')
   link.href = URL.createObjectURL(blob)
@@ -48,146 +42,201 @@ function exportToCSV(transactions) {
 }
 
 export default function Transactions({ transactions, onDelete, onUpdate, selectedMonth, selectedYear, onMonthChange, selectedUser = 'family' }) {
-  const [search, setSearch]   = useState('')
-  const [filterCat, setCat]   = useState('')
-  const [filterType, setType] = useState('')
-  const [periodFilter, setPeriod] = useState('')
-  const [editId,     setEditId]     = useState(null)
-  const [editForm,   setForm]       = useState({})
-  const [deleteId,   setDeleteId]   = useState(null)
+  const [search, setSearch]       = useState('')
+  const [filterType, setType]     = useState('')
+  const [filterCat, setCat]       = useState('')
+  const [editId, setEditId]       = useState(null)
+  const [editForm, setForm]       = useState({})
+  const [deleteId, setDeleteId]   = useState(null)
+  const [showFilters, setFilters] = useState(false)
 
   const filtered = useMemo(() => {
-    let result = transactions
-
-    if (periodFilter) {
-      const [start, end] = getPeriodDates(periodFilter, selectedYear)
-      result = result.filter(t => {
-        const d = new Date(t.date)
-        return d >= start && d <= end
-      })
-    } else {
-      result = result.filter(t => {
-        const d = new Date(t.date)
-        return d.getMonth() === selectedMonth && d.getFullYear() === selectedYear
-      })
-    }
-
-    return result.filter(t => {
+    return transactions.filter(t => {
+      const d = new Date(t.date)
+      if (d.getMonth() !== selectedMonth || d.getFullYear() !== selectedYear) return false
       if (selectedUser !== 'family' && t.user !== selectedUser) return false
       if (filterType && t.type !== filterType) return false
       if (filterCat  && t.category !== filterCat) return false
       if (search && !t.desc.toLowerCase().includes(search.toLowerCase())) return false
       return true
-    }).sort((a,b) => b.date.localeCompare(a.date))
-  }, [transactions, selectedMonth, selectedYear, selectedUser, filterType, filterCat, search, periodFilter])
+    }).sort((a, b) => b.date.localeCompare(a.date))
+  }, [transactions, selectedMonth, selectedYear, selectedUser, filterType, filterCat, search])
 
-  const totalIncome   = filtered.filter(t=>t.type==='income').reduce((a,t)=>a+t.amount,0)
-  const totalExpenses = filtered.filter(t=>t.type==='expense').reduce((a,t)=>a+t.amount,0)
+  const totalIncome   = filtered.filter(t => t.type === 'income').reduce((a, t) => a + t.amount, 0)
+  const totalExpenses = filtered.filter(t => t.type === 'expense').reduce((a, t) => a + t.amount, 0)
+  const balance       = totalIncome - totalExpenses
+  const grouped       = useMemo(() => groupByDate(filtered), [filtered])
 
   function startEdit(t) {
     setEditId(t.id)
     setForm({ desc: t.desc, amount: t.amount, category: t.category, date: t.date, user: t.user })
   }
-
   function saveEdit() {
     onUpdate(editId, { ...editForm, amount: parseFloat(editForm.amount) })
     setEditId(null)
   }
 
+  const hasActiveFilter = filterType || filterCat || search
+
   return (
     <div className={styles.wrap}>
-      <div className={styles.filters}>
-        <div className={styles.searchRow}>
-          <input className={styles.search} placeholder="חיפוש..." value={search} onChange={e=>setSearch(e.target.value)} />
-          <button className={styles.exportBtn} onClick={() => exportToCSV(filtered)} title="הורד CSV">📥</button>
+
+      {/* ── Search + controls ── */}
+      <div className={styles.topBar}>
+        <div className={styles.searchWrap}>
+          <span className={styles.searchIcon}>⌕</span>
+          <input
+            className={styles.search}
+            placeholder="חיפוש עסקאות..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
+          {search && <button className={styles.clearSearch} onClick={() => setSearch('')}>✕</button>}
         </div>
-        <div className={styles.periodRow}>
-          {['today', 'week', 'month', 'year'].map(p => (
-            <button
-              key={p}
-              className={`${styles.periodBtn} ${periodFilter === p ? styles.periodActive : ''}`}
-              onClick={() => setPeriod(periodFilter === p ? '' : p)}
-            >
-              {p === 'today' ? 'היום' : p === 'week' ? 'שבוע' : p === 'month' ? 'חודש' : 'שנה'}
-            </button>
+        <button
+          className={`${styles.filterToggle} ${(showFilters || hasActiveFilter) ? styles.filterToggleActive : ''}`}
+          onClick={() => setFilters(v => !v)}
+        >
+          ⚙
+          {hasActiveFilter && <span className={styles.filterDot} />}
+        </button>
+        <button className={styles.exportBtn} onClick={() => exportToCSV(filtered)} title="ייצוא CSV">
+          ↓
+        </button>
+      </div>
+
+      {/* ── Filter panel ── */}
+      {showFilters && (
+        <div className={styles.filterPanel}>
+          <div className={styles.filterGroup}>
+            <span className={styles.filterLabel}>סוג</span>
+            <div className={styles.chips}>
+              {[['', 'הכל'], ['expense', 'הוצאות'], ['income', 'הכנסות']].map(([v, l]) => (
+                <button key={v} className={`${styles.chip} ${filterType === v ? styles.chipActive : ''}`} onClick={() => setType(v)}>{l}</button>
+              ))}
+            </div>
+          </div>
+          <div className={styles.filterGroup}>
+            <span className={styles.filterLabel}>חודש</span>
+            <div className={styles.chips}>
+              <select className={styles.miniSel} value={selectedMonth} onChange={e => onMonthChange(+e.target.value, selectedYear)}>
+                {MONTHS.map((m, i) => <option key={i} value={i}>{m}</option>)}
+              </select>
+              <select className={styles.miniSel} value={selectedYear} onChange={e => onMonthChange(selectedMonth, +e.target.value)}>
+                {[2024, 2025, 2026, 2027].map(y => <option key={y}>{y}</option>)}
+              </select>
+            </div>
+          </div>
+          {(filterType || filterCat) && (
+            <button className={styles.clearFilters} onClick={() => { setType(''); setCat('') }}>נקה פילטרים</button>
+          )}
+        </div>
+      )}
+
+      {/* ── Summary strip ── */}
+      <div className={styles.summaryStrip}>
+        <div className={styles.summaryItem}>
+          <span className={styles.summaryLbl}>הכנסות</span>
+          <span className={`${styles.summaryVal} ${styles.inc}`}>+{fmt(totalIncome)}</span>
+        </div>
+        <div className={styles.summaryDivider} />
+        <div className={styles.summaryItem}>
+          <span className={styles.summaryLbl}>הוצאות</span>
+          <span className={`${styles.summaryVal} ${styles.exp}`}>-{fmt(totalExpenses)}</span>
+        </div>
+        <div className={styles.summaryDivider} />
+        <div className={styles.summaryItem}>
+          <span className={styles.summaryLbl}>מאזן</span>
+          <span className={`${styles.summaryVal} ${balance >= 0 ? styles.inc : styles.exp}`}>{fmt(balance)}</span>
+        </div>
+      </div>
+
+      {/* ── Transaction list grouped by date ── */}
+      {filtered.length === 0 ? (
+        <div className={styles.empty}>
+          <div className={styles.emptyIcon}>📭</div>
+          <p>אין עסקאות לתקופה זו</p>
+        </div>
+      ) : (
+        <div className={styles.list}>
+          {grouped.map(([date, txs]) => (
+            <div key={date} className={styles.dateGroup}>
+              <div className={styles.dateHeader}>
+                <span className={styles.dateLbl}>{formatDateLabel(date)}</span>
+                <span className={styles.dateLine} />
+                <span className={styles.dateAmt}>
+                  {(() => {
+                    const net = txs.reduce((a, t) => a + (t.type === 'income' ? t.amount : -t.amount), 0)
+                    return <span style={{ color: net >= 0 ? 'var(--c-green)' : 'var(--c-red)' }}>{net >= 0 ? '+' : ''}{fmt(net)}</span>
+                  })()}
+                </span>
+              </div>
+
+              {txs.map(t => {
+                const c = cat(t.category)
+                const u = userInfo(t.user)
+
+                if (editId === t.id) {
+                  return (
+                    <div key={t.id} className={styles.editCard}>
+                      <input className={styles.editInput} value={editForm.desc}
+                        onChange={e => setForm(f => ({ ...f, desc: e.target.value }))} placeholder="תיאור" />
+                      <div className={styles.editRow}>
+                        <input className={styles.editInput} type="number" value={editForm.amount}
+                          onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} placeholder="סכום" />
+                        <input className={styles.editInput} type="date" value={editForm.date}
+                          onChange={e => setForm(f => ({ ...f, date: e.target.value }))} />
+                      </div>
+                      <select className={styles.editInput} value={editForm.user} onChange={e => setForm(f => ({ ...f, user: e.target.value }))}>
+                        {USERS.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
+                      </select>
+                      <div className={styles.editActions}>
+                        <button className={styles.saveBtn} onClick={saveEdit}>שמור</button>
+                        <button className={styles.cancelBtn} onClick={() => setEditId(null)}>ביטול</button>
+                      </div>
+                    </div>
+                  )
+                }
+
+                return (
+                  <div key={t.id} className={`${styles.row} ${t.type === 'income' ? styles.rowIncome : styles.rowExpense}`}>
+                    <div className={styles.iconWrap} style={{ background: c?.color ? c.color + '18' : 'var(--c-bg)' }}>
+                      <span className={styles.rowIcon}>{c?.icon || '📦'}</span>
+                    </div>
+                    <div className={styles.info}>
+                      <div className={styles.descRow}>
+                        <span className={styles.desc}>{t.desc}</span>
+                        {u && u.id !== 'family' && (
+                          <span className={styles.userBadge} style={{ background: u.color + '22', color: u.color }}>{u.avatar}</span>
+                        )}
+                      </div>
+                      <span className={styles.meta}>{c?.label || t.category}</span>
+                    </div>
+                    <div className={styles.rowRight}>
+                      <span className={`${styles.amt} ${t.type === 'income' ? styles.inc : styles.exp}`}>
+                        {t.type === 'income' ? '+' : '-'}{fmt(t.amount)}
+                      </span>
+                      <div className={styles.actions}>
+                        {deleteId === t.id ? (
+                          <>
+                            <button className={styles.deleteConfirmBtn} onClick={() => { onDelete(t.id); setDeleteId(null) }}>מחק</button>
+                            <button className={styles.deleteCancelBtn} onClick={() => setDeleteId(null)}>ביטול</button>
+                          </>
+                        ) : (
+                          <>
+                            <button className={styles.actionBtn} onClick={() => startEdit(t)}>✏</button>
+                            <button className={`${styles.actionBtn} ${styles.actionBtnDel}`} onClick={() => setDeleteId(t.id)}>✕</button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
           ))}
         </div>
-        <div className={styles.filterRow}>
-          <select className={styles.sel} value={selectedMonth} onChange={e => { setPeriod(''); onMonthChange(+e.target.value, selectedYear) }}>
-            {MONTHS.map((m,i) => <option key={i} value={i}>{m}</option>)}
-          </select>
-          <select className={styles.sel} value={selectedYear} onChange={e => { setPeriod(''); onMonthChange(selectedMonth, +e.target.value) }}>
-            {[2024,2025,2026,2027].map(y => <option key={y}>{y}</option>)}
-          </select>
-          <select className={styles.sel} value={filterType} onChange={e=>setType(e.target.value)}>
-            <option value="">הכל</option>
-            <option value="expense">הוצאות</option>
-            <option value="income">הכנסות</option>
-          </select>
-        </div>
-      </div>
-
-      <div className={styles.summary}>
-        <span className={styles.inc}>+{fmt(totalIncome)}</span>
-        <span className={styles.divider}>|</span>
-        <span className={styles.exp}>-{fmt(totalExpenses)}</span>
-        <span className={styles.divider}>|</span>
-        <span className={totalIncome-totalExpenses>=0 ? styles.inc : styles.exp}>{fmt(totalIncome-totalExpenses)}</span>
-      </div>
-
-      <div className={styles.list}>
-        {filtered.length === 0 && <p className={styles.empty}>אין עסקאות לתקופה זו</p>}
-        {filtered.map(t => {
-          const c = cat(t.category)
-          const u = userInfo(t.user)
-          if (editId === t.id) {
-            return (
-              <div key={t.id} className={styles.editCard}>
-                <input className={styles.input} value={editForm.desc}   onChange={e=>setForm(f=>({...f,desc:e.target.value}))} placeholder="תיאור" />
-                <input className={styles.input} type="number" value={editForm.amount} onChange={e=>setForm(f=>({...f,amount:e.target.value}))} placeholder="סכום" />
-                <input className={styles.input} type="date"   value={editForm.date}   onChange={e=>setForm(f=>({...f,date:e.target.value}))} />
-                <select className={styles.input} value={editForm.user} onChange={e=>setForm(f=>({...f,user:e.target.value}))}>
-                  {USERS.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
-                </select>
-                <div className={styles.editActions}>
-                  <button className={styles.saveBtn}   onClick={saveEdit}>שמור</button>
-                  <button className={styles.cancelBtn} onClick={()=>setEditId(null)}>ביטול</button>
-                </div>
-              </div>
-            )
-          }
-          return (
-            <div key={t.id} className={styles.row}>
-              <span className={styles.icon}>{c?.icon || '📦'}</span>
-              <div className={styles.info}>
-                <div className={styles.descRow}>
-                  <span className={styles.desc}>{t.desc}</span>
-                  {u && u.id !== 'family' && (
-                    <span className={styles.userBadge} style={{ background: u.color + '22', color: u.color }}>{u.avatar}</span>
-                  )}
-                </div>
-                <span className={styles.meta}>{t.date} · {c?.label}</span>
-              </div>
-              <span className={`${styles.amt} ${t.type==='income' ? styles.inc : styles.exp}`}>
-                {t.type==='income' ? '+' : '-'}{fmt(t.amount)}
-              </span>
-              <div className={styles.actions}>
-                {deleteId === t.id ? (
-                  <>
-                    <button className={styles.deleteConfirmBtn} onClick={() => { onDelete(t.id); setDeleteId(null) }}>מחק</button>
-                    <button className={styles.deleteCancelBtn}  onClick={() => setDeleteId(null)}>ביטול</button>
-                  </>
-                ) : (
-                  <>
-                    <button className={styles.editBtn}   onClick={() => startEdit(t)} aria-label="ערוך עסקה">✏️</button>
-                    <button className={styles.deleteBtn} onClick={() => setDeleteId(t.id)} aria-label="מחק עסקה">🗑️</button>
-                  </>
-                )}
-              </div>
-            </div>
-          )
-        })}
-      </div>
+      )}
     </div>
   )
 }
