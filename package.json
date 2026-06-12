@@ -8,7 +8,7 @@
     "build": "vite build",
     "preview": "vite preview --port 4173",
     "lint": "eslint src",
-    "postinstall": "patch-package || true"
+    "postinstall": "cp vendor/israeli-bank-scrapers/fetch.js node_modules/israeli-bank-scrapers/lib/helpers/fetch.js && cp vendor/israeli-bank-scrapers/discount.js node_modules/israeli-bank-scrapers/lib/scrapers/discount.js || true"
   },
   "dependencies": {
     "@sparticuz/chromium-min": "^149.0.0",
@@ -17,6 +17,7 @@
     "firebase": "^12.13.0",
     "israeli-bank-scrapers": "^6.7.5",
     "lucide-react": "^0.394.0",
+    "pdf-parse": "^2.4.5",
     "puppeteer-core": "^25.1.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

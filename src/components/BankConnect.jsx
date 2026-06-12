@@ -42,10 +42,11 @@ export default function BankConnect({ onClose, onImported }) {
   const [error, setError]       = useState('')
   const [phase, setPhase]       = useState('')
 
-  // ── Excel import state ──
+  // ── Excel/PDF import state ──
   const [fileName, setFileName]   = useState('')
   const [preview, setPreview]     = useState(null)   // { rows, bankName }
   const [importing, setImporting] = useState(false)
+  const [pdfLoading, setPdfLoading] = useState(false)
 
   // ────────── SYNC ──────────
   async function submitSync(e) {
@@ -78,36 +79,65 @@ export default function BankConnect({ onClose, onImported }) {
     }
   }
 
-  // ────────── EXCEL IMPORT ──────────
+  // ────────── EXCEL/PDF IMPORT ──────────
   function handleFile(e) {
     const file = e.target.files?.[0]
     if (!file) return
-    setFileName(file.name)
-    const isCSV = file.name.toLowerCase().endsWith('.csv')
+    setFileName(file.name); setError(''); setPreview(null)
+
+    if (file.name.toLowerCase().endsWith('.pdf')) {
+      handlePdf(file)
+      return
+    }
+
     const reader = new FileReader()
     reader.onload = ev => {
       try {
-        let rows
-        if (isCSV) {
-          rows = parseCSV(ev.target.result)
-        } else {
-          // For Excel files, read as text with UTF-8 (works for many banks' exports)
-          rows = parseCSV(ev.target.result)
-        }
+        const rows = parseCSV(ev.target.result)
         const parsed = parseRows(rows, file.name)
         if (parsed.total === 0) {
           setError('לא נמצאו עסקאות בקובץ. נסה לשמור כ-CSV מתוך Excel.')
-          setPreview(null)
         } else {
           setPreview(parsed)
-          setError('')
         }
       } catch (err) {
         setError('לא ניתן לקרוא את הקובץ: ' + err.message)
-        setPreview(null)
       }
     }
     reader.readAsText(file, 'utf-8')
+  }
+
+  async function handlePdf(file) {
+    setPdfLoading(true); setError('')
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) throw new Error('לא מחובר')
+
+      const arrayBuf = await file.arrayBuffer()
+      const b64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuf)))
+
+      const res = await fetch('/api/import-pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          pdfBase64: b64,
+          householdId: household.id,
+          authToken: session.access_token,
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'שגיאה בייבוא PDF')
+      if (data.total === 0) {
+        setError('לא נמצאו עסקאות ב-PDF. ייתכן שהפורמט אינו נתמך.')
+        return
+      }
+      setResult({ added: data.added, total: data.total, accounts: [], preview: data.preview })
+      setStep('done'); onImported?.()
+    } catch (err) {
+      setError('שגיאה: ' + err.message)
+    } finally {
+      setPdfLoading(false)
+    }
   }
 
   function parseCSV(text) {
@@ -316,16 +346,17 @@ export default function BankConnect({ onClose, onImported }) {
           <div className={styles.form}>
             <div className={styles.notice}>
               <span className={styles.noticeIcon}>📋</span>
-              <p>הורד תנועות חשבון מאתר הבנק כ-<strong>CSV</strong> ועלה אותן כאן. עובד עם כל הבנקים.</p>
+              <p>הורד תנועות חשבון מאתר הבנק כ-<strong>CSV</strong> או <strong>PDF</strong> ועלה כאן. עובד עם כל הבנקים.</p>
             </div>
 
             <div className={styles.fieldWrap}>
-              <label className={styles.label}>קובץ CSV מהבנק</label>
+              <label className={styles.label}>קובץ מהבנק (CSV או PDF)</label>
               <button type="button" className={styles.fileBtn}
-                onClick={() => fileRef.current?.click()}>
-                📂 {fileName || 'בחר קובץ CSV...'}
+                onClick={() => fileRef.current?.click()}
+                disabled={pdfLoading}>
+                {pdfLoading ? '⏳ מעבד PDF...' : `📂 ${fileName || 'בחר קובץ CSV / PDF...'}`}
               </button>
-              <input ref={fileRef} type="file" accept=".csv,.txt"
+              <input ref={fileRef} type="file" accept=".csv,.txt,.pdf"
                 style={{ display: 'none' }} onChange={handleFile} />
             </div>
 
@@ -360,7 +391,7 @@ export default function BankConnect({ onClose, onImported }) {
               <div className={styles.importHint}>
                 <p className={styles.importHintTitle}>איך להוריד מהבנק?</p>
                 <ul className={styles.importHintList}>
-                  <li>דיסקונט: תנועות חשבון → ייצוא → CSV</li>
+                  <li>דיסקונט: תנועות חשבון → ייצוא → PDF (נתמך!) או CSV</li>
                   <li>לאומי: תנועות בחשבון → הורדת נתונים → CSV</li>
                   <li>הפועלים: פעולות בחשבון → CSV/Excel → שמור כ-CSV</li>
                   <li>מזרחי: תנועות בחשבון → ייצוא → CSV</li>
@@ -394,6 +425,22 @@ export default function BankConnect({ onClose, onImported }) {
                 <span>{a.txns} עסקאות</span>
               </div>
             ))}
+            {result.preview?.length > 0 && (
+              <div className={styles.previewBox} style={{ width: '100%' }}>
+                <div className={styles.previewHeader}>תצוגה מקדימה</div>
+                <div className={styles.previewRows}>
+                  {result.preview.slice(0, 5).map((t, i) => (
+                    <div key={i} className={styles.previewRow}>
+                      <span className={styles.previewDate}>{t.date}</span>
+                      <span className={styles.previewDesc}>{t.description}</span>
+                      <span className={`${styles.previewAmt} ${t.type === 'expense' ? styles.expense : styles.income}`}>
+                        {t.type === 'expense' ? '-' : '+'}{t.amount?.toLocaleString('he-IL')} ₪
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
             <button className={styles.submitBtn} onClick={onClose}>סגור</button>
           </div>
         )}
