@@ -1,6 +1,7 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef } from 'react'
 import { CATEGORIES, MONTHS, USERS } from '../data.js'
 import { INTERVAL_LABELS } from '../hooks/useRecurring.js'
+import { useReceipts } from '../hooks/useReceipts.js'
 import styles from './Transactions.module.css'
 import calStyles from './Calendar.module.css'
 
@@ -56,6 +57,10 @@ export default function Transactions({ transactions, onDelete, onUpdate, selecte
   const [showRecurring, setShowRec] = useState(false)
   const [view, setView]             = useState('list')
   const [calDay, setCalDay]         = useState(null)
+  const [receiptModal, setReceiptModal] = useState(null) // txId being viewed
+  const [receiptTxId,  setReceiptTxId]  = useState(null) // txId awaiting file
+  const fileInputRef = useRef(null)
+  const receipts = useReceipts()
 
   // Merge real transactions + recurring instances for this month
   const allTxns = useMemo(() => {
@@ -286,6 +291,18 @@ export default function Transactions({ transactions, onDelete, onUpdate, selecte
                         {t.type === 'income' ? '+' : '-'}{fmt(t.amount)}
                       </span>
                       <div className={styles.actions}>
+                        {!t.isRecurring && (
+                          <button
+                            className={`${styles.actionBtn} ${receipts.map[t.id] ? styles.receiptHas : ''}`}
+                            title={receipts.map[t.id] ? 'צפה בקבלה' : 'צרף קבלה'}
+                            onClick={() => {
+                              if (receipts.map[t.id]) setReceiptModal(t.id)
+                              else { setReceiptTxId(t.id); fileInputRef.current?.click() }
+                            }}
+                          >
+                            {receipts.map[t.id] ? '🖼' : '📎'}
+                          </button>
+                        )}
                         {t.isRecurring ? (
                           deleteId === t.id ? (
                             <>
@@ -315,6 +332,38 @@ export default function Transactions({ transactions, onDelete, onUpdate, selecte
           ))}
         </div>
       )}
+      {/* ── Receipt viewer modal ── */}
+      {receiptModal && (
+        <div className={styles.receiptOverlay} onClick={() => setReceiptModal(null)}>
+          <div className={styles.receiptCard} onClick={e => e.stopPropagation()}>
+            <div className={styles.receiptHeader}>
+              <span className={styles.receiptTitle}>קבלה</span>
+              <button className={styles.receiptClose} onClick={() => setReceiptModal(null)}>✕</button>
+            </div>
+            <img src={receipts.map[receiptModal]} alt="קבלה" className={styles.receiptImg} />
+            <div className={styles.receiptFooter}>
+              <button className={styles.receiptDeleteBtn} onClick={() => { receipts.remove(receiptModal); setReceiptModal(null) }}>
+                מחק קבלה
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Hidden file input for camera / gallery ── */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        style={{ display: 'none' }}
+        onChange={async e => {
+          const file = e.target.files?.[0]
+          if (file && receiptTxId) await receipts.attach(receiptTxId, file)
+          e.target.value = ''
+          setReceiptTxId(null)
+        }}
+      />
     </div>
   )
 }
