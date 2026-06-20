@@ -1,9 +1,8 @@
 import { MONTHS, USERS } from '../data.js'
 import styles from './MonthNav.module.css'
 
-const now = new Date()
-
 export default function MonthNav({ month, year, onChange, selectedUser, onUserChange }) {
+  const now = new Date()
   const isCurrentMonth = month === now.getMonth() && year === now.getFullYear()
 
   function prev() {

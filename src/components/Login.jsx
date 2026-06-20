@@ -19,12 +19,12 @@ export default function Login({ onLogin, onRegister, onSendResetCode, onLoginWit
   async function submit(e) {
     e.preventDefault()
     setError(''); setSuccess('')
+    if (mode === 'register' && !name.trim()) { setError('נא להזין שם'); return }
     setLoading(true)
     try {
       if (mode === 'login') {
         await onLogin(email, pass)
       } else if (mode === 'register') {
-        if (!name.trim()) { setError('נא להזין שם'); return }
         await onRegister(email, pass, name.trim())
         setSuccess('החשבון נוצר! בדוק את המייל לאישור')
       } else if (mode === 'reset-email') {

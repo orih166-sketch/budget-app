@@ -72,7 +72,9 @@ export default function Transactions({ transactions, onDelete, onUpdate, selecte
     setForm({ desc: t.desc, amount: t.amount, category: t.category, date: t.date, user: t.user })
   }
   function saveEdit() {
-    onUpdate(editId, { ...editForm, amount: parseFloat(editForm.amount) })
+    const amount = parseFloat(editForm.amount)
+    if (!amount || isNaN(amount) || amount <= 0) return
+    onUpdate(editId, { ...editForm, amount })
     setEditId(null)
   }
 

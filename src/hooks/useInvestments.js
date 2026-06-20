@@ -20,15 +20,27 @@ export function useInvestments() {
   }
 
   function addInvestment(inv) {
-    save([{ ...inv, id: 'inv' + Date.now() }, ...investments])
+    setInvestments(prev => {
+      const next = [{ ...inv, id: 'inv' + Date.now() }, ...prev]
+      persist(next)
+      return next
+    })
   }
 
   function updateInvestment(id, data) {
-    save(investments.map(i => i.id === id ? { ...i, ...data } : i))
+    setInvestments(prev => {
+      const next = prev.map(i => i.id === id ? { ...i, ...data } : i)
+      persist(next)
+      return next
+    })
   }
 
   function deleteInvestment(id) {
-    save(investments.filter(i => i.id !== id))
+    setInvestments(prev => {
+      const next = prev.filter(i => i.id !== id)
+      persist(next)
+      return next
+    })
   }
 
   return { investments, addInvestment, updateInvestment, deleteInvestment }

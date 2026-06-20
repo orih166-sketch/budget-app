@@ -24,19 +24,23 @@ export default function Reports({ transactions }) {
       }
     }), [transactions, year])
 
+  const yearTxns = useMemo(() =>
+    transactions.filter(t => new Date(t.date).getFullYear() === year),
+    [transactions, year])
+
   const byCat = useMemo(() => {
     const map = {}
-    transactions.forEach(t => {
+    yearTxns.forEach(t => {
       if (t.type === 'expense') map[t.category] = (map[t.category] || 0) + t.amount
     })
     return Object.entries(map)
       .map(([id, amount]) => ({ id, amount, meta: cat(id) }))
       .filter(x => x.meta)
       .sort((a, b) => b.amount - a.amount)
-  }, [transactions])
+  }, [yearTxns])
 
-  const totalIncome   = transactions.filter(t => t.type === 'income').reduce((a, t) => a + t.amount, 0)
-  const totalExpenses = transactions.filter(t => t.type === 'expense').reduce((a, t) => a + t.amount, 0)
+  const totalIncome   = yearTxns.filter(t => t.type === 'income').reduce((a, t) => a + t.amount, 0)
+  const totalExpenses = yearTxns.filter(t => t.type === 'expense').reduce((a, t) => a + t.amount, 0)
 
   return (
     <div className={styles.wrap}>

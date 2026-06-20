@@ -103,7 +103,7 @@ function DepositModal({ goal, onDeposit, onClose }) {
     e.preventDefault()
     const n = parseFloat(amount)
     if (!n || n <= 0) return
-    onDeposit(goal.id, n)
+    onDeposit(goal.id, Math.min(n, remaining))
     onClose()
   }
 

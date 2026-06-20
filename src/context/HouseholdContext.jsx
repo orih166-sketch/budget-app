@@ -29,7 +29,7 @@ export function HouseholdProvider({ user, children }) {
       if (error || !data?.households) {
         // No household yet — create one now (handles users who registered before the DB trigger)
         await bootstrapHousehold()
-        return
+        return  // bootstrapHousehold sets loading(false) via finally below
       }
 
       const h = data.households
@@ -68,8 +68,6 @@ export function HouseholdProvider({ user, children }) {
       setMembers([{ user_id: user.uid, role: 'owner', joined_at: new Date().toISOString() }])
     } catch (e) {
       console.error('bootstrapHousehold:', e)
-    } finally {
-      setLoading(false)
     }
   }
 

@@ -1,8 +1,11 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import styles from './AlertBanner.module.css'
 
 export default function AlertBanner({ alerts }) {
   const [dismissed, setDismissed] = useState(new Set())
+
+  // Reset dismissed when the alert set changes (new month, new data)
+  useEffect(() => { setDismissed(new Set()) }, [alerts])
 
   if (!alerts || alerts.length === 0) return null
 
