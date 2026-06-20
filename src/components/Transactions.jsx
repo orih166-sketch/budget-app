@@ -30,6 +30,84 @@ function groupByDate(txs) {
   return Object.entries(groups).sort((a, b) => b[0].localeCompare(a[0]))
 }
 
+async function exportToPDF(transactions, month, year) {
+  const { jsPDF } = await import('jspdf')
+  const { default: autoTable } = await import('jspdf-autotable')
+
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
+  const MONTHS_HE = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר']
+
+  const income   = transactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0)
+  const expenses = transactions.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0)
+  const balance  = income - expenses
+  const fmtNum   = n => n.toLocaleString('he-IL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+
+  // Header
+  doc.setFontSize(20)
+  doc.setFont('helvetica', 'bold')
+  doc.text(`${MONTHS_HE[month]} ${year} - Family Budget`, 105, 18, { align: 'center' })
+
+  // Summary row
+  doc.setFontSize(11)
+  doc.setFont('helvetica', 'normal')
+  const sumY = 28
+  doc.setFillColor(240, 253, 244)
+  doc.roundedRect(14, sumY, 55, 18, 3, 3, 'F')
+  doc.setTextColor(22, 101, 52)
+  doc.text('Income', 41, sumY + 7, { align: 'center' })
+  doc.setFont('helvetica', 'bold')
+  doc.text('ILS ' + fmtNum(income), 41, sumY + 13, { align: 'center' })
+
+  doc.setFillColor(254, 242, 242)
+  doc.roundedRect(75, sumY, 55, 18, 3, 3, 'F')
+  doc.setTextColor(185, 28, 28)
+  doc.setFont('helvetica', 'normal')
+  doc.text('Expenses', 102, sumY + 7, { align: 'center' })
+  doc.setFont('helvetica', 'bold')
+  doc.text('ILS ' + fmtNum(expenses), 102, sumY + 13, { align: 'center' })
+
+  doc.setFillColor(balance >= 0 ? 240 : 254, balance >= 0 ? 249 : 226, balance >= 0 ? 255 : 226)
+  doc.roundedRect(136, sumY, 55, 18, 3, 3, 'F')
+  doc.setTextColor(balance >= 0 ? 109 : 185, balance >= 0 ? 40 : 28, balance >= 0 ? 217 : 28)
+  doc.setFont('helvetica', 'normal')
+  doc.text('Balance', 163, sumY + 7, { align: 'center' })
+  doc.setFont('helvetica', 'bold')
+  doc.text('ILS ' + fmtNum(balance), 163, sumY + 13, { align: 'center' })
+  doc.setTextColor(0, 0, 0)
+
+  // Transactions table
+  const rows = [...transactions]
+    .sort((a, b) => a.date.localeCompare(b.date))
+    .map(t => {
+      const c = allCats.find(x => x.id === t.category)
+      const sign = t.type === 'expense' ? '-' : '+'
+      return [t.date, t.desc || '-', c?.label || t.category, `${sign} ILS ${fmtNum(t.amount)}`]
+    })
+
+  autoTable(doc, {
+    startY: sumY + 24,
+    head: [['Date', 'Description', 'Category', 'Amount']],
+    body: rows,
+    theme: 'striped',
+    headStyles: { fillColor: [22, 101, 52], textColor: 255, fontStyle: 'bold', fontSize: 10 },
+    bodyStyles: { fontSize: 9 },
+    columnStyles: { 3: { halign: 'right' } },
+    margin: { left: 14, right: 14 },
+    styles: { overflow: 'linebreak' },
+  })
+
+  // Footer
+  const pageCount = doc.internal.getNumberOfPages()
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i)
+    doc.setFontSize(8)
+    doc.setTextColor(150)
+    doc.text(`Page ${i} of ${pageCount}  |  Generated ${new Date().toLocaleDateString('en-GB')}`, 105, 290, { align: 'center' })
+  }
+
+  doc.save(`budget-${year}-${String(month + 1).padStart(2, '0')}.pdf`)
+}
+
 function exportToCSV(transactions) {
   const headers = ['תאריך', 'תיאור', 'קטגוריה', 'סכום', 'סוג']
   const rows = transactions.map(t => [
@@ -122,6 +200,9 @@ export default function Transactions({ transactions, onDelete, onUpdate, selecte
         </button>
         <button className={styles.exportBtn} onClick={() => exportToCSV(filtered)} title="ייצוא CSV">
           ↓
+        </button>
+        <button className={styles.exportBtn} onClick={() => exportToPDF(filtered, selectedMonth, selectedYear)} title="ייצוא PDF">
+          📄
         </button>
         <button
           className={`${styles.filterToggle} ${view === 'calendar' ? styles.filterToggleActive : ''}`}
