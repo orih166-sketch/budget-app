@@ -12,6 +12,7 @@ import Toast from './components/Toast.jsx'
 import FamilySettings from './components/FamilySettings.jsx'
 import BankConnect from './components/BankConnect.jsx'
 import Accounts from './components/Accounts.jsx'
+import Onboarding, { shouldShowOnboarding } from './components/Onboarding.jsx'
 import { HouseholdProvider, useHousehold } from './context/HouseholdContext.jsx'
 import { useTransactions } from './hooks/useTransactions.js'
 import { useSavingsGoals } from './hooks/useSavingsGoals.js'
@@ -39,6 +40,7 @@ function AppShell({ user, isPasswordRecovery, logout, updatePassword }) {
   const { netWorth, totalAssets, totalLiab } = useAccounts()
   const recurring = useRecurring()
 
+  const [showOnboarding, setShowOnboarding] = useState(shouldShowOnboarding)
   const [tab, setTab]             = useState('dashboard')
   const [tabKey, setTabKey]       = useState(0)
   const [sideOpen, setSide]       = useState(false)
@@ -183,6 +185,7 @@ function AppShell({ user, isPasswordRecovery, logout, updatePassword }) {
         ))}
       </nav>
 
+      {showOnboarding && <Onboarding onDone={() => setShowOnboarding(false)} />}
       {addOpen && <AddTransaction onAdd={addTransaction} onAddRecurring={recurring.addRule} onClose={() => setAdd(false)} user={user} />}
       {familyOpen && <FamilySettings user={user} onClose={() => setFamily(false)} />}
       {bankOpen   && <BankConnect onClose={() => setBank(false)} onImported={() => { setBank(false) }} />}
