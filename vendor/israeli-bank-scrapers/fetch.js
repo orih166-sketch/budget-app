@@ -75,19 +75,17 @@ async function fetchGetWithinPage(page, url, ignoreErrors = false) {
   return null;
 }
 async function fetchPostWithinPage(page, url, data, extraHeaders = {}, ignoreErrors = false) {
-  const result = await page.evaluate(async (innerUrl, innerData, innerExtraHeaders) => {
-    const response = await fetch(innerUrl, {
+  // Use .then() chains instead of async/await inside page.evaluate for Chrome 149 compatibility
+  const result = await page.evaluate(function(innerUrl, innerData, innerExtraHeaders) {
+    return fetch(innerUrl, {
       method: 'POST',
       body: JSON.stringify(innerData),
       credentials: 'include',
-      headers: Object.assign({
-        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-      }, innerExtraHeaders)
+      headers: Object.assign({ 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' }, innerExtraHeaders)
+    }).then(function(response) {
+      if (response.status === 204) return null;
+      return response.text();
     });
-    if (response.status === 204) {
-      return null;
-    }
-    return response.text();
   }, url, data, extraHeaders);
   try {
     if (result !== null) {

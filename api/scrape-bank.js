@@ -8,11 +8,16 @@ const CHROMIUM_URL =
 export const config = { maxDuration: 300 }
 
 const BANK_MAP = {
-  discount:  CompanyTypes.discount,
-  leumi:     CompanyTypes.leumi,
-  hapoalim:  CompanyTypes.hapoalim,
-  mizrahi:   CompanyTypes.mizrahi,
+  // Banks
+  discount:   CompanyTypes.discount,
+  leumi:      CompanyTypes.leumi,
+  hapoalim:   CompanyTypes.hapoalim,
+  mizrahi:    CompanyTypes.mizrahi,
   mercantile: CompanyTypes.mercantile,
+  // Credit cards
+  cal:        CompanyTypes.cal,
+  max:        CompanyTypes.max,
+  isracard:   CompanyTypes.isracard,
 }
 
 export default async function handler(req, res) {
@@ -114,14 +119,17 @@ export default async function handler(req, res) {
   }
 }
 
-function buildCreds(bank, { id, password, username, num }) {
+function buildCreds(bank, { id, password, username }) {
   switch (bank) {
     case 'hapoalim':
       return { userCode: username || id, password }
     case 'leumi':
+    case 'cal':
+    case 'max':
       return { username: username || id, password }
     case 'mizrahi':
     case 'mercantile':
+    case 'isracard':
       return { id, password }
     default: // discount
       return { id, password }

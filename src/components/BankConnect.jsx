@@ -4,11 +4,16 @@ import { useHousehold } from '../context/HouseholdContext.jsx'
 import styles from './BankConnect.module.css'
 
 const BANKS = [
-  { id: 'discount',   label: 'דיסקונט',      icon: '🏦', fields: ['id', 'password'] },
-  { id: 'leumi',      label: 'לאומי',         icon: '🏛', fields: ['username', 'password'] },
-  { id: 'hapoalim',   label: 'הפועלים',       icon: '🔴', fields: ['username', 'password'] },
-  { id: 'mizrahi',    label: 'מזרחי-טפחות',  icon: '🟠', fields: ['id', 'password'] },
-  { id: 'mercantile', label: 'מרכנתיל',       icon: '🏢', fields: ['id', 'password'] },
+  // Banks
+  { id: 'discount',   label: 'דיסקונט',      icon: '🏦', fields: ['id', 'password'],       group: 'bank' },
+  { id: 'leumi',      label: 'לאומי',         icon: '🏛', fields: ['username', 'password'],  group: 'bank' },
+  { id: 'hapoalim',   label: 'הפועלים',       icon: '🔴', fields: ['username', 'password'],  group: 'bank' },
+  { id: 'mizrahi',    label: 'מזרחי-טפחות',  icon: '🟠', fields: ['id', 'password'],        group: 'bank' },
+  { id: 'mercantile', label: 'מרכנתיל',       icon: '🏢', fields: ['id', 'password'],        group: 'bank' },
+  // Credit cards
+  { id: 'cal',        label: 'כאל',           icon: '💳', fields: ['username', 'password'],  group: 'card' },
+  { id: 'max',        label: 'מקס',           icon: '💳', fields: ['username', 'password'],  group: 'card' },
+  { id: 'isracard',   label: 'ישראכרט',       icon: '💳', fields: ['id', 'password'],        group: 'card' },
 ]
 
 const FIELD_LABELS = {
@@ -260,7 +265,7 @@ export default function BankConnect({ onClose, onImported }) {
         <div className={styles.header}>
           <div className={styles.bankBadge}>
             <span className={styles.bankIcon}>{bank.icon}</span>
-            <span className={styles.bankName}>{mode === 'import' ? 'ייבוא מאקסל' : `${bank.label} — סנכרון`}</span>
+            <span className={styles.bankName}>{mode === 'import' ? 'ייבוא קובץ' : `${bank.label} — סנכרון`}</span>
           </div>
           <button className={styles.closeBtn} onClick={onClose}>✕</button>
         </div>
@@ -285,7 +290,18 @@ export default function BankConnect({ onClose, onImported }) {
             <div className={styles.fieldWrap}>
               <label className={styles.label}>בנק</label>
               <div className={styles.bankGrid}>
-                {BANKS.map(b => (
+                {BANKS.filter(b => b.group === 'bank').map(b => (
+                  <button key={b.id} type="button"
+                    className={`${styles.bankBtn} ${bank.id === b.id ? styles.bankBtnActive : ''}`}
+                    onClick={() => { setBank(b); setCreds({}) }}>
+                    <span>{b.icon}</span>
+                    <span>{b.label}</span>
+                  </button>
+                ))}
+              </div>
+              <label className={styles.label} style={{ marginTop: 10 }}>כרטיסי אשראי</label>
+              <div className={styles.bankGrid}>
+                {BANKS.filter(b => b.group === 'card').map(b => (
                   <button key={b.id} type="button"
                     className={`${styles.bankBtn} ${bank.id === b.id ? styles.bankBtnActive : ''}`}
                     onClick={() => { setBank(b); setCreds({}) }}>
