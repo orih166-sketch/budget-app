@@ -67,10 +67,11 @@ export default function Dashboard({
   const daysInMonth    = new Date(selectedYear, selectedMonth + 1, 0).getDate()
   const dayOfMonth     = isCurrentMonth ? new Date().getDate() : daysInMonth
   const daysLeft       = Math.max(1, daysInMonth - dayOfMonth + 1)
+  const hasIncomeBudget = expectedIncome > 0
   const remaining      = expectedIncome - expenses
   const dailyBudget    = Math.round(remaining / Math.max(1, daysLeft))
-  const spentPct       = expectedIncome > 0 ? Math.min(100, Math.round((expenses / expectedIncome) * 100)) : 0
-  const isOverBudget   = remaining < 0
+  const spentPct       = hasIncomeBudget ? Math.min(100, Math.round((expenses / expectedIncome) * 100)) : 0
+  const isOverBudget   = hasIncomeBudget && remaining < 0
 
   function saveIncome() {
     const v = parseFloat(incomeInput)
@@ -183,11 +184,13 @@ export default function Dashboard({
 
         {/* Big remaining */}
         <div className={styles.heroCenter}>
-          <div className={styles.heroCenterLabel}>{isOverBudget ? '⚠️ חרגת מהתקציב' : 'נשאר החודש'}</div>
-          <div className={`${styles.heroBigNum} ${isOverBudget ? styles.heroBigOver : ''}`}>
-            {isOverBudget ? '-' : ''}{fmt(Math.abs(remaining))}
+          <div className={styles.heroCenterLabel}>
+            {isOverBudget ? '⚠️ חרגת מהתקציב' : hasIncomeBudget ? 'נשאר החודש' : 'יתרה החודש'}
           </div>
-          {isCurrentMonth && !isOverBudget && (
+          <div className={`${styles.heroBigNum} ${isOverBudget ? styles.heroBigOver : ''}`}>
+            {isOverBudget ? '-' : (hasIncomeBudget ? '' : (balance >= 0 ? '+' : '-'))}{fmt(Math.abs(hasIncomeBudget ? remaining : balance))}
+          </div>
+          {isCurrentMonth && !isOverBudget && hasIncomeBudget && (
             <div className={styles.heroDailyHint}>≈ {fmt(dailyBudget)} ליום · {daysLeft} ימים נותרו</div>
           )}
         </div>
