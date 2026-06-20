@@ -25,7 +25,7 @@ export default async function handler(req, res) {
 
   const body = req.body || {}
   const { bank = 'discount', credentials = {}, startDate, householdId, authToken } = body
-  const { id, password, username } = credentials
+  const { id, password, username, num } = credentials
 
   console.log('scrape-bank request:', { bank, householdId: !!householdId, authToken: !!authToken, bodyKeys: Object.keys(body) })
 
@@ -71,6 +71,8 @@ export default async function handler(req, res) {
 
     // Each bank uses different credential field names
     const bankCreds = buildCreds(bank, { id, password, username, num })
+    const missing = validateCreds(bank, bankCreds)
+    if (missing) return res.status(400).json({ error: `חסר שדה: ${missing}` })
     const result = await scraper.scrape(bankCreds)
 
     if (!result.success) {
@@ -123,7 +125,7 @@ export default async function handler(req, res) {
   }
 }
 
-function buildCreds(bank, { id, password, username }) {
+function buildCreds(bank, { id, password, username, num }) {
   switch (bank) {
     case 'hapoalim':
       return { userCode: username || id, password }
@@ -133,9 +135,20 @@ function buildCreds(bank, { id, password, username }) {
       return { username: username || id, password }
     case 'mizrahi':
     case 'mercantile':
+      // num = branch/user number required by mizrahi/mercantile
+      return { id, password, num }
     case 'isracard':
       return { id, password }
     default: // discount
-      return { id, password }
+      return { id, password, num }
   }
+}
+
+function validateCreds(bank, creds) {
+  if (!creds.password) return 'סיסמה'
+  if (bank === 'hapoalim' && !creds.userCode) return 'קוד משתמש'
+  if (['leumi', 'cal', 'max'].includes(bank) && !creds.username) return 'שם משתמש'
+  if (['mizrahi', 'mercantile', 'discount'].includes(bank) && !creds.id) return 'מספר זיהוי'
+  if (['mizrahi', 'mercantile'].includes(bank) && !creds.num) return 'מספר סניף/משתמש (num)'
+  return null
 }
