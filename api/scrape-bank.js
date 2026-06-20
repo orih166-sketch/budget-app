@@ -23,11 +23,15 @@ const BANK_MAP = {
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end()
 
-  const { bank = 'discount', credentials = {}, startDate, householdId, authToken } = req.body || {}
-  const { id, password, username, num } = credentials
+  const body = req.body || {}
+  const { bank = 'discount', credentials = {}, startDate, householdId, authToken } = body
+  const { id, password, username } = credentials
+
+  console.log('scrape-bank request:', { bank, householdId: !!householdId, authToken: !!authToken, bodyKeys: Object.keys(body) })
 
   if (!householdId || !authToken) {
-    return res.status(400).json({ error: 'חסרים פרטים' })
+    console.error('scrape-bank 400: missing', { householdId: !!householdId, authToken: !!authToken })
+    return res.status(400).json({ error: 'חסרים פרטים — נסה לרענן את הדף ולהתחבר מחדש' })
   }
 
   const companyType = BANK_MAP[bank]

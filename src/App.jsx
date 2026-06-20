@@ -11,19 +11,22 @@ import ErrorBoundary from './components/ErrorBoundary.jsx'
 import Toast from './components/Toast.jsx'
 import FamilySettings from './components/FamilySettings.jsx'
 import BankConnect from './components/BankConnect.jsx'
+import Accounts from './components/Accounts.jsx'
 import { HouseholdProvider, useHousehold } from './context/HouseholdContext.jsx'
 import { useTransactions } from './hooks/useTransactions.js'
 import { useSavingsGoals } from './hooks/useSavingsGoals.js'
+import { useAccounts } from './hooks/useAccounts.js'
 import { useAuth } from './hooks/useAuth.js'
 import { USERS, CURRENT_MONTH, CURRENT_YEAR } from './data.js'
 import styles from './App.module.css'
 
 const TABS = [
-  { id: 'dashboard',    label: 'בית',    icon: '⌂' },
-  { id: 'transactions', label: 'עסקאות', icon: '↕' },
-  { id: 'budget',       label: 'תקציב',  icon: '◎' },
-  { id: 'savings',      label: 'חיסכון', icon: '🎯' },
-  { id: 'reports',      label: 'דוחות',  icon: '▦' },
+  { id: 'dashboard',    label: 'בית',     icon: '⌂' },
+  { id: 'transactions', label: 'עסקאות',  icon: '↕' },
+  { id: 'budget',       label: 'תקציב',   icon: '◎' },
+  { id: 'savings',      label: 'חיסכון',  icon: '🎯' },
+  { id: 'accounts',     label: 'חשבונות', icon: '🏦' },
+  { id: 'reports',      label: 'דוחות',   icon: '▦' },
 ]
 
 function AppShell({ user, isPasswordRecovery, logout, updatePassword }) {
@@ -32,6 +35,7 @@ function AppShell({ user, isPasswordRecovery, logout, updatePassword }) {
     useTransactions()
   const { goals, loading: goalsLoading, addGoal, updateGoal, depositToGoal, deleteGoal } =
     useSavingsGoals()
+  const { netWorth, totalAssets, totalLiab } = useAccounts()
 
   const [tab, setTab]             = useState('dashboard')
   const [tabKey, setTabKey]       = useState(0)
@@ -156,10 +160,11 @@ function AppShell({ user, isPasswordRecovery, logout, updatePassword }) {
       <main className={styles.main}>
         <ErrorBoundary>
           <div key={tabKey} className={styles.tabPane}>
-            {tab === 'dashboard'    && <Dashboard transactions={transactions} budget={budget} user={user} selectedMonth={selectedMonth} selectedYear={selectedYear} selectedUser={selectedUser} expectedIncome={expectedIncome} onSetExpectedIncome={setExpectedIncome} />}
+            {tab === 'dashboard'    && <Dashboard transactions={transactions} budget={budget} user={user} selectedMonth={selectedMonth} selectedYear={selectedYear} selectedUser={selectedUser} expectedIncome={expectedIncome} onSetExpectedIncome={setExpectedIncome} netWorth={netWorth} totalAssets={totalAssets} totalLiab={totalLiab} />}
             {tab === 'transactions' && <Transactions transactions={transactions} onDelete={deleteTransaction} onUpdate={updateTransaction} selectedMonth={selectedMonth} selectedYear={selectedYear} onMonthChange={(m, y) => { setSelectedMonth(m); setSelectedYear(y) }} selectedUser={selectedUser} />}
             {tab === 'budget'       && <Budget transactions={transactions} budget={budget} onUpdateBudget={updateBudget} selectedMonth={selectedMonth} selectedYear={selectedYear} />}
             {tab === 'savings'      && <Savings goals={goals} loading={goalsLoading} onAdd={addGoal} onUpdate={updateGoal} onDeposit={depositToGoal} onDelete={deleteGoal} />}
+            {tab === 'accounts'     && <Accounts />}
             {tab === 'reports'      && <Reports transactions={transactions} />}
           </div>
         </ErrorBoundary>

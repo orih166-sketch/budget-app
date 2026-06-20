@@ -25,7 +25,8 @@ export default function Dashboard({
   selectedMonth, selectedYear,
   selectedUser = 'family',
   expectedIncome = 0,
-  onSetExpectedIncome
+  onSetExpectedIncome,
+  netWorth = 0, totalAssets = 0, totalLiab = 0,
 }) {
   const { budgets: categoryBudgets } = useCategoryBudgets()
   const [editingIncome, setEditingIncome] = useState(false)
@@ -223,6 +224,28 @@ export default function Dashboard({
           </div>
         </div>
       </div>
+
+      {/* ── NET WORTH CARD ── */}
+      {(totalAssets > 0 || totalLiab > 0) && (
+        <div className={styles.netWorthCard}>
+          <div className={styles.netWorthLeft}>
+            <div className={styles.netWorthLabel}>שווי נטו</div>
+            <div className={`${styles.netWorthVal} ${netWorth >= 0 ? styles.green : styles.red}`}>
+              {netWorth >= 0 ? '' : '−'}{fmt(Math.abs(netWorth))}
+            </div>
+          </div>
+          <div className={styles.netWorthRight}>
+            <div className={styles.netWorthStat}>
+              <span className={styles.netWorthStatLbl}>נכסים</span>
+              <span className={`${styles.netWorthStatVal} ${styles.green}`}>{fmt(totalAssets)}</span>
+            </div>
+            <div className={styles.netWorthStat}>
+              <span className={styles.netWorthStatLbl}>חובות</span>
+              <span className={`${styles.netWorthStatVal} ${styles.red}`}>{fmt(totalLiab)}</span>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── KPI ROW ── */}
       <div className={styles.kpiRow}>

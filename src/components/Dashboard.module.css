@@ -72,6 +72,23 @@
   -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
 }
 
+/* ── NET WORTH CARD ─────────────────────────────────── */
+.netWorthCard {
+  background: #fff;
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+  padding: 14px 16px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.netWorthLeft { display: flex; flex-direction: column; gap: 3px; }
+.netWorthLabel { font-size: 11px; color: var(--c-text-2); font-weight: 700; letter-spacing: .04em; }
+.netWorthVal { font-size: 22px; font-weight: 900; line-height: 1; }
+.netWorthRight { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
+.netWorthStat { display: flex; align-items: center; gap: 6px; }
+.netWorthStatLbl { font-size: 11px; color: var(--c-text-2); font-weight: 600; }
+.netWorthStatVal { font-size: 13px; font-weight: 800; }
+
 /* ══ KPI ROW ═══════════════════════════════════════════ */
 .kpiRow { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .kpiCard {

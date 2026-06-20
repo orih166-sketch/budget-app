@@ -58,8 +58,9 @@ export default function BankConnect({ onClose, onImported }) {
     e.preventDefault()
     setStep('loading'); setError(''); setPhase('מתחבר לבנק...')
     try {
+      if (!household?.id) throw new Error('משק הבית לא נטען — נסה לרענן את הדף')
       const { data: { session } } = await supabase.auth.getSession()
-      if (!session) throw new Error('לא מחובר')
+      if (!session) throw new Error('לא מחובר — נסה להתחבר מחדש')
 
       const startDate = new Date()
       startDate.setMonth(startDate.getMonth() - months)

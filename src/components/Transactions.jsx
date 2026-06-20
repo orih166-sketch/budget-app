@@ -1,6 +1,9 @@
 import { useState, useMemo } from 'react'
 import { CATEGORIES, MONTHS, USERS } from '../data.js'
 import styles from './Transactions.module.css'
+import calStyles from './Calendar.module.css'
+
+const DOW_HE = ['א׳', 'ב׳', 'ג׳', 'ד׳', 'ה׳', 'ו׳', 'ש׳']
 
 const fmt = n => '₪' + n.toLocaleString('he-IL', { maximumFractionDigits: 0 })
 const allCats = [...CATEGORIES.expenses, ...CATEGORIES.income]
@@ -49,6 +52,8 @@ export default function Transactions({ transactions, onDelete, onUpdate, selecte
   const [editForm, setForm]       = useState({})
   const [deleteId, setDeleteId]   = useState(null)
   const [showFilters, setFilters] = useState(false)
+  const [view, setView]           = useState('list')   // 'list' | 'calendar'
+  const [calDay, setCalDay]       = useState(null)     // selected day in calendar
 
   const filtered = useMemo(() => {
     return transactions.filter(t => {
@@ -105,6 +110,13 @@ export default function Transactions({ transactions, onDelete, onUpdate, selecte
         <button className={styles.exportBtn} onClick={() => exportToCSV(filtered)} title="ייצוא CSV">
           ↓
         </button>
+        <button
+          className={`${styles.filterToggle} ${view === 'calendar' ? styles.filterToggleActive : ''}`}
+          onClick={() => { setView(v => v === 'calendar' ? 'list' : 'calendar'); setCalDay(null) }}
+          title="תצוגת לוח שנה"
+        >
+          📅
+        </button>
       </div>
 
       {/* ── Filter panel ── */}
@@ -153,13 +165,27 @@ export default function Transactions({ transactions, onDelete, onUpdate, selecte
         </div>
       </div>
 
+      {/* ── Calendar view ── */}
+      {view === 'calendar' && (
+        <CalendarView
+          transactions={transactions}
+          selectedMonth={selectedMonth}
+          selectedYear={selectedYear}
+          calDay={calDay}
+          setCalDay={setCalDay}
+          onUpdate={onUpdate}
+          onDelete={onDelete}
+        />
+      )}
+
       {/* ── Transaction list grouped by date ── */}
-      {filtered.length === 0 ? (
+      {view === 'list' && filtered.length === 0 && (
         <div className={styles.empty}>
           <div className={styles.emptyIcon}>📭</div>
           <p>אין עסקאות לתקופה זו</p>
         </div>
-      ) : (
+      )}
+      {view === 'list' && filtered.length > 0 && (
         <div className={styles.list}>
           {grouped.map(([date, txs]) => (
             <div key={date} className={styles.dateGroup}>
@@ -237,6 +263,93 @@ export default function Transactions({ transactions, onDelete, onUpdate, selecte
               })}
             </div>
           ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── Calendar view component ──────────────────────────────────────
+
+function CalendarView({ transactions, selectedMonth, selectedYear, calDay, setCalDay, onUpdate, onDelete }) {
+  const fmt = n => '₪' + n.toLocaleString('he-IL', { maximumFractionDigits: 0 })
+
+  // Build day map: day number → {income, expense, txns}
+  const dayMap = useMemo(() => {
+    const map = {}
+    transactions.forEach(t => {
+      const d = new Date(t.date)
+      if (d.getMonth() !== selectedMonth || d.getFullYear() !== selectedYear) return
+      const day = d.getDate()
+      if (!map[day]) map[day] = { income: 0, expense: 0, txns: [] }
+      if (t.type === 'income') map[day].income += t.amount
+      else map[day].expense += t.amount
+      map[day].txns.push(t)
+    })
+    return map
+  }, [transactions, selectedMonth, selectedYear])
+
+  const firstDow   = new Date(selectedYear, selectedMonth, 1).getDay() // 0=Sun
+  const daysInMonth = new Date(selectedYear, selectedMonth + 1, 0).getDate()
+
+  const dayTxns = calDay && dayMap[calDay]?.txns || []
+
+  return (
+    <div className={calStyles.wrap}>
+      {/* Day headers */}
+      <div className={calStyles.grid}>
+        {DOW_HE.map(d => <div key={d} className={calStyles.dayHeader}>{d}</div>)}
+
+        {/* Empty cells before first day */}
+        {Array(firstDow).fill(null).map((_, i) => <div key={'e' + i} className={calStyles.empty} />)}
+
+        {/* Day cells */}
+        {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(day => {
+          const data = dayMap[day]
+          const net  = data ? data.income - data.expense : 0
+          const isSelected = calDay === day
+          return (
+            <div
+              key={day}
+              className={`${calStyles.day} ${data ? calStyles.hasData : ''} ${isSelected ? calStyles.selected : ''}`}
+              onClick={() => data && setCalDay(prev => prev === day ? null : day)}
+            >
+              <span className={calStyles.dayNum}>{day}</span>
+              {data && (
+                <span className={`${calStyles.dayAmt} ${net >= 0 ? calStyles.income : calStyles.expense}`}>
+                  {net >= 0 ? '+' : ''}{fmt(Math.abs(net))}
+                </span>
+              )}
+            </div>
+          )
+        })}
+      </div>
+
+      {/* Selected day transaction list */}
+      {calDay && (
+        <div className={calStyles.dayDetail}>
+          <div className={calStyles.detailHeader}>
+            {calDay}/{selectedMonth + 1}/{selectedYear}
+            <button className={calStyles.detailClose} onClick={() => setCalDay(null)}>✕</button>
+          </div>
+          {dayTxns.length === 0 && <p className={calStyles.noTxns}>אין עסקאות</p>}
+          {dayTxns.map(t => {
+            const c = [...CATEGORIES.expenses, ...CATEGORIES.income].find(x => x.id === t.category)
+            return (
+              <div key={t.id} className={calStyles.txRow}>
+                <div className={calStyles.txIcon} style={{ background: c?.color ? c.color + '18' : '#f1f5f9' }}>
+                  {c?.icon || '📦'}
+                </div>
+                <div className={calStyles.txInfo}>
+                  <span className={calStyles.txDesc}>{t.desc}</span>
+                  <span className={calStyles.txCat}>{c?.label || t.category}</span>
+                </div>
+                <span className={`${calStyles.txAmt} ${t.type === 'expense' ? calStyles.expense : calStyles.income}`}>
+                  {t.type === 'expense' ? '-' : '+'}{fmt(t.amount)}
+                </span>
+              </div>
+            )
+          })}
         </div>
       )}
     </div>

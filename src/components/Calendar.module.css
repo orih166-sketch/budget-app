@@ -1,0 +1,158 @@
+.wrap { display: flex; flex-direction: column; gap: 12px; }
+
+/* ── Calendar grid ── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+  background: #fff;
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+  padding: 12px 8px;
+  box-shadow: var(--shadow);
+}
+
+.dayHeader {
+  text-align: center;
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--c-text-2);
+  padding: 4px 0 8px;
+  letter-spacing: .03em;
+}
+
+.empty { /* blank cells */ }
+
+.day {
+  min-height: 52px;
+  border-radius: 8px;
+  padding: 5px 3px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  cursor: default;
+  transition: background .12s;
+}
+
+.hasData {
+  cursor: pointer;
+  background: #f8fafc;
+}
+.hasData:hover { background: #f1f5f9; }
+
+.selected {
+  background: #0f172a !important;
+}
+.selected .dayNum { color: #fff; }
+.selected .dayAmt { color: #f9eda0 !important; }
+
+.dayNum {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--c-text);
+  line-height: 1;
+}
+
+.dayAmt {
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 1;
+  text-align: center;
+  word-break: break-all;
+}
+
+.income { color: #16a34a; }
+.expense { color: #dc2626; }
+
+/* ── Day detail panel ── */
+.dayDetail {
+  background: #fff;
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  animation: fadeUp .18s ease both;
+}
+
+.detailHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: #0f172a;
+  color: #f9eda0;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.detailClose {
+  background: none;
+  border: none;
+  color: rgba(249,237,160,.6);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0 2px;
+  line-height: 1;
+}
+
+.noTxns {
+  text-align: center;
+  color: var(--c-text-2);
+  font-size: 13px;
+  padding: 20px;
+  margin: 0;
+}
+
+.txRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--c-border);
+}
+
+.txIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.txInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.txDesc {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--c-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.txCat {
+  font-size: 11px;
+  color: var(--c-text-2);
+  font-weight: 600;
+}
+
+.txAmt {
+  font-size: 14px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
