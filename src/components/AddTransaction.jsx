@@ -2,6 +2,13 @@ import { useState } from 'react'
 import { CATEGORIES, USERS } from '../data.js'
 import styles from './AddTransaction.module.css'
 
+const REPEAT_OPTS = [
+  { value: 'none',    label: 'חד-פעמי', icon: '1' },
+  { value: 'weekly',  label: 'שבועי',   icon: '7' },
+  { value: 'monthly', label: 'חודשי',   icon: '🔁' },
+  { value: 'yearly',  label: 'שנתי',    icon: '📆' },
+]
+
 // Fix #3: Local-timezone safe date — no more midnight UTC bugs
 const today = () => {
   const d = new Date()
@@ -12,9 +19,10 @@ const today = () => {
 // Fix #4: Non-family users from data.js — no hardcoded options
 const USER_OPTIONS = USERS.filter(u => u.id !== 'family')
 
-export default function AddTransaction({ onAdd, onClose, user, users = USER_OPTIONS }) {
-  const [type, setType] = useState('expense')
-  const [form, setForm] = useState({
+export default function AddTransaction({ onAdd, onAddRecurring, onClose, user, users = USER_OPTIONS }) {
+  const [type, setType]     = useState('expense')
+  const [repeat, setRepeat] = useState('none')
+  const [form, setForm]     = useState({
     desc:     '',
     amount:   '',
     category: '',
@@ -32,7 +40,24 @@ export default function AddTransaction({ onAdd, onClose, user, users = USER_OPTI
   function submit(e) {
     e.preventDefault()
     if (!form.amount || !form.category) return
-    onAdd({ ...form, amount: parseFloat(form.amount), type })
+    const amount = parseFloat(form.amount)
+
+    if (repeat !== 'none' && onAddRecurring) {
+      const startDate = form.date
+      onAddRecurring({
+        desc:       form.desc || '',
+        amount,
+        type,
+        category:   form.category,
+        user:       form.user,
+        interval:   repeat,
+        startDate,
+        endDate:    null,
+        dayOfMonth: new Date(startDate + 'T00:00:00').getDate(),
+      })
+    } else {
+      onAdd({ ...form, amount, type })
+    }
     onClose()
   }
 
@@ -130,6 +155,22 @@ export default function AddTransaction({ onAdd, onClose, user, users = USER_OPTI
                     style={{ background: form.user === u.id ? 'rgba(255,255,255,.25)' : u.color }}
                   >{u.avatar}</span>
                   {u.name}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Repeat */}
+          <div className={styles.labelBlock}>
+            <span className={styles.labelText}>חזרה</span>
+            <div className={styles.repeatGrid}>
+              {REPEAT_OPTS.map(opt => (
+                <button key={opt.value} type="button"
+                  className={`${styles.repeatBtn} ${repeat === opt.value ? styles.repeatBtnActive : ''}`}
+                  onClick={() => setRepeat(opt.value)}
+                >
+                  <span className={styles.repeatIcon}>{opt.icon}</span>
+                  <span>{opt.label}</span>
                 </button>
               ))}
             </div>

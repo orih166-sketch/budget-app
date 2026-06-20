@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import { CATEGORIES, MONTHS, USERS } from '../data.js'
+import { INTERVAL_LABELS } from '../hooks/useRecurring.js'
 import styles from './Transactions.module.css'
 import calStyles from './Calendar.module.css'
 
@@ -44,19 +45,26 @@ function exportToCSV(transactions) {
   link.click()
 }
 
-export default function Transactions({ transactions, onDelete, onUpdate, selectedMonth, selectedYear, onMonthChange, selectedUser = 'family' }) {
-  const [search, setSearch]       = useState('')
-  const [filterType, setType]     = useState('')
-  const [filterCat, setCat]       = useState('')
-  const [editId, setEditId]       = useState(null)
-  const [editForm, setForm]       = useState({})
-  const [deleteId, setDeleteId]   = useState(null)
-  const [showFilters, setFilters] = useState(false)
-  const [view, setView]           = useState('list')   // 'list' | 'calendar'
-  const [calDay, setCalDay]       = useState(null)     // selected day in calendar
+export default function Transactions({ transactions, onDelete, onUpdate, selectedMonth, selectedYear, onMonthChange, selectedUser = 'family', recurring }) {
+  const [search, setSearch]         = useState('')
+  const [filterType, setType]       = useState('')
+  const [filterCat, setCat]         = useState('')
+  const [editId, setEditId]         = useState(null)
+  const [editForm, setForm]         = useState({})
+  const [deleteId, setDeleteId]     = useState(null)
+  const [showFilters, setFilters]   = useState(false)
+  const [showRecurring, setShowRec] = useState(false)
+  const [view, setView]             = useState('list')
+  const [calDay, setCalDay]         = useState(null)
+
+  // Merge real transactions + recurring instances for this month
+  const allTxns = useMemo(() => {
+    const instances = recurring?.instancesForMonth(selectedYear, selectedMonth) ?? []
+    return [...transactions, ...instances]
+  }, [transactions, selectedMonth, selectedYear, recurring?.rules])  // eslint-disable-line
 
   const filtered = useMemo(() => {
-    return transactions.filter(t => {
+    return allTxns.filter(t => {
       const d = new Date(t.date)
       if (d.getMonth() !== selectedMonth || d.getFullYear() !== selectedYear) return false
       if (selectedUser !== 'family' && t.user !== selectedUser) return false
@@ -117,6 +125,15 @@ export default function Transactions({ transactions, onDelete, onUpdate, selecte
         >
           📅
         </button>
+        {recurring?.rules?.length > 0 && (
+          <button
+            className={`${styles.filterToggle} ${showRecurring ? styles.filterToggleActive : ''}`}
+            onClick={() => setShowRec(v => !v)}
+            title="עסקאות קבועות"
+          >
+            🔁
+          </button>
+        )}
       </div>
 
       {/* ── Filter panel ── */}
@@ -144,6 +161,29 @@ export default function Transactions({ transactions, onDelete, onUpdate, selecte
           {(filterType || filterCat) && (
             <button className={styles.clearFilters} onClick={() => { setType(''); setCat('') }}>נקה פילטרים</button>
           )}
+        </div>
+      )}
+
+      {/* ── Recurring rules panel ── */}
+      {showRecurring && recurring?.rules?.length > 0 && (
+        <div className={styles.recPanel}>
+          <div className={styles.recPanelTitle}>עסקאות קבועות</div>
+          {recurring.rules.map(rule => {
+            const c = allCats.find(x => x.id === rule.category)
+            return (
+              <div key={rule.id} className={styles.recRow}>
+                <span className={styles.recIcon}>{c?.icon || '📦'}</span>
+                <div className={styles.recInfo}>
+                  <span className={styles.recDesc}>{rule.desc || c?.label}</span>
+                  <span className={styles.recMeta}>{INTERVAL_LABELS[rule.interval]} · {fmt(rule.amount)}</span>
+                </div>
+                <span className={`${styles.recAmt} ${rule.type === 'income' ? styles.inc : styles.exp}`}>
+                  {rule.type === 'income' ? '+' : '-'}{fmt(rule.amount)}
+                </span>
+                <button className={styles.recDelete} onClick={() => recurring.deleteRule(rule.id)} title="הפסק חזרה">✕</button>
+              </div>
+            )
+          })}
         </div>
       )}
 
@@ -234,6 +274,7 @@ export default function Transactions({ transactions, onDelete, onUpdate, selecte
                     <div className={styles.info}>
                       <div className={styles.descRow}>
                         <span className={styles.desc}>{t.desc}</span>
+                        {t.isRecurring && <span className={styles.recBadge}>🔁</span>}
                         {u && u.id !== 'family' && (
                           <span className={styles.userBadge} style={{ background: u.color + '22', color: u.color }}>{u.avatar}</span>
                         )}
@@ -245,7 +286,16 @@ export default function Transactions({ transactions, onDelete, onUpdate, selecte
                         {t.type === 'income' ? '+' : '-'}{fmt(t.amount)}
                       </span>
                       <div className={styles.actions}>
-                        {deleteId === t.id ? (
+                        {t.isRecurring ? (
+                          deleteId === t.id ? (
+                            <>
+                              <button className={styles.deleteConfirmBtn} onClick={() => { recurring.deleteRule(t.recurringId); setDeleteId(null) }}>הפסק</button>
+                              <button className={styles.deleteCancelBtn} onClick={() => setDeleteId(null)}>ביטול</button>
+                            </>
+                          ) : (
+                            <button className={`${styles.actionBtn} ${styles.actionBtnDel}`} onClick={() => setDeleteId(t.id)} title="הפסק חזרה">✕</button>
+                          )
+                        ) : deleteId === t.id ? (
                           <>
                             <button className={styles.deleteConfirmBtn} onClick={() => { onDelete(t.id); setDeleteId(null) }}>מחק</button>
                             <button className={styles.deleteCancelBtn} onClick={() => setDeleteId(null)}>ביטול</button>
