@@ -19,7 +19,10 @@ const { Client, LocalAuth, MessageMedia } = pkg
 
 const HOUSEHOLD_ID   = process.env.HOUSEHOLD_ID
 const ALLOWED_NUMBER = process.env.ALLOWED_NUMBER
-const GROUP_NAME     = process.env.GROUP_NAME  // optional: listen to a specific group
+const WIFE_NUMBER    = process.env.WIFE_NUMBER
+const GROUP_NAME     = process.env.GROUP_NAME
+
+const ALLOWED_NUMBERS = new Set([ALLOWED_NUMBER, WIFE_NUMBER].filter(Boolean))
 
 if (!HOUSEHOLD_ID || !ALLOWED_NUMBER) {
   console.error('❌  Missing env: HOUSEHOLD_ID or ALLOWED_NUMBER')
@@ -72,16 +75,14 @@ client.on('auth_failure', () => {
 })
 
 async function handleMessage(message) {
-  const fromId = message.from
-  const isFromGroup   = allowedGroupId && fromId === allowedGroupId
-  const isFromMe      = fromId === `${ALLOWED_NUMBER}@c.us` || message.fromMe
-  const isDirectToMe  = fromId === `${ALLOWED_NUMBER}@c.us`
+  const fromId       = message.from
+  const authorNumber = (message.author || message.from).replace('@c.us', '').replace('@g.us', '')
+  const isFromGroup  = allowedGroupId && fromId === allowedGroupId
+  const isDirectSelf = message.fromMe && !isFromGroup
 
-  // Accept: message from the allowed group, OR direct message from/to self
-  if (!isFromGroup && !isFromMe && !isDirectToMe) return
-
-  // In group: only process files sent by the allowed number (you)
-  if (isFromGroup && !message.fromMe) return
+  // Accept: messages in the allowed group from allowed numbers, or direct self-messages
+  if (!isFromGroup && !isDirectSelf) return
+  if (isFromGroup && !ALLOWED_NUMBERS.has(authorNumber)) return
 
   console.log('📨  הודעה התקבלה:', { from: message.from, hasMedia: message.hasMedia, fromMe: message.fromMe })
 
