@@ -96,10 +96,17 @@ export default function BankConnect({ onClose, onImported }) {
       return
     }
 
-    const reader = new FileReader()
-    reader.onload = ev => {
+    file.arrayBuffer().then(buf => {
       try {
-        const rows = parseCSV(ev.target.result)
+        // Try windows-1255 (Hebrew Windows encoding used by Israeli banks) first
+        // Fall back to UTF-8 if it looks garbled
+        const w1255 = new TextDecoder('windows-1255').decode(buf)
+        const utf8  = new TextDecoder('utf-8').decode(buf)
+        // Heuristic: if windows-1255 has more Hebrew chars, use it
+        const hebrewRe = /[א-ת]/g
+        const text = (w1255.match(hebrewRe) || []).length >= (utf8.match(hebrewRe) || []).length
+          ? w1255 : utf8
+        const rows = parseCSV(text)
         const parsed = parseRows(rows, file.name)
         if (parsed.total === 0) {
           setError('לא נמצאו עסקאות בקובץ. נסה לשמור כ-CSV מתוך Excel.')
@@ -109,8 +116,7 @@ export default function BankConnect({ onClose, onImported }) {
       } catch (err) {
         setError('לא ניתן לקרוא את הקובץ: ' + err.message)
       }
-    }
-    reader.readAsText(file, 'utf-8')
+    })
   }
 
   async function handlePdf(file) {
