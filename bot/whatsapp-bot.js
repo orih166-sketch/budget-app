@@ -18,12 +18,15 @@ import { upsertTransactions } from './db.js'
 const { Client, LocalAuth, MessageMedia } = pkg
 
 const HOUSEHOLD_ID   = process.env.HOUSEHOLD_ID
-const ALLOWED_NUMBER = process.env.ALLOWED_NUMBER  // e.g. "972501234567"
+const ALLOWED_NUMBER = process.env.ALLOWED_NUMBER
+const GROUP_NAME     = process.env.GROUP_NAME  // optional: listen to a specific group
 
 if (!HOUSEHOLD_ID || !ALLOWED_NUMBER) {
   console.error('❌  Missing env: HOUSEHOLD_ID or ALLOWED_NUMBER')
   process.exit(1)
 }
+
+let allowedGroupId = null  // resolved on 'ready'
 
 const ALLOWED_MIME = new Set([
   'text/csv',
@@ -38,6 +41,7 @@ const ALLOWED_EXT = new Set(['csv', 'txt', 'xls', 'xlsx'])
 const client = new Client({
   authStrategy: new LocalAuth({ dataPath: '.wwebjs_auth' }),
   puppeteer: {
+    executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
     headless: true,
   },
@@ -48,23 +52,55 @@ client.on('qr', qr => {
   qrcode.generate(qr, { small: true })
 })
 
-client.on('ready', () => {
+client.on('ready', async () => {
   console.log('✅  WhatsApp bot מחובר ומוכן לקבל קבצים')
+
+  if (GROUP_NAME) {
+    const chats = await client.getChats()
+    const group = chats.find(c => c.isGroup && c.name === GROUP_NAME)
+    if (group) {
+      allowedGroupId = group.id._serialized
+      console.log(`✅  קבוצה נמצאה: "${GROUP_NAME}" (${allowedGroupId})`)
+    } else {
+      console.warn(`⚠️  קבוצה "${GROUP_NAME}" לא נמצאה — מאזין רק למספר האישי`)
+    }
+  }
 })
 
 client.on('auth_failure', () => {
   console.error('❌  אימות נכשל — מחק את תיקיית .wwebjs_auth ונסה שוב')
 })
 
-client.on('message', async message => {
-  // Security: only handle messages from the allowed number
-  const senderNumber = message.from.replace('@c.us', '')
-  if (senderNumber !== ALLOWED_NUMBER) return
+async function handleMessage(message) {
+  const fromId = message.from
+  const isFromGroup   = allowedGroupId && fromId === allowedGroupId
+  const isFromMe      = fromId === `${ALLOWED_NUMBER}@c.us` || message.fromMe
+  const isDirectToMe  = fromId === `${ALLOWED_NUMBER}@c.us`
+
+  // Accept: message from the allowed group, OR direct message from/to self
+  if (!isFromGroup && !isFromMe && !isDirectToMe) return
+
+  // In group: only process files sent by the allowed number (you)
+  if (isFromGroup && !message.fromMe) return
+
+  console.log('📨  הודעה התקבלה:', { from: message.from, hasMedia: message.hasMedia, fromMe: message.fromMe })
 
   if (!message.hasMedia) {
-    // Help text on plain message
-    if (message.body.trim() === 'עזרה' || message.body.trim().toLowerCase() === 'help') {
-      await message.reply('שלח לי קובץ CSV או Excel של תנועות בנק ואכניס אותו אוטומטית לאפליקציה 💳')
+    const text = message.body.trim()
+    if (text === 'עזרה' || text.toLowerCase() === 'help') {
+      await message.reply('שלח קובץ CSV/Excel מהבנק, או כתוב הוצאה בפורמט:\n"260 דלק" / "פילאטס 80" / "קפה 18 שח"')
+      return
+    }
+    // Try to parse as a quick expense: "260 דלק" / "דלק 260" / "260 ש״ח דלק"
+    const expense = parseTextExpense(text)
+    if (expense) {
+      try {
+        const today = new Date().toISOString().split('T')[0]
+        await upsertTransactions([{ ...expense, date: today }], HOUSEHOLD_ID)
+        await message.reply(`✅ נרשם: *${expense.desc}* — ${expense.amount} ₪`)
+      } catch (err) {
+        await message.reply(`❌ שגיאה: ${err.message}`)
+      }
     }
     return
   }
@@ -77,9 +113,10 @@ client.on('message', async message => {
     return
   }
 
-  // Check extension from filename or mimetype
   const filename = media.filename || `file.${mimeToExt(media.mimetype)}`
   const ext = filename.split('.').pop().toLowerCase()
+
+  console.log('📎  קובץ:', filename, media.mimetype)
 
   if (!ALLOWED_EXT.has(ext) && !ALLOWED_MIME.has(media.mimetype)) {
     await message.reply(`⚠️  סוג קובץ לא נתמך (${media.mimetype || ext}). שלח CSV או Excel.`)
@@ -108,9 +145,32 @@ client.on('message', async message => {
     console.error('parse/upsert error:', err)
     await message.reply(`❌  שגיאה בעיבוד הקובץ: ${err.message}`)
   }
-})
+}
+
+// 'message' = הודעות נכנסות, 'message_create' = כולל הודעות ששלחת לעצמך
+client.on('message',        handleMessage)
+client.on('message_create', handleMessage)
 
 client.initialize()
+
+function parseTextExpense(text) {
+  // Remove currency words
+  const cleaned = text.replace(/ש[״"]ח|שח|₪|NIS/gi, '').trim()
+
+  // Pattern: number first — "260 דלק" / "260.5 קפה"
+  let m = cleaned.match(/^(\d+(?:[.,]\d+)?)\s+(.{2,})$/)
+  if (m) {
+    return { amount: parseFloat(m[1].replace(',', '.')), desc: m[2].trim(), type: 'expense' }
+  }
+
+  // Pattern: description first — "דלק 260"
+  m = cleaned.match(/^(.{2,})\s+(\d+(?:[.,]\d+)?)$/)
+  if (m) {
+    return { amount: parseFloat(m[2].replace(',', '.')), desc: m[1].trim(), type: 'expense' }
+  }
+
+  return null
+}
 
 function mimeToExt(mime = '') {
   if (mime.includes('csv') || mime.includes('plain')) return 'csv'
