@@ -341,6 +341,14 @@ export default function Transactions({ transactions, onDelete, onUpdate, selecte
                         <input className={styles.editInput} type="date" value={editForm.date}
                           onChange={e => setForm(f => ({ ...f, date: e.target.value }))} />
                       </div>
+                      <select className={styles.editInput} value={editForm.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))}>
+                        <optgroup label="הוצאות">
+                          {CATEGORIES.expenses.map(c => <option key={c.id} value={c.id}>{c.icon} {c.label}</option>)}
+                        </optgroup>
+                        <optgroup label="הכנסות">
+                          {CATEGORIES.income.map(c => <option key={c.id} value={c.id}>{c.icon} {c.label}</option>)}
+                        </optgroup>
+                      </select>
                       <select className={styles.editInput} value={editForm.user} onChange={e => setForm(f => ({ ...f, user: e.target.value }))}>
                         {USERS.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
                       </select>

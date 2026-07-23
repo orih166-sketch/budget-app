@@ -16,7 +16,7 @@
   width: 100%; padding: 11px 38px 11px 36px;
   border: 1.5px solid var(--c-border); border-radius: var(--radius-sm);
   font-size: 14px; font-family: inherit; outline: none;
-  background: #fff; direction: rtl;
+  background: #fff; color: #1a1830; direction: rtl;
   transition: border-color .15s;
 }
 .search:focus { border-color: var(--c-primary); }
@@ -31,7 +31,7 @@
 .filterToggle {
   width: 42px; height: 42px; flex-shrink: 0;
   border: 1.5px solid var(--c-border); border-radius: var(--radius-sm);
-  background: #fff; font-size: 17px; color: var(--c-text-2);
+  background: #fff; font-size: 17px; color: #555;
   display: flex; align-items: center; justify-content: center;
   position: relative; transition: all .15s;
 }
@@ -45,7 +45,7 @@
 .exportBtn {
   width: 42px; height: 42px; flex-shrink: 0;
   border: 1.5px solid var(--c-border); border-radius: var(--radius-sm);
-  background: #fff; font-size: 18px; color: var(--c-text-2);
+  background: #fff; font-size: 18px; color: #555;
   display: flex; align-items: center; justify-content: center;
   transition: all .15s;
 }
@@ -61,13 +61,13 @@
 @keyframes fadeDown { from { opacity: 0; transform: translateY(-6px) } to { opacity: 1; transform: translateY(0) } }
 
 .filterGroup { display: flex; flex-direction: column; gap: 6px; }
-.filterLabel { font-size: 11px; font-weight: 700; color: var(--c-text-2); text-transform: uppercase; letter-spacing: .06em; }
+.filterLabel { font-size: 11px; font-weight: 700; color: #666; text-transform: uppercase; letter-spacing: .06em; }
 
 .chips { display: flex; gap: 6px; flex-wrap: wrap; }
 .chip {
   padding: 6px 14px; border-radius: 99px;
   border: 1.5px solid var(--c-border); background: #fff;
-  font-size: 13px; font-weight: 600; color: var(--c-text-2);
+  font-size: 13px; font-weight: 600; color: #555;
   transition: all .15s; cursor: pointer;
 }
 .chip:hover { border-color: var(--c-primary); color: var(--c-primary); }
@@ -75,7 +75,7 @@
 
 .miniSel {
   padding: 6px 10px; border: 1.5px solid var(--c-border); border-radius: 8px;
-  font-size: 13px; font-family: inherit; color: var(--c-text); background: #fff;
+  font-size: 13px; font-family: inherit; color: #1a1830; background: #fff;
   outline: none; direction: rtl;
 }
 
@@ -92,7 +92,7 @@
   box-shadow: var(--shadow);
 }
 .summaryItem { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; }
-.summaryLbl  { font-size: 10px; font-weight: 700; color: var(--c-text-2); text-transform: uppercase; letter-spacing: .06em; }
+.summaryLbl  { font-size: 10px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: .06em; }
 .summaryVal  { font-size: 16px; font-weight: 800; }
 .summaryDivider { width: 1px; height: 32px; background: var(--c-border); flex-shrink: 0; }
 
@@ -110,7 +110,7 @@
   padding: 0 2px;
 }
 .dateLbl {
-  font-size: 12px; font-weight: 700; color: var(--c-text-2);
+  font-size: 12px; font-weight: 700; color: #666;
   white-space: nowrap;
 }
 .dateLine {
@@ -144,11 +144,11 @@
 .info { flex: 1; min-width: 0; }
 .descRow { display: flex; align-items: center; gap: 6px; margin-bottom: 2px; }
 .desc {
-  font-size: 14px; font-weight: 600;
+  font-size: 14px; font-weight: 600; color: #1a1830;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   flex: 1; min-width: 0;
 }
-.meta { font-size: 11px; color: var(--c-text-2); }
+.meta { font-size: 11px; color: #888; }
 .userBadge {
   font-size: 10px; font-weight: 800;
   padding: 2px 6px; border-radius: 99px;
@@ -174,7 +174,7 @@
 }
 .deleteCancelBtn {
   padding: 4px 10px; border: 1.5px solid var(--c-border);
-  border-radius: 6px; font-size: 12px; font-weight: 600; color: var(--c-text-2);
+  border-radius: 6px; font-size: 12px; font-weight: 600; color: #555;
   background: #fff;
 }
 
@@ -188,12 +188,13 @@
 .editInput {
   flex: 1; padding: 9px 12px; border: 1.5px solid var(--c-border);
   border-radius: 8px; font-size: 14px; font-family: inherit;
+  background: #f8f9fa; color: #1a1830;
   direction: rtl; outline: none; width: 100%;
 }
 .editInput:focus { border-color: var(--c-primary); }
 .editActions { display: flex; gap: 8px; }
 .saveBtn   { flex: 1; padding: 10px; background: var(--c-primary); color: #fff; border-radius: 8px; font-weight: 700; font-size: 14px; }
-.cancelBtn { flex: 1; padding: 10px; border: 1.5px solid var(--c-border); border-radius: 8px; font-weight: 600; color: var(--c-text-2); font-size: 14px; }
+.cancelBtn { flex: 1; padding: 10px; border: 1.5px solid var(--c-border); border-radius: 8px; font-weight: 600; color: #555; font-size: 14px; background: #fff; }
 
 /* ══ EMPTY ═══════════════════════════════════════════════ */
 .empty { text-align: center; color: var(--c-text-2); padding: 48px 24px; }

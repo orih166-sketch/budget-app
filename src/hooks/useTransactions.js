@@ -19,6 +19,33 @@ export function useTransactions() {
   useEffect(() => {
     if (!household) return
     loadTransactions()
+
+    // Real-time subscription — updates appear instantly across all devices
+    const channel = supabase
+      .channel(`transactions:${household.id}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'transactions' },
+        (payload) => {
+          // Filter to this household only (free-plan doesn't support server-side column filters)
+          const row = payload.new || payload.old
+          if (row?.household_id !== household.id) return
+
+          if (payload.eventType === 'INSERT') {
+            setTransactions(prev => {
+              if (prev.some(t => t.id === payload.new.id)) return prev  // already have it (our own insert)
+              return [mapRow(payload.new), ...prev]
+            })
+          } else if (payload.eventType === 'UPDATE') {
+            setTransactions(prev => prev.map(t => t.id === payload.new.id ? mapRow(payload.new) : t))
+          } else if (payload.eventType === 'DELETE') {
+            setTransactions(prev => prev.filter(t => t.id !== payload.old.id))
+          }
+        }
+      )
+      .subscribe()
+
+    return () => { supabase.removeChannel(channel) }
   }, [household?.id])
 
   async function loadTransactions() {
@@ -55,6 +82,7 @@ export function useTransactions() {
         type: tx.type,
         category_id: tx.category,
         member: tx.user || 'family',
+        source: 'manual',
       })
       .select()
       .single()
