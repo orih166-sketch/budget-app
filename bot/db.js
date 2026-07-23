@@ -26,13 +26,12 @@ export async function upsertTransactions(txns, householdId) {
   if (!txns.length) return { added: 0, total: 0 }
 
   const rows = txns.map(t => ({
-    household_id: householdId,
+    family_id: householdId,
     date: t.date,
     description: t.desc,
     amount: t.amount,
     type: t.type,
-    category_id: 'other',
-    member: 'family',
+    source: 'whatsapp',
     external_id: makeExternalId(t),
   }))
 

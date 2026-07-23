@@ -1,0 +1,139 @@
+.wrap {
+  padding: 12px 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pageTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--gold-light);
+  margin-bottom: 12px;
+}
+
+.backBtn {
+  color: var(--gold);
+  font-size: 14px;
+  margin-bottom: 8px;
+  text-align: right;
+  width: 100%;
+}
+
+.section {
+  background: var(--card);
+  border: 1px solid var(--gold-border);
+  border-radius: var(--radius);
+  padding: 14px;
+}
+
+.sectionTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text2);
+  margin-bottom: 10px;
+}
+
+.profileCard { padding: 4px 0; }
+.profileNames { font-size: 15px; font-weight: 600; color: var(--text1); }
+.profileSub { font-size: 13px; color: var(--text2); margin-top: 4px; }
+
+.rowBtn, .rowBtnStatic {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--gold-border);
+  color: var(--text1);
+  font-size: 14px;
+}
+
+.rowBtn:last-child, .rowBtnStatic:last-child { border-bottom: none; }
+.rowBtn:hover { color: var(--gold-light); }
+
+.chevron { color: var(--text3); transform: rotate(180deg); }
+.muted { color: var(--text3); font-size: 13px; }
+.badgeOk { color: var(--green); font-size: 12px; }
+
+.toggleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--gold-border);
+  font-size: 14px;
+  color: var(--text1);
+}
+
+.toggleRow:last-child { border-bottom: none; }
+
+.toggle {
+  width: 44px;
+  height: 26px;
+  border-radius: 99px;
+  background: var(--card2);
+  border: 1px solid var(--gold-border);
+  position: relative;
+  transition: background 0.2s;
+}
+
+.toggleOn { background: var(--gold-dim); border-color: var(--gold); }
+
+.toggleKnob {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--text2);
+  transition: transform 0.2s, background 0.2s;
+}
+
+.toggleOn .toggleKnob {
+  transform: translateX(-16px);
+  background: var(--gold-light);
+}
+
+.card {
+  background: var(--card2);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+}
+
+.incomeRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--gold-border);
+  font-size: 14px;
+}
+
+.incomeTotal {
+  font-weight: 700;
+  color: var(--gold-light);
+  border-bottom: none;
+}
+
+.danger { border-color: rgba(224, 82, 82, 0.3); }
+
+.dangerBtn, .logoutBtn {
+  width: 100%;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  margin-top: 8px;
+}
+
+.dangerBtn {
+  background: rgba(224, 82, 82, 0.1);
+  color: var(--red);
+  border: 1px solid rgba(224, 82, 82, 0.3);
+}
+
+.logoutBtn {
+  background: var(--card2);
+  color: var(--text2);
+  border: 1px solid var(--gold-border);
+}

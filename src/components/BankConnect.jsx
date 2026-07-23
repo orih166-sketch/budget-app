@@ -1,6 +1,9 @@
 import { useState, useRef } from 'react'
 import { supabase } from '../lib/supabase.js'
 import { useHousehold } from '../context/HouseholdContext.jsx'
+import { readFileWithEncoding, parseCSV } from '../utils/fileImport.js'
+import { detectFormat, parseWithFormat } from '../utils/formatDetector.js'
+import { parseIsraeliDate } from '../utils/dateUtils.js'
 import styles from './BankConnect.module.css'
 
 const BANKS = [
@@ -96,22 +99,30 @@ export default function BankConnect({ onClose, onImported }) {
       return
     }
 
-    file.arrayBuffer().then(buf => {
+    readFileWithEncoding(file).then(text => {
       try {
-        // Try windows-1255 (Hebrew Windows encoding used by Israeli banks) first
-        // Fall back to UTF-8 if it looks garbled
-        const w1255 = new TextDecoder('windows-1255').decode(buf)
-        const utf8  = new TextDecoder('utf-8').decode(buf)
-        // Heuristic: if windows-1255 has more Hebrew chars, use it
-        const hebrewRe = /[א-ת]/g
-        const text = (w1255.match(hebrewRe) || []).length >= (utf8.match(hebrewRe) || []).length
-          ? w1255 : utf8
         const rows = parseCSV(text)
-        const parsed = parseRows(rows, file.name)
-        if (parsed.total === 0) {
+        const headers = (rows.find(r => r.some(c => c && c.length > 0)) || []).map(h => String(h || ''))
+        const format = detectFormat(headers)
+        let txns = format ? parseWithFormat(rows, format) : []
+        if (!txns.length) {
+          const parsed = parseRows(rows, file.name)
+          txns = parsed.txns
+        } else {
+          txns = txns.map(t => ({
+            date: (() => {
+              const d = parseIsraeliDate(t.date)
+              return d ? d.toISOString().split('T')[0] : t.date
+            })(),
+            description: t.merchant,
+            amount: t.amount,
+            type: t.type,
+          }))
+        }
+        if (!txns.length) {
           setError('לא נמצאו עסקאות בקובץ. נסה לשמור כ-CSV מתוך Excel.')
         } else {
-          setPreview(parsed)
+          setPreview({ txns, total: txns.length, bankName: format?.name })
         }
       } catch (err) {
         setError('לא ניתן לקרוא את הקובץ: ' + err.message)
@@ -153,24 +164,6 @@ export default function BankConnect({ onClose, onImported }) {
     } finally {
       setPdfLoading(false)
     }
-  }
-
-  function parseCSV(text) {
-    // Handle Windows line endings, split into lines
-    const lines = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n')
-    return lines.map(line => {
-      // Split by comma or tab, handle quoted fields
-      const cells = []
-      let cur = '', inQ = false
-      for (let i = 0; i < line.length; i++) {
-        const c = line[i]
-        if (c === '"') { inQ = !inQ }
-        else if ((c === ',' || c === '\t') && !inQ) { cells.push(cur.trim()); cur = '' }
-        else cur += c
-      }
-      cells.push(cur.trim())
-      return cells
-    })
   }
 
   function parseRows(rows, filename) {

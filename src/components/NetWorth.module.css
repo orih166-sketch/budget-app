@@ -1,0 +1,75 @@
+.wrap {
+  padding: 12px 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.hero {
+  background: linear-gradient(135deg, var(--card), #221c08);
+  border: 1px solid var(--gold-border2);
+  border-radius: var(--radius);
+  padding: 20px;
+  text-align: center;
+}
+
+.heroLabel { font-size: 13px; color: var(--text2); margin-bottom: 6px; }
+.heroVal { font-size: 28px; font-weight: 800; color: var(--gold-light); }
+.heroSub {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text2);
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.divider { color: var(--text3); }
+
+.section {
+  background: var(--card);
+  border: 1px solid var(--gold-border);
+  border-radius: var(--radius);
+  padding: 14px;
+}
+
+.sectionTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text2);
+  margin-bottom: 10px;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--gold-border);
+  font-size: 14px;
+}
+
+.row:last-child { border-bottom: none; }
+
+.liabCard { padding: 4px 0; }
+.liabSub { font-size: 12px; color: var(--text3); margin-top: 4px; padding-right: 4px; }
+
+.simLabel { font-size: 13px; color: var(--text2); display: block; margin-bottom: 8px; }
+
+.simInput {
+  width: 100%;
+  padding: 12px;
+  background: var(--card2);
+  border: 1px solid var(--gold-border);
+  border-radius: var(--radius-sm);
+  color: var(--gold-light);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.simResult {
+  margin-top: 10px;
+  font-size: 14px;
+  color: var(--green);
+}

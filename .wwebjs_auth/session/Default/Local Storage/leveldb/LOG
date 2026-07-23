@@ -1,0 +1,51 @@
+2026/06/28-22:27:52.207 5b291 Reusing MANIFEST /Users/oriharel/קוד/.wwebjs_auth/session/Default/Local Storage/leveldb/MANIFEST-000001
+2026/06/28-22:27:52.209 5b291 Recovering log #3
+2026/06/28-22:27:52.210 5b291 Reusing old log /Users/oriharel/קוד/.wwebjs_auth/session/Default/Local Storage/leveldb/000003.log 
+2026/06/28-22:28:52.212 5b294 Level-0 table #5: started
+2026/06/28-22:28:52.214 5b294 Level-0 table #5: 23498 bytes OK
+2026/06/28-22:28:52.216 5b294 Delete type=0 #3
+2026/06/29-13:12:55.306 5b294 Level-0 table #7: started
+2026/06/29-13:12:55.311 5b294 Level-0 table #7: 17016 bytes OK
+2026/06/29-13:12:55.319 5b294 Delete type=0 #4
+2026/06/29-14:08:40.870 5b294 Level-0 table #9: started
+2026/06/29-14:08:40.871 5b294 Level-0 table #9: 16029 bytes OK
+2026/06/29-14:08:40.875 5b294 Delete type=0 #6
+2026/06/29-15:18:40.939 5b294 Level-0 table #11: started
+2026/06/29-15:18:40.945 5b294 Level-0 table #11: 13326 bytes OK
+2026/06/29-15:18:40.947 5b294 Delete type=0 #8
+2026/06/29-17:02:27.464 5b294 Level-0 table #13: started
+2026/06/29-17:02:27.467 5b294 Level-0 table #13: 14844 bytes OK
+2026/06/29-17:02:27.468 5b294 Delete type=0 #10
+2026/06/29-20:29:03.830 5b294 Level-0 table #15: started
+2026/06/29-20:29:03.836 5b294 Level-0 table #15: 15225 bytes OK
+2026/06/29-20:29:03.840 5b294 Delete type=0 #12
+2026/06/29-20:29:03.845 5b291 Compacting 4@0 + 1@1 files
+2026/06/29-20:29:03.849 5b291 Generated table #16@0: 42 keys, 5639 bytes
+2026/06/29-20:29:03.849 5b291 Compacted 4@0 + 1@1 files => 5639 bytes
+2026/06/29-20:29:03.850 5b291 compacted to: files[ 0 1 1 0 0 0 0 ]
+2026/06/29-20:29:03.850 5b291 Delete type=2 #15
+2026/06/29-20:29:03.850 5b291 Delete type=2 #7
+2026/06/29-20:29:03.850 5b291 Delete type=2 #13
+2026/06/29-20:29:03.850 5b291 Delete type=2 #11
+2026/06/29-20:29:03.850 5b291 Delete type=2 #9
+2026/06/29-21:59:09.712 5b294 Level-0 table #18: started
+2026/06/29-21:59:09.718 5b294 Level-0 table #18: 16365 bytes OK
+2026/06/29-21:59:09.720 5b294 Delete type=0 #14
+2026/06/29-23:28:20.491 5b294 Level-0 table #20: started
+2026/06/29-23:28:20.496 5b294 Level-0 table #20: 15947 bytes OK
+2026/06/29-23:28:20.498 5b294 Delete type=0 #17
+2026/06/30-01:37:34.638 5b294 Level-0 table #22: started
+2026/06/30-01:37:34.641 5b294 Level-0 table #22: 16029 bytes OK
+2026/06/30-01:37:34.645 5b294 Delete type=0 #19
+2026/06/30-18:28:04.507 5b294 Level-0 table #24: started
+2026/06/30-18:28:04.512 5b294 Level-0 table #24: 15848 bytes OK
+2026/06/30-18:28:04.515 5b294 Delete type=0 #21
+2026/06/30-18:28:04.521 5b294 Compacting 4@0 + 1@1 files
+2026/06/30-18:28:04.523 5b294 Generated table #25@0: 52 keys, 6658 bytes
+2026/06/30-18:28:04.523 5b294 Compacted 4@0 + 1@1 files => 6658 bytes
+2026/06/30-18:28:04.524 5b294 compacted to: files[ 0 1 1 0 0 0 0 ]
+2026/06/30-18:28:04.525 5b294 Delete type=2 #16
+2026/06/30-18:28:04.525 5b294 Delete type=2 #20
+2026/06/30-18:28:04.525 5b294 Delete type=2 #22
+2026/06/30-18:28:04.526 5b294 Delete type=2 #18
+2026/06/30-18:28:04.526 5b294 Delete type=2 #24

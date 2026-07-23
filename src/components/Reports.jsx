@@ -1,11 +1,31 @@
 import { useMemo } from 'react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts'
+import * as XLSX from 'xlsx'
 import { CATEGORIES, MONTHS } from '../data.js'
 import styles from './Reports.module.css'
 
 const fmt = n => '₪' + n.toLocaleString('he-IL', { maximumFractionDigits: 0 })
 const allCats = [...CATEGORIES.expenses, ...CATEGORIES.income]
 const cat = id => allCats.find(c => c.id === id)
+
+function exportToExcel(transactions, year) {
+  const rows = transactions
+    .filter(t => new Date(t.date).getFullYear() === year)
+    .map(t => ({
+      תאריך: new Date(t.date).toLocaleDateString('he-IL'),
+      עסק: t.merchant || t.description || '',
+      קטגוריה: t.category || '',
+      סכום: t.type === 'expense' ? -Math.abs(t.amount) : Math.abs(t.amount),
+      סוג: t.type === 'income' ? 'הכנסה' : 'הוצאה',
+      'אמצעי תשלום': t.paymentMethod || '',
+      'שולם ע"י': t.paidBy || t.user || '',
+    }))
+
+  const ws = XLSX.utils.json_to_sheet(rows)
+  const wb = XLSX.utils.book_new()
+  XLSX.utils.book_append_sheet(wb, ws, `עסקאות ${year}`)
+  XLSX.writeFile(wb, `כלכלת-בית-${year}.xlsx`)
+}
 
 export default function Reports({ transactions }) {
   const now  = new Date()
@@ -44,6 +64,16 @@ export default function Reports({ transactions }) {
 
   return (
     <div className={styles.wrap}>
+      <div className={styles.exportRow}>
+        <button
+          className={styles.exportBtn}
+          onClick={() => exportToExcel(transactions, year)}
+          disabled={yearTxns.length === 0}
+        >
+          ⬇ ייצוא לאקסל {year}
+        </button>
+      </div>
+
       <div className={styles.kpis}>
         <div className={styles.kpi}>
           <span className={styles.kLabel}>סך הכנסות {year}</span>

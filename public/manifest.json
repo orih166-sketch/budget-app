@@ -1,30 +1,18 @@
 {
-  "name": "תקציב הבית",
-  "short_name": "תקציב",
-  "description": "ניהול תקציב משפחתי חכם",
+  "name": "כלכלת בית",
+  "short_name": "כלכלת בית",
+  "description": "ניהול פינאנסי פרימיום למשפחה",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "orientation": "portrait-primary",
-  "theme_color": "#1a2744",
-  "background_color": "#ffffff",
+  "orientation": "portrait",
+  "theme_color": "#1a1830",
+  "background_color": "#1a1830",
   "dir": "rtl",
-  "lang": "he-IL",
+  "lang": "he",
   "icons": [
-    {
-      "src": "/icon.svg",
-      "sizes": "192x192",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
-    }
+    { "src": "/icon.svg", "sizes": "192x192", "type": "image/svg+xml", "purpose": "any maskable" },
+    { "src": "/icon.svg", "sizes": "512x512", "type": "image/svg+xml", "purpose": "any maskable" }
   ],
-  "categories": ["finance", "productivity"],
-  "screenshots": [
-    {
-      "src": "/icon.svg",
-      "sizes": "540x720",
-      "type": "image/svg+xml",
-      "form_factor": "narrow"
-    }
-  ]
+  "categories": ["finance", "productivity"]
 }

@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
-import { CATEGORIES, MONTHS } from '../data.js'
+import { MONTHS } from '../data.js'
+import { BUDGET_CATEGORIES, CATEGORY_ID_MAP } from '../data/household.js'
 import { useCategoryBudgets } from '../hooks/useCategoryBudgets.js'
 import styles from './Budget.module.css'
 
@@ -17,13 +18,17 @@ export default function Budget({ transactions, budget, onUpdateBudget, selectedM
       return d.getMonth() === selectedMonth && d.getFullYear() === selectedYear && t.type === 'expense'
     }), [transactions, selectedMonth, selectedYear])
 
+  // Map transaction category IDs → budget category IDs before summing
   const actual = useMemo(() => {
     const m = {}
-    monthTx.forEach(t => { m[t.category] = (m[t.category] || 0) + t.amount })
+    monthTx.forEach(t => {
+      const mapped = CATEGORY_ID_MAP[t.category] || t.category
+      m[mapped] = (m[mapped] || 0) + t.amount
+    })
     return m
   }, [monthTx])
 
-  const totalPlanned = CATEGORIES.expenses.reduce((a, c) => a + (categoryBudgets[c.id] || 0), 0)
+  const totalPlanned = BUDGET_CATEGORIES.reduce((a, c) => a + (categoryBudgets[c.id] ?? c.default), 0)
   const totalActual  = Object.values(actual).reduce((a, v) => a + v, 0)
   const totalRemain  = totalPlanned - totalActual
   const overallPct   = totalPlanned > 0 ? Math.min(100, Math.round((totalActual / totalPlanned) * 100)) : 0
@@ -31,7 +36,7 @@ export default function Budget({ transactions, budget, onUpdateBudget, selectedM
 
   function startEdit() {
     const d = {}
-    CATEGORIES.expenses.forEach(c => { d[c.id] = categoryBudgets[c.id] ?? 0 })
+    BUDGET_CATEGORIES.forEach(c => { d[c.id] = categoryBudgets[c.id] ?? c.default })
     setDraft(d)
     setEditing(true)
   }
@@ -95,8 +100,8 @@ export default function Budget({ transactions, budget, onUpdateBudget, selectedM
 
       {/* ── Category list ── */}
       <div className={styles.list}>
-        {CATEGORIES.expenses.map((c, i) => {
-          const plan = categoryBudgets[c.id] || 0
+        {BUDGET_CATEGORIES.map((c, i) => {
+          const plan = categoryBudgets[c.id] ?? c.default
           const done = actual[c.id] || 0
           const pct  = plan > 0 ? Math.min(100, Math.round((done / plan) * 100)) : (done > 0 ? 100 : 0)
           const over = done > plan && plan > 0
@@ -112,10 +117,10 @@ export default function Budget({ transactions, budget, onUpdateBudget, selectedM
 
               <div className={styles.cardTop}>
                 <div className={styles.iconWrap} style={{ background: c.color + '18' }}>
-                  <span className={styles.icon}>{c.icon}</span>
+                  <span className={styles.icon}>{c.emoji}</span>
                 </div>
                 <div className={styles.cardInfo}>
-                  <span className={styles.label}>{c.label}</span>
+                  <span className={styles.label}>{c.name}</span>
                   <div className={styles.barWrap}>
                     <div className={styles.bar} style={{ width: `${pct}%`, background: barColor }} />
                   </div>

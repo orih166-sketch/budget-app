@@ -1,63 +1,75 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Login from './components/Login.jsx'
 import Dashboard from './components/Dashboard.jsx'
 import Transactions from './components/Transactions.jsx'
-import Budget from './components/Budget.jsx'
 import Reports from './components/Reports.jsx'
-import Savings from './components/Savings.jsx'
+import NetWorth from './components/NetWorth.jsx'
+import Settings from './components/Settings.jsx'
 import AddTransaction from './components/AddTransaction.jsx'
 import MonthNav from './components/MonthNav.jsx'
+import Navbar from './components/Navbar.jsx'
+import Logo from './components/Logo.jsx'
 import ErrorBoundary from './components/ErrorBoundary.jsx'
 import Toast from './components/Toast.jsx'
+import { requestNotificationPermission, listenToForegroundMessages } from './notifications.js'
 import FamilySettings from './components/FamilySettings.jsx'
 import BankConnect from './components/BankConnect.jsx'
-import Accounts from './components/Accounts.jsx'
 import Onboarding, { shouldShowOnboarding } from './components/Onboarding.jsx'
 import { HouseholdProvider, useHousehold } from './context/HouseholdContext.jsx'
 import { useTransactions } from './hooks/useTransactions.js'
-import { useSavingsGoals } from './hooks/useSavingsGoals.js'
 import { useAccounts } from './hooks/useAccounts.js'
 import { useRecurring } from './hooks/useRecurring.js'
 import { useAuth } from './hooks/useAuth.js'
-import { USERS, CURRENT_MONTH, CURRENT_YEAR } from './data.js'
+import { useCategoryBudgets } from './hooks/useCategoryBudgets.js'
+import { checkBudgetAlert } from './utils/budgetNotify.js'
+import { CURRENT_MONTH, CURRENT_YEAR } from './data.js'
 import styles from './App.module.css'
 
-const TABS = [
-  { id: 'dashboard',    label: 'בית',     icon: '⌂' },
-  { id: 'transactions', label: 'עסקאות',  icon: '↕' },
-  { id: 'budget',       label: 'תקציב',   icon: '◎' },
-  { id: 'savings',      label: 'חיסכון',  icon: '🎯' },
-  { id: 'accounts',     label: 'חשבונות', icon: '🏦' },
-  { id: 'reports',      label: 'דוחות',   icon: '▦' },
-]
-
 function AppShell({ user, isPasswordRecovery, logout, updatePassword }) {
-  const { household, acceptInvitation } = useHousehold()
-  const { transactions, budget, expectedIncome, setExpectedIncome, addTransaction, updateTransaction, deleteTransaction, updateBudget, txError, clearTxError } =
-    useTransactions()
-  const { goals, loading: goalsLoading, addGoal, updateGoal, depositToGoal, deleteGoal } =
-    useSavingsGoals()
+  const { acceptInvitation } = useHousehold()
+  const {
+    transactions, budget, expectedIncome, setExpectedIncome,
+    addTransaction, updateTransaction, deleteTransaction, updateBudget,
+    txError, clearTxError,
+  } = useTransactions()
   const { netWorth, totalAssets, totalLiab } = useAccounts()
   const recurring = useRecurring()
+  const { budgets } = useCategoryBudgets()
+  const { household } = useHousehold()
+
+  // הוסף עסקה + בדוק חריגה מתקציב
+  async function handleAddTransaction(tx) {
+    await addTransaction(tx)
+    checkBudgetAlert({ newTx: tx, transactions, budgets, householdId: household?.id })
+  }
 
   const [showOnboarding, setShowOnboarding] = useState(shouldShowOnboarding)
-  const [tab, setTab]             = useState('dashboard')
-  const [tabKey, setTabKey]       = useState(0)
-  const [sideOpen, setSide]       = useState(false)
-  const [sideClosing, setClosing] = useState(false)
-  const [addOpen, setAdd]         = useState(false)
-  const [familyOpen, setFamily]   = useState(false)
-  const [bankOpen,   setBank]     = useState(false)
+  const [tab, setTab] = useState('dashboard')
+  const [tabKey, setTabKey] = useState(0)
+  const [addOpen, setAdd] = useState(false)
+  const [familyOpen, setFamily] = useState(false)
+  const [bankOpen, setBank] = useState(false)
+  const [notifCount] = useState(0)
+  const [notifToast, setNotifToast] = useState('')
+
+  const showNotif = useCallback(({ title, body }) => {
+    setNotifToast(`${title}: ${body}`)
+  }, [])
+
+  useEffect(() => {
+    requestNotificationPermission(user?.id).catch(() => {})
+    const unsub = listenToForegroundMessages(showNotif)
+    return unsub
+  }, [user?.id, showNotif])
 
   const [selectedMonth, setSelectedMonth] = useState(CURRENT_MONTH)
-  const [selectedYear,  setSelectedYear]  = useState(CURRENT_YEAR)
-  const [selectedUser,  setSelectedUser]  = useState('family')
+  const [selectedYear, setSelectedYear] = useState(CURRENT_YEAR)
+  const [selectedUser] = useState('family')
 
-  const [newPassword, setNewPassword]   = useState('')
-  const [pwdLoading, setPwdLoading]     = useState(false)
-  const [pwdError, setPwdError]         = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [pwdLoading, setPwdLoading] = useState(false)
+  const [pwdError, setPwdError] = useState('')
 
-  // Accept invite from URL on first load
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const invite = params.get('invite')
@@ -70,15 +82,11 @@ function AppShell({ user, isPasswordRecovery, logout, updatePassword }) {
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  function closeSide() {
-    setClosing(true)
-    setTimeout(() => { setSide(false); setClosing(false) }, 210)
-  }
-
   async function handlePasswordUpdate(e) {
     e.preventDefault()
     if (newPassword.length < 6) { setPwdError('סיסמה חייבת להכיל לפחות 6 תווים'); return }
-    setPwdLoading(true); setPwdError('')
+    setPwdLoading(true)
+    setPwdError('')
     try {
       await updatePassword(newPassword)
     } catch (err) {
@@ -88,12 +96,11 @@ function AppShell({ user, isPasswordRecovery, logout, updatePassword }) {
     }
   }
 
-  // Password recovery overlay (user clicked reset link in email)
   if (isPasswordRecovery) {
     return (
       <div className={styles.pwdRecoveryWrap}>
         <div className={styles.pwdRecoveryCard}>
-          <div className={styles.logo}>🔐</div>
+          <Logo size={48} />
           <h2 className={styles.pwdRecoveryTitle}>קביעת סיסמה חדשה</h2>
           <form onSubmit={handlePasswordUpdate} className={styles.pwdRecoveryForm}>
             <input
@@ -115,87 +122,109 @@ function AppShell({ user, isPasswordRecovery, logout, updatePassword }) {
     )
   }
 
+  const showMonthNav = tab === 'dashboard' || tab === 'transactions' || tab === 'settings'
+  const showFab = tab !== 'settings' && tab !== 'reports'
+
   return (
     <div className={styles.app}>
       <header className={styles.header}>
-        <button className={styles.menuBtn} onClick={() => setSide(o => !o)}>☰</button>
+        <Logo size={36} />
         <h1 className={styles.title}>כלכלת בית</h1>
-        <span className={styles.userChip}>{user.name}</span>
+        <button type="button" className={styles.bellBtn} aria-label="התראות">
+          🔔
+          {notifCount > 0 && <span className={styles.bellBadge}>{notifCount}</span>}
+        </button>
       </header>
 
-      {tab !== 'reports' && tab !== 'savings' && (
+      {showMonthNav && (
         <MonthNav
-          month={selectedMonth} year={selectedYear} onChange={(m, y) => { setSelectedMonth(m); setSelectedYear(y) }}
-          selectedUser={selectedUser} onUserChange={setSelectedUser}
+          month={selectedMonth}
+          year={selectedYear}
+          onChange={(m, y) => { setSelectedMonth(m); setSelectedYear(y) }}
         />
-      )}
-
-      {sideOpen && (
-        <div className={`${styles.overlay} ${sideClosing ? styles.overlayClosing : ''}`} onClick={closeSide}>
-          <aside className={`${styles.sidebar} ${sideClosing ? styles.sidebarClosing : ''}`} onClick={e => e.stopPropagation()}>
-            <div className={styles.sideTop}>
-              <div className={styles.sideAvatar}>{user.avatar}</div>
-              <div>
-                <p className={styles.sideName}>{user.name}</p>
-                <p className={styles.sideSub}>{user.email || 'ניהול תקציב הבית'}</p>
-              </div>
-            </div>
-            <nav className={styles.sideNav}>
-              {TABS.map(t => (
-                <button key={t.id} className={`${styles.sideItem} ${tab===t.id ? styles.sideActive : ''}`}
-                  onClick={() => { setTab(t.id); closeSide() }}>
-                  <span>{t.icon}</span><span>{t.label}</span>
-                </button>
-              ))}
-              <button className={styles.sideItem}
-                onClick={() => { setBank(true); closeSide() }}>
-                <span>🏦</span><span>סנכרון בנק</span>
-              </button>
-              <button className={styles.sideItem}
-                onClick={() => { setFamily(true); closeSide() }}>
-                <span>👨‍👩‍👧</span><span>הגדרות משפחה</span>
-              </button>
-            </nav>
-            <button className={styles.logoutBtn} onClick={() => { logout(); closeSide() }}>← יציאה</button>
-          </aside>
-        </div>
       )}
 
       <main className={styles.main}>
         <ErrorBoundary>
           <div key={tabKey} className={styles.tabPane}>
-            {tab === 'dashboard'    && <Dashboard transactions={transactions} budget={budget} user={user} selectedMonth={selectedMonth} selectedYear={selectedYear} selectedUser={selectedUser} expectedIncome={expectedIncome} onSetExpectedIncome={setExpectedIncome} netWorth={netWorth} totalAssets={totalAssets} totalLiab={totalLiab} />}
-            {tab === 'transactions' && <Transactions transactions={transactions} onDelete={deleteTransaction} onUpdate={updateTransaction} selectedMonth={selectedMonth} selectedYear={selectedYear} onMonthChange={(m, y) => { setSelectedMonth(m); setSelectedYear(y) }} selectedUser={selectedUser} recurring={recurring} />}
-            {tab === 'budget'       && <Budget transactions={transactions} budget={budget} onUpdateBudget={updateBudget} selectedMonth={selectedMonth} selectedYear={selectedYear} />}
-            {tab === 'savings'      && <Savings goals={goals} loading={goalsLoading} onAdd={addGoal} onUpdate={updateGoal} onDeposit={depositToGoal} onDelete={deleteGoal} />}
-            {tab === 'accounts'     && <Accounts />}
-            {tab === 'reports'      && <Reports transactions={transactions} />}
+            {tab === 'dashboard' && (
+              <Dashboard
+                transactions={transactions}
+                budget={budget}
+                user={user}
+                selectedMonth={selectedMonth}
+                selectedYear={selectedYear}
+                selectedUser={selectedUser}
+                expectedIncome={expectedIncome}
+                onSetExpectedIncome={setExpectedIncome}
+                netWorth={netWorth}
+                totalAssets={totalAssets}
+                totalLiab={totalLiab}
+                alertCount={notifCount}
+              />
+            )}
+            {tab === 'transactions' && (
+              <Transactions
+                transactions={transactions}
+                onDelete={deleteTransaction}
+                onUpdate={updateTransaction}
+                selectedMonth={selectedMonth}
+                selectedYear={selectedYear}
+                onMonthChange={(m, y) => { setSelectedMonth(m); setSelectedYear(y) }}
+                selectedUser={selectedUser}
+                recurring={recurring}
+              />
+            )}
+            {tab === 'reports' && <Reports transactions={transactions} />}
+            {tab === 'networth' && <NetWorth />}
+            {tab === 'settings' && (
+              <Settings
+                user={user}
+                logout={logout}
+                transactions={transactions}
+                budget={budget}
+                onUpdateBudget={updateBudget}
+                selectedMonth={selectedMonth}
+                selectedYear={selectedYear}
+                onOpenBank={() => setBank(true)}
+                onOpenFamily={() => setFamily(true)}
+              />
+            )}
           </div>
         </ErrorBoundary>
       </main>
 
-      <button className={styles.fab} onClick={() => setAdd(true)}>＋</button>
+      {showFab && (
+        <button type="button" className={styles.fab} onClick={() => setAdd(true)} aria-label="הוסף עסקה">＋</button>
+      )}
 
-      <nav className={styles.bottomNav}>
-        {TABS.map(t => (
-          <button key={t.id} className={`${styles.navItem} ${tab===t.id ? styles.navActive : ''}`} onClick={() => { setTab(t.id); setTabKey(k => k+1) }}>
-            <span className={styles.navIcon}>{t.icon}</span>
-            <span className={styles.navLabel}>{t.label}</span>
-          </button>
-        ))}
-      </nav>
+      <Navbar
+        active={tab}
+        onChange={id => { setTab(id); setTabKey(k => k + 1) }}
+      />
 
       {showOnboarding && <Onboarding onDone={() => setShowOnboarding(false)} />}
-      {addOpen && <AddTransaction onAdd={addTransaction} onAddRecurring={recurring.addRule} onClose={() => setAdd(false)} user={user} />}
+      {addOpen && (
+        <AddTransaction
+          onAdd={handleAddTransaction}
+          onAddRecurring={recurring.addRule}
+          onClose={() => setAdd(false)}
+          user={user}
+        />
+      )}
       {familyOpen && <FamilySettings user={user} onClose={() => setFamily(false)} />}
-      {bankOpen   && <BankConnect onClose={() => setBank(false)} onImported={() => { setBank(false) }} />}
+      {bankOpen && <BankConnect onClose={() => setBank(false)} onImported={() => setBank(false)} />}
       <Toast message={txError} onClose={clearTxError} />
+      <Toast message={notifToast} onClose={() => setNotifToast('')} />
     </div>
   )
 }
 
 export default function App() {
-  const { user, isPasswordRecovery, login, register, logout, sendResetCode, updatePassword, loginWithGoogle, sendPhoneOtp, verifyPhoneOtp } = useAuth()
+  const {
+    user, isPasswordRecovery, login, register, logout,
+    sendResetCode, updatePassword, loginWithGoogle, sendPhoneOtp, verifyPhoneOtp,
+  } = useAuth()
 
   if (user === undefined) {
     return (
@@ -206,7 +235,16 @@ export default function App() {
   }
 
   if (!user) {
-    return <Login onLogin={login} onRegister={register} onSendResetCode={sendResetCode} onLoginWithGoogle={loginWithGoogle} onSendPhoneOtp={sendPhoneOtp} onVerifyPhoneOtp={verifyPhoneOtp} />
+    return (
+      <Login
+        onLogin={login}
+        onRegister={register}
+        onSendResetCode={sendResetCode}
+        onLoginWithGoogle={loginWithGoogle}
+        onSendPhoneOtp={sendPhoneOtp}
+        onVerifyPhoneOtp={verifyPhoneOtp}
+      />
+    )
   }
 
   return (

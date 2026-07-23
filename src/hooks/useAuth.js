@@ -6,16 +6,30 @@ export function useAuth() {
   const [isPasswordRecovery, setIsPasswordRecovery] = useState(false)
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session ? formatUser(session.user) : null)
-    })
+    // Bail out to login screen if Supabase doesn't respond within 10 s
+    const timeoutId = setTimeout(() => {
+      setUser(prev => prev === undefined ? null : prev)
+    }, 10_000)
+
+    supabase.auth.getSession()
+      .then(({ data: { session } }) => {
+        clearTimeout(timeoutId)
+        setUser(session ? formatUser(session.user) : null)
+      })
+      .catch(() => {
+        clearTimeout(timeoutId)
+        setUser(null)
+      })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setIsPasswordRecovery(event === 'PASSWORD_RECOVERY')
       setUser(session ? formatUser(session.user) : null)
     })
 
-    return () => subscription.unsubscribe()
+    return () => {
+      clearTimeout(timeoutId)
+      subscription.unsubscribe()
+    }
   }, [])
 
   async function login(email, password) {

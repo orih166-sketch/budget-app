@@ -1,0 +1,55 @@
+export const HOUSEHOLD = {
+  id: 'harel-family',
+  name: 'משפחת הראל',
+  members: {
+    uri: { name: 'אורי הראל', salary: 14200, color: '#4aaf7a' },
+    afek: { name: 'אפק הראל', salary: 12773, color: '#6a9acc' },
+  },
+  totalIncome: 26973,
+  savingsRate: 0.21,
+  savingsMonthly: 5633,
+  carLoan: {
+    remaining: 100000,
+    monthlyPayment: 2100,
+    endDate: '2030-03',
+  },
+  savingsFunds: ['איילון', 'מגדל', 'מור', 'אנליסט'],
+  paymentMethods: ['אשראי 1', 'אשראי 2', 'אשראי 3', 'מזומן', 'העברה בנקאית', 'פייטר', "צ'ק"],
+}
+
+export const BUDGET_CATEGORIES = [
+  { id: 'housing',   name: 'דיור',          emoji: '🏠', color: '#6366f1', isFixed: true,  default: 5000 },
+  { id: 'grocery',   name: 'סופר',          emoji: '🛒', color: '#10b981', isFixed: false, default: 1800 },
+  { id: 'dining',    name: 'אוכל בחוץ',     emoji: '🍔', color: '#f97316', isFixed: false, default: 600  },
+  { id: 'car',       name: 'רכב + דלק',     emoji: '🚗', color: '#f59e0b', isFixed: false, default: 900  },
+  { id: 'medical',   name: 'רפואה',          emoji: '💊', color: '#14b8a6', isFixed: false, default: 500  },
+  { id: 'cosmetics', name: 'קוסמטיקה',      emoji: '💄', color: '#f472b6', isFixed: false, default: 500  },
+  { id: 'clothing',  name: 'ביגוד',          emoji: '👕', color: '#ec4899', isFixed: false, default: 500  },
+  { id: 'treats',    name: 'פינוקים',        emoji: '🎁', color: '#a855f7', isFixed: false, default: 400  },
+  { id: 'mobile',    name: 'סלולר',          emoji: '📱', color: '#64748b', isFixed: true,  default: 200  },
+  { id: 'vacation',  name: 'נופש',           emoji: '✈️', color: '#0ea5e9', isFixed: false, default: 1000 },
+  { id: 'education', name: 'חינוך',          emoji: '🎓', color: '#3b82f6', isFixed: false, default: 300  },
+  { id: 'pets',      name: 'חיות מחמד',      emoji: '🐕', color: '#84cc16', isFixed: false, default: 400  },
+  { id: 'savings',   name: 'חיסכון',         emoji: '💰', color: '#0ea5e9', isFixed: true,  default: 5633 },
+  { id: 'other',     name: 'שונות',          emoji: '📦', color: '#94a3b8', isFixed: false, default: 500  },
+]
+
+export const CATEGORY_ID_MAP = {
+  super: 'grocery',
+  dining: 'dining',
+  car: 'car',
+  health: 'medical',
+  cosmet: 'cosmetics',
+  bigud: 'clothing',
+  pampering: 'treats',
+  education: 'education',
+  home: 'housing',
+  savings: 'savings',
+  other: 'other',
+  bills: 'housing',
+  insurance: 'housing',
+  transport: 'car',
+  children: 'education',
+  charity: 'other',
+  events: 'treats',
+}

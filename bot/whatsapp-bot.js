@@ -10,10 +10,19 @@
  *   ALLOWED_NUMBER     — your WhatsApp number in international format, e.g. 972501234567
  */
 
-import qrcode  from 'qrcode-terminal'
-import pkg     from 'whatsapp-web.js'
+import qrcode        from 'qrcode-terminal'
+import QRCode        from 'qrcode'
+import fs            from 'fs'
+import { exec }      from 'child_process'
+import pkg           from 'whatsapp-web.js'
 import { parseFile }          from './parser.js'
 import { upsertTransactions } from './db.js'
+import { createClient }       from '@supabase/supabase-js'
+
+const sbNotif = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_KEY
+)
 
 const { Client, LocalAuth, MessageMedia } = pkg
 
@@ -45,28 +54,97 @@ const client = new Client({
   authStrategy: new LocalAuth({ dataPath: '.wwebjs_auth' }),
   puppeteer: {
     executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
     headless: true,
+    protocolTimeout: 60000,
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-accelerated-2d-canvas',
+      '--no-first-run',
+      '--no-zygote',
+      '--disable-gpu',
+      '--disable-features=IsolateOrigins,site-per-process',
+    ],
   },
 })
 
-client.on('qr', qr => {
-  console.log('\nסרוק את ה-QR הזה מ-WhatsApp → מכשירים מקושרים:\n')
+client.on('qr', async qr => {
+  console.log('\n📱  פותח QR בדפדפן לסריקה...\n')
   qrcode.generate(qr, { small: true })
+
+  // Save QR as image and open in browser
+  const html = `<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<title>WhatsApp QR</title>
+<style>body{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;margin:0;background:#111;font-family:sans-serif;color:#fff}
+img{width:300px;height:300px;border-radius:16px;background:#fff;padding:16px}
+p{margin-top:20px;opacity:.6;font-size:14px}</style></head>
+<body>
+<img src="${await QRCode.toDataURL(qr, { width: 300 })}" />
+<p>WhatsApp → הגדרות → מכשירים מקושרים → קשר מכשיר → סרוק</p>
+</body></html>`
+
+  const path = '/tmp/whatsapp-qr.html'
+  fs.writeFileSync(path, html)
+  exec(`open "${path}"`)
 })
+
+// ── שליחת התראות ממתינות ─────────────────────────────────────
+async function pollAndSendNotifications() {
+  try {
+    const { data, error } = await sbNotif
+      .from('pending_notifications')
+      .select('*')
+      .is('sent_at', null)
+      .order('created_at', { ascending: true })
+      .limit(20)
+
+    if (error) { console.warn('poll notifications error:', error.message); return }
+    if (!data?.length) return
+
+    for (const notif of data) {
+      try {
+        const target = `${ALLOWED_NUMBER}@c.us`
+        await client.sendMessage(target, notif.message)
+        await sbNotif
+          .from('pending_notifications')
+          .update({ sent_at: new Date().toISOString() })
+          .eq('id', notif.id)
+        console.log(`📤  נשלחה התראה [${notif.type}]:`, notif.message.slice(0, 60))
+      } catch (e) {
+        console.error('שגיאה בשליחת התראה:', e.message)
+      }
+    }
+  } catch (e) {
+    console.warn('pollAndSendNotifications:', e.message)
+  }
+}
 
 client.on('ready', async () => {
   console.log('✅  WhatsApp bot מחובר ומוכן לקבל קבצים')
 
+  // הפעל polling להתראות: תוך 10 שניות ואז כל 30 דקות
+  setTimeout(pollAndSendNotifications, 10_000)
+  setInterval(pollAndSendNotifications, 30 * 60 * 1000)
+
   if (GROUP_NAME) {
-    const chats = await client.getChats()
-    const group = chats.find(c => c.isGroup && c.name === GROUP_NAME)
-    if (group) {
-      allowedGroupId = group.id._serialized
-      console.log(`✅  קבוצה נמצאה: "${GROUP_NAME}" (${allowedGroupId})`)
-    } else {
-      console.warn(`⚠️  קבוצה "${GROUP_NAME}" לא נמצאה — מאזין רק למספר האישי`)
-    }
+    // מחכה קצת לפני getChats כדי ש-WhatsApp Web יסיים לטעון
+    setTimeout(async () => {
+      try {
+        const chats = await client.getChats()
+        const normalize = s => s?.normalize('NFC').trim() ?? ''
+        const group = chats.find(c => c.isGroup && normalize(c.name) === normalize(GROUP_NAME))
+        if (group) {
+          allowedGroupId = group.id._serialized
+          console.log(`✅  קבוצה נמצאה: "${GROUP_NAME}" (${allowedGroupId})`)
+        } else {
+          console.warn(`⚠️  קבוצה "${GROUP_NAME}" לא נמצאה — מאזין רק למספר האישי`)
+        }
+      } catch (e) {
+        console.warn('⚠️  לא הצליח לטעון קבוצות:', e.message)
+      }
+    }, 5000)
   }
 })
 
@@ -75,14 +153,23 @@ client.on('auth_failure', () => {
 })
 
 async function handleMessage(message) {
-  const fromId       = message.from
-  const authorNumber = (message.author || message.from).replace('@c.us', '').replace('@g.us', '')
-  const isFromGroup  = allowedGroupId && fromId === allowedGroupId
-  const isDirectSelf = message.fromMe && !isFromGroup
+  let chat
+  try { chat = await message.getChat() } catch { return }
 
-  // Accept: messages in the allowed group from allowed numbers, or direct self-messages
-  if (!isFromGroup && !isDirectSelf) return
-  if (isFromGroup && !ALLOWED_NUMBERS.has(authorNumber)) return
+  const isGroup     = chat.isGroup
+  const normalize   = s => s?.normalize('NFC').trim() ?? ''
+  const isRightGroup = isGroup && GROUP_NAME && normalize(chat.name) === normalize(GROUP_NAME)
+  const isDirectSelf = message.fromMe && !isGroup
+
+  if (!isRightGroup && !isDirectSelf) return
+
+  console.log('💬  הודעה מ:', chat.name || chat.id._serialized, '| fromMe:', message.fromMe)
+
+  // In group: only process messages from allowed numbers
+  if (isRightGroup) {
+    const authorId = (message.author || message.from || '').replace(/@.+/, '')
+    if (!message.fromMe && !ALLOWED_NUMBERS.has(authorId)) return
+  }
 
   console.log('📨  הודעה התקבלה:', { from: message.from, hasMedia: message.hasMedia, fromMe: message.fromMe })
 

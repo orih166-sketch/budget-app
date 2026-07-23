@@ -1,0 +1,10 @@
+node_modules/
+.env
+.env.local
+.claude/
+bot/
+*.log
+*.DS_Store
+public/Gemini_Generated_Image_*.png
+.wwebjs_auth/
+.wwebjs_cache/

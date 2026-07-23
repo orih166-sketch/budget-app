@@ -1,25 +1,37 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --c-bg: #f0ede8;
-  --c-surface: #ffffff;
-  --c-border: #e0d9d0;
-  --c-text: #0d2b1a;
-  --c-text-2: #6b7280;
-  --c-primary: #0d2b1a;
-  --c-primary-light: #deeee5;
-  --c-gold: #c9a84c;
-  --c-gold-light: #faf3e0;
-  --c-green: #1a7a5e;
-  --c-green-light: #e0f5ee;
-  --c-red: #c0392b;
-  --c-red-light: #fdecea;
-  --c-yellow: #c9a84c;
-  --c-yellow-light: #faf3e0;
-  --radius: 18px;
-  --radius-sm: 12px;
-  --shadow: 0 2px 8px rgba(26,39,68,.08), 0 1px 3px rgba(26,39,68,.05);
-  --shadow-md: 0 6px 20px rgba(26,39,68,.1), 0 2px 6px rgba(26,39,68,.06);
+  --bg:           #1a1830;
+  --bg2:          #201e35;
+  --card:         #252240;
+  --card2:        #1e1c32;
+
+  --gold:         #c9a84c;
+  --gold-light:   #e8d48a;
+  --gold-dim:     #8a6f2a;
+  --gold-faint:   #c9a84c18;
+  --gold-border:  #c9a84c33;
+  --gold-border2: #c9a84c55;
+
+  --text1:  #f0e8d0;
+  --text2:  #9a8a6a;
+  --text3:  #5a5070;
+
+  --green: #4aaf7a;
+  --red:   #e05252;
+  --amber: #e8a020;
+
+  --c-bg: var(--bg);
+  --c-surface: var(--card);
+  --c-border: var(--gold-border);
+  --c-text: var(--text1);
+  --c-text-2: var(--text2);
+  --c-primary: var(--bg2);
+  --c-gold: var(--gold);
+  --c-green: var(--green);
+  --c-red: var(--red);
+  --radius: 14px;
+  --radius-sm: 10px;
 }
 
 html {
@@ -29,9 +41,9 @@ html {
 }
 
 body {
-  font-family: 'Heebo', sans-serif;
-  background: var(--c-bg);
-  color: var(--c-text);
+  font-family: 'Heebo', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text1);
   direction: rtl;
   position: fixed;
   width: 100%;
@@ -44,16 +56,57 @@ body {
 #root { height: 100%; display: flex; flex-direction: column; }
 
 button { font-family: inherit; cursor: pointer; border: none; background: none; }
-input, select, textarea { font-family: inherit; }
+input, select, textarea {
+  font-family: inherit;
+  background: var(--card2);
+  color: var(--text1);
+  border-color: var(--gold-border);
+}
 
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--c-border); border-radius: 99px; }
+::-webkit-scrollbar-thumb { background: var(--gold-border2); border-radius: 99px; }
 
 .card {
-  background: var(--c-surface);
+  background: var(--card);
   border-radius: var(--radius);
-  border: 1px solid var(--c-border);
-  box-shadow: var(--shadow);
+  border: 1px solid var(--gold-border);
   padding: 20px;
+  position: relative;
 }
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 10%;
+  right: 10%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  border-radius: 2px;
+}
+
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+.dot-red { background: var(--red); animation: blink 0.8s infinite; border-radius: 50%; }
+.dot-amber { background: var(--amber); animation: blink 1.4s infinite; border-radius: 50%; }
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--card2) 25%, var(--gold-faint) 50%, var(--card2) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-sm);
+}
+
+@keyframes slideIn {
+  from { transform: translateX(30px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.slide-in { animation: slideIn 0.25s ease-out; }
+
+@keyframes spin { to { transform: rotate(360deg); } }

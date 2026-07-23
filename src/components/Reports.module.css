@@ -1,5 +1,20 @@
 .wrap { display: flex; flex-direction: column; gap: 14px; padding-bottom: 16px; }
 
+.exportRow { display:flex; justify-content:flex-end; }
+.exportBtn {
+  background: var(--gold, #c9a84c);
+  color: #1a1830;
+  border: none;
+  border-radius: var(--radius-sm, 8px);
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity .15s;
+}
+.exportBtn:disabled { opacity: .4; cursor: default; }
+.exportBtn:not(:disabled):hover { opacity: .85; }
+
 .kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .kpi  { background:#fff; border:1px solid var(--c-border); border-radius:var(--radius-sm); padding:14px; box-shadow:var(--shadow); }
 .kLabel { display:block; font-size:12px; color:var(--c-text-2); font-weight:600; margin-bottom:6px; }
