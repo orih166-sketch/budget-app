@@ -30,6 +30,7 @@ function mapCategory(cat) {
     'אוכל בחוץ': 'dining', 'מסעדה': 'dining', 'מסעדות': 'dining', 'dining': 'dining',
     'ביגוד': 'bigud', 'bigud': 'bigud', 'clothing': 'bigud',
     'לימודים': 'education', 'חינוך': 'education', 'education': 'education',
+    'ימודים והתפתחות': 'education', 'לימודים והתפתחות': 'education',
     'רפואה': 'health', 'בריאות': 'health', 'רפואה ובריאות': 'health', 'health': 'health',
     'תחבורה': 'transport', 'transport': 'transport',
     'בית': 'home', 'הוצאות בית': 'home', 'home': 'home',
@@ -632,6 +633,161 @@ function queueWhatsAppNotification(type, message) {
   });
 }
 
+// ── הוצאות חוזרות — הכנסה אוטומטית ב-1 לחודש ────────────────
+function autoInsertRecurring() {
+  var now      = new Date();
+  var year     = now.getFullYear();
+  var month    = now.getMonth() + 1; // 1-12
+  var monthStr = String(month).padStart(2, '0');
+
+  // שלוף כל הכללים
+  var url = SUPABASE_URL + '/rest/v1/recurring_rules'
+    + '?household_id=eq.' + HOUSEHOLD_ID
+    + '&select=id,description,amount,type,category,interval,day_of_month,start_date,end_date';
+
+  var res = UrlFetchApp.fetch(url, {
+    method: 'GET',
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY },
+    muteHttpExceptions: true,
+  });
+
+  if (res.getResponseCode() !== 200) {
+    Logger.log('autoInsertRecurring error: ' + res.getContentText().substring(0, 200));
+    return;
+  }
+
+  var rules    = JSON.parse(res.getContentText());
+  var inserted = 0;
+
+  for (var i = 0; i < rules.length; i++) {
+    var rule  = rules[i];
+    var start = new Date(rule.start_date + 'T00:00:00');
+    var end   = rule.end_date ? new Date(rule.end_date + 'T00:00:00') : null;
+    var dayOfMonth;
+
+    if (rule.interval === 'monthly') {
+      dayOfMonth = rule.day_of_month || start.getDate();
+    } else if (rule.interval === 'yearly') {
+      if ((start.getMonth() + 1) !== month) continue;
+      dayOfMonth = start.getDate();
+    } else {
+      continue; // weekly — too many rows, skip
+    }
+
+    // ודא שהתאריך בטווח תקין
+    var ruleDate = new Date(year, month - 1, dayOfMonth);
+    if (ruleDate < start) continue;
+    if (end && ruleDate > end) continue;
+
+    var dayStr     = String(dayOfMonth).padStart(2, '0');
+    var isoDate    = year + '-' + monthStr + '-' + dayStr;
+    var externalId = 'recurring_' + rule.id + '_' + year + '-' + monthStr;
+
+    // category_id: כבר שמור כ-id באפליקציה (super, car, bills וכו')
+    var catId = rule.category || 'other';
+
+    var payload = {
+      household_id: HOUSEHOLD_ID,
+      date:         isoDate,
+      description:  rule.description,
+      amount:       rule.amount,
+      type:         rule.type || 'expense',
+      category_id:  catId,
+      source:       'recurring',
+      external_id:  externalId,
+    };
+
+    var postRes = UrlFetchApp.fetch(SUPABASE_URL + '/rest/v1/transactions', {
+      method: 'POST',
+      headers: {
+        'Content-Type':  'application/json',
+        'apikey':        SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Prefer':        'resolution=ignore-duplicates,return=minimal',
+      },
+      payload: JSON.stringify(payload),
+      muteHttpExceptions: true,
+    });
+
+    var code = postRes.getResponseCode();
+    if (code >= 200 && code < 300) {
+      Logger.log('✅ autoInsertRecurring: ' + rule.description + ' ₪' + rule.amount + ' → ' + isoDate);
+      inserted++;
+    } else {
+      Logger.log('⚠️ autoInsertRecurring error [' + rule.description + ']: '
+        + code + ' ' + postRes.getContentText().substring(0, 100));
+    }
+    Utilities.sleep(50);
+  }
+
+  Logger.log('autoInsertRecurring: ' + inserted + ' הוצאות הוכנסו לחודש ' + month + '/' + year);
+}
+
+// ── סנכרון תקציב מהאפליקציה → גיליון (עמודה G) ──────────────
+function syncBudgets() {
+  var now   = new Date();
+  var month = now.getMonth() + 1; // 1-12
+
+  // שלוף category_budgets מ-Supabase
+  var url = SUPABASE_URL + '/rest/v1/category_budgets'
+    + '?household_id=eq.' + HOUSEHOLD_ID
+    + '&select=category_id,budget_amount';
+
+  var res = UrlFetchApp.fetch(url, {
+    method: 'GET',
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY },
+    muteHttpExceptions: true,
+  });
+
+  if (res.getResponseCode() !== 200) {
+    Logger.log('syncBudgets error: ' + res.getContentText().substring(0, 200));
+    return;
+  }
+
+  var budgets = JSON.parse(res.getContentText());
+  if (!budgets.length) { Logger.log('syncBudgets: אין תקציבים ב-Supabase'); return; }
+
+  // בנה מפה: label עברי → סכום תקציב
+  var budgetByLabel = {};
+  for (var i = 0; i < budgets.length; i++) {
+    var label = toCategoryLabel(budgets[i].category_id);
+    budgetByLabel[label] = budgets[i].budget_amount;
+  }
+
+  // פתח את גיליון החודש הנוכחי
+  var budgetSS = SpreadsheetApp.openById(BUDGET_SHEET_ID);
+  var sheet    = budgetSS.getSheetByName(String(month));
+  if (!sheet) { Logger.log('syncBudgets: אין גיליון לחודש ' + month); return; }
+
+  // סרוק עמודה F (6) לצלאות קטגוריה, כתוב תקציב לעמודה G (7)
+  var lastRow = sheet.getLastRow();
+  if (lastRow < 5) return;
+
+  var colF    = sheet.getRange(5, 6, lastRow - 4, 1).getValues();
+  var updated = 0;
+
+  for (var r = 0; r < colF.length; r++) {
+    var catLabel = String(colF[r][0]).trim();
+    if (!catLabel || catLabel === 'מאפיין') continue; // דלג כותרת
+
+    // נסה גם תרגום ישיר וגם דרך mapCategory
+    var amount = budgetByLabel[catLabel];
+    if (amount === undefined) {
+      var catId = mapCategory(catLabel);
+      if (catId !== 'other') {
+        amount = budgetByLabel[toCategoryLabel(catId)];
+      }
+    }
+
+    if (amount !== undefined && amount > 0) {
+      sheet.getRange(r + 5, 7).setValue(amount); // עמודה G = index 7
+      updated++;
+    }
+  }
+
+  Logger.log('syncBudgets: עדכן ' + updated + ' קטגוריות לחודש ' + month);
+}
+
 // ── Trigger setup ─────────────────────────────────────────────
 function createTrigger() {
   ScriptApp.getProjectTriggers().forEach(function(t) { ScriptApp.deleteTrigger(t); });
@@ -648,6 +804,11 @@ function createTrigger() {
   // סיכום שבועי — ראשון בשעה 20
   ScriptApp.newTrigger('sendWeeklySummary').timeBased()
     .onWeekDay(ScriptApp.WeekDay.SUNDAY).atHour(20).create();
+  // הכנסת הוצאות חוזרות אוטומטית — 1 לכל חודש בשעה 6 בבוקר
+  ScriptApp.newTrigger('autoInsertRecurring').timeBased()
+    .onMonthDay(1).atHour(6).create();
+  // סנכרון תקציב מאפליקציה → גיליון — כל שעה
+  ScriptApp.newTrigger('syncBudgets').timeBased().everyHours(1).create();
 
-  Logger.log('Triggers created: syncWhatsAppExpenses + syncAppToSheets + syncDeletions (every 10 min) + sendRecurringReminders (daily 8am) + sendWeeklySummary (Sunday 8pm)');
+  Logger.log('Triggers created: 5 existing + autoInsertRecurring (1st of month 6am) + syncBudgets (hourly)');
 }
