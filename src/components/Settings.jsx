@@ -19,11 +19,14 @@ export default function Settings({
   onUpdateBudget,
   selectedMonth,
   selectedYear,
+  expectedIncome,
+  onSetExpectedIncome,
   onOpenBank,
   onOpenFamily,
 }) {
   const { household } = useHousehold()
   const [subScreen, setSubScreen] = useState(null)
+  const [incomeInput, setIncomeInput] = useState('')
   const [notifs, setNotifs] = useState(() => {
     const saved = localStorage.getItem('kb_notifications')
     if (saved) try { return JSON.parse(saved) } catch { /* ignore */ }
@@ -41,24 +44,55 @@ export default function Settings({
     })
   }
 
+  const MONTH_NAMES = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר']
+
   if (subScreen === 'income') {
+    const currentVal = incomeInput !== '' ? incomeInput : (expectedIncome > 0 ? String(expectedIncome) : '')
+    function handleSave() {
+      const amount = parseFloat(currentVal.replace(/[^\d.]/g, '')) || 0
+      onSetExpectedIncome(amount)
+      setSubScreen(null)
+    }
     return (
       <div className={`${styles.wrap} slide-in`}>
         <button type="button" className={styles.backBtn} onClick={() => setSubScreen(null)}>→ חזרה</button>
-        <h2 className={styles.pageTitle}>הכנסות חודשיות</h2>
+        <h2 className={styles.pageTitle}>הכנסות — {MONTH_NAMES[selectedMonth]} {selectedYear}</h2>
         <div className={styles.card}>
+          <p style={{ fontSize: '0.85rem', color: 'var(--c-text-2)', marginBottom: '1rem' }}>
+            הכנסות משתנות מחודש לחודש. הזן את הסכום הצפוי לחודש זה — ישמש לחישוב "נותר" ו"חיסכון".
+          </p>
           <div className={styles.incomeRow}>
-            <span>אורי</span>
-            <span dir="ltr">₪{HOUSEHOLD.members.uri.salary.toLocaleString('he-IL')}</span>
+            <span>הכנסה צפויה החודש</span>
           </div>
-          <div className={styles.incomeRow}>
-            <span>אפק</span>
-            <span dir="ltr">₪{HOUSEHOLD.members.afek.salary.toLocaleString('he-IL')}</span>
-          </div>
-          <div className={`${styles.incomeRow} ${styles.incomeTotal}`}>
-            <span>סה״כ</span>
-            <span dir="ltr">₪{HOUSEHOLD.totalIncome.toLocaleString('he-IL')}</span>
-          </div>
+          <input
+            type="number"
+            dir="ltr"
+            placeholder="0"
+            value={currentVal}
+            onChange={e => setIncomeInput(e.target.value)}
+            style={{
+              width: '100%', padding: '0.75rem', fontSize: '1.1rem',
+              background: 'var(--c-surface)', border: '1px solid var(--c-border)',
+              borderRadius: '8px', color: 'var(--c-text)', marginBottom: '1rem',
+            }}
+          />
+          <button
+            type="button"
+            onClick={handleSave}
+            style={{
+              width: '100%', padding: '0.75rem', background: 'var(--green)',
+              color: '#fff', border: 'none', borderRadius: '8px',
+              fontSize: '1rem', cursor: 'pointer',
+            }}
+          >
+            שמור
+          </button>
+          {expectedIncome > 0 && (
+            <div className={`${styles.incomeRow} ${styles.incomeTotal}`} style={{ marginTop: '1rem' }}>
+              <span>שמור לחודש זה</span>
+              <span dir="ltr">₪{expectedIncome.toLocaleString('he-IL')}</span>
+            </div>
+          )}
         </div>
       </div>
     )

@@ -28,7 +28,7 @@ export default function Budget({ transactions, budget, onUpdateBudget, selectedM
     return m
   }, [monthTx])
 
-  const totalPlanned = BUDGET_CATEGORIES.reduce((a, c) => a + (categoryBudgets[c.id] ?? c.default), 0)
+  const totalPlanned = BUDGET_CATEGORIES.reduce((a, c) => a + (categoryBudgets[c.id] ?? 0), 0)
   const totalActual  = Object.values(actual).reduce((a, v) => a + v, 0)
   const totalRemain  = totalPlanned - totalActual
   const overallPct   = totalPlanned > 0 ? Math.min(100, Math.round((totalActual / totalPlanned) * 100)) : 0
@@ -36,7 +36,7 @@ export default function Budget({ transactions, budget, onUpdateBudget, selectedM
 
   function startEdit() {
     const d = {}
-    BUDGET_CATEGORIES.forEach(c => { d[c.id] = categoryBudgets[c.id] ?? c.default })
+    BUDGET_CATEGORIES.forEach(c => { d[c.id] = categoryBudgets[c.id] ?? 0 })
     setDraft(d)
     setEditing(true)
   }
@@ -101,7 +101,7 @@ export default function Budget({ transactions, budget, onUpdateBudget, selectedM
       {/* ── Category list ── */}
       <div className={styles.list}>
         {BUDGET_CATEGORIES.map((c, i) => {
-          const plan = categoryBudgets[c.id] ?? c.default
+          const plan = categoryBudgets[c.id] ?? 0
           const done = actual[c.id] || 0
           const pct  = plan > 0 ? Math.min(100, Math.round((done / plan) * 100)) : (done > 0 ? 100 : 0)
           const over = done > plan && plan > 0

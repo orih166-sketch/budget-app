@@ -27,21 +27,8 @@ import styles from './App.module.css'
 
 function AppShell({ user, isPasswordRecovery, logout, updatePassword }) {
   const { acceptInvitation } = useHousehold()
-  const {
-    transactions, budget, expectedIncome, setExpectedIncome,
-    addTransaction, updateTransaction, deleteTransaction, updateBudget,
-    txError, clearTxError,
-  } = useTransactions()
-  const { netWorth, totalAssets, totalLiab } = useAccounts()
-  const recurring = useRecurring()
-  const { budgets } = useCategoryBudgets()
   const { household } = useHousehold()
-
-  // הוסף עסקה + בדוק חריגה מתקציב
-  async function handleAddTransaction(tx) {
-    await addTransaction(tx)
-    checkBudgetAlert({ newTx: tx, transactions, budgets, householdId: household?.id })
-  }
+  const { budgets } = useCategoryBudgets()
 
   const [showOnboarding, setShowOnboarding] = useState(shouldShowOnboarding)
   const [tab, setTab] = useState('dashboard')
@@ -51,6 +38,23 @@ function AppShell({ user, isPasswordRecovery, logout, updatePassword }) {
   const [bankOpen, setBank] = useState(false)
   const [notifCount] = useState(0)
   const [notifToast, setNotifToast] = useState('')
+  const [selectedMonth, setSelectedMonth] = useState(CURRENT_MONTH)
+  const [selectedYear, setSelectedYear] = useState(CURRENT_YEAR)
+  const [selectedUser] = useState('family')
+
+  const {
+    transactions, budget, expectedIncome, setExpectedIncome,
+    addTransaction, updateTransaction, deleteTransaction, updateBudget,
+    txError, clearTxError,
+  } = useTransactions(selectedYear, selectedMonth)
+  const { netWorth, totalAssets, totalLiab } = useAccounts()
+  const recurring = useRecurring()
+
+  // הוסף עסקה + בדוק חריגה מתקציב
+  async function handleAddTransaction(tx) {
+    await addTransaction(tx)
+    checkBudgetAlert({ newTx: tx, transactions, budgets, householdId: household?.id })
+  }
 
   const showNotif = useCallback(({ title, body }) => {
     setNotifToast(`${title}: ${body}`)
@@ -61,10 +65,6 @@ function AppShell({ user, isPasswordRecovery, logout, updatePassword }) {
     const unsub = listenToForegroundMessages(showNotif)
     return unsub
   }, [user?.id, showNotif])
-
-  const [selectedMonth, setSelectedMonth] = useState(CURRENT_MONTH)
-  const [selectedYear, setSelectedYear] = useState(CURRENT_YEAR)
-  const [selectedUser] = useState('family')
 
   const [newPassword, setNewPassword] = useState('')
   const [pwdLoading, setPwdLoading] = useState(false)
@@ -186,6 +186,8 @@ function AppShell({ user, isPasswordRecovery, logout, updatePassword }) {
                 onUpdateBudget={updateBudget}
                 selectedMonth={selectedMonth}
                 selectedYear={selectedYear}
+                expectedIncome={expectedIncome}
+                onSetExpectedIncome={setExpectedIncome}
                 onOpenBank={() => setBank(true)}
                 onOpenFamily={() => setFamily(true)}
               />

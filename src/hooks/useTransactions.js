@@ -2,19 +2,20 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabase.js'
 import { useHousehold } from '../context/HouseholdContext.jsx'
 
-export function useTransactions() {
+export function useTransactions(selectedYear, selectedMonth) {
   const { household } = useHousehold()
   const [transactions, setTransactions] = useState([])
   const [expectedIncome, setExpectedIncomeState] = useState(0)
   const [legacyFamilyId, setLegacyFamilyId] = useState(null)
   const [txError, setTxError] = useState(null)
 
-  // Load expected income from localStorage (household-specific)
+  // Load expected income from localStorage — per month (income varies each month)
   useEffect(() => {
-    if (!household?.id) return
-    const saved = localStorage.getItem(`expected_income_${household.id}`)
-    if (saved) setExpectedIncomeState(Number(saved))
-  }, [household?.id])
+    if (!household?.id || selectedYear == null || selectedMonth == null) return
+    const key = `expected_income_${household.id}_${selectedYear}_${selectedMonth}`
+    const saved = localStorage.getItem(key)
+    setExpectedIncomeState(saved ? Number(saved) : 0)
+  }, [household?.id, selectedYear, selectedMonth])
 
   useEffect(() => {
     if (!household) return
@@ -127,11 +128,14 @@ export function useTransactions() {
     }
   }
 
-  // Fix 2: persist expected income to localStorage
+  // persist expected income to localStorage — per month
   function setExpectedIncome(amount) {
     const val = Math.max(0, Number(amount) || 0)
     setExpectedIncomeState(val)
-    if (household?.id) localStorage.setItem(`expected_income_${household.id}`, val)
+    if (household?.id && selectedYear != null && selectedMonth != null) {
+      const key = `expected_income_${household.id}_${selectedYear}_${selectedMonth}`
+      localStorage.setItem(key, val)
+    }
   }
 
   function updateBudget() {}

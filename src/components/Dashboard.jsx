@@ -42,7 +42,7 @@ export default function Dashboard({
 
   const income = useMemo(() => monthTx.filter(t => t.type === 'income').reduce((a, t) => a + t.amount, 0), [monthTx])
   const expenses = useMemo(() => monthTx.filter(t => t.type === 'expense').reduce((a, t) => a + t.amount, 0), [monthTx])
-  const plannedIncome = expectedIncome || HOUSEHOLD.totalIncome
+  const plannedIncome = expectedIncome > 0 ? expectedIncome : income
   const remaining = plannedIncome - expenses
   const savingsPct = plannedIncome > 0 ? Math.round((remaining / plannedIncome) * 100) : 0
 
@@ -52,7 +52,7 @@ export default function Dashboard({
   const daysLeft = Math.max(1, daysInMonth - dayOfMonth + 1)
 
   const variableCategories = BUDGET_CATEGORIES.filter(c => !c.isFixed)
-  const variablePlanned = variableCategories.reduce((a, c) => a + (categoryBudgets[c.id] ?? budget[c.id] ?? c.default), 0)
+  const variablePlanned = variableCategories.reduce((a, c) => a + (categoryBudgets[c.id] ?? budget[c.id] ?? 0), 0)
   const variableActual = useMemo(() => {
     let total = 0
     monthTx.filter(t => t.type === 'expense').forEach(t => {
@@ -73,7 +73,7 @@ export default function Dashboard({
     })
 
     return BUDGET_CATEGORIES.filter(c => !c.isFixed).map(c => {
-      const planned = categoryBudgets[c.id] ?? budget[c.id] ?? c.default
+      const planned = categoryBudgets[c.id] ?? budget[c.id] ?? 0
       const spent = actual[c.id] || 0
       const pct = planned > 0 ? Math.round((spent / planned) * 100) : 0
       const diff = planned - spent
@@ -138,7 +138,7 @@ export default function Dashboard({
         <div className={styles.netCol}>
           <div className={styles.netLabel}>שווי נקי משפחתי</div>
           <div className={styles.netVal} dir="ltr">{fmt(netWorth || totalAssets - totalLiab)}</div>
-          <div className={styles.netSub} dir="ltr">↑ +{fmt(HOUSEHOLD.savingsMonthly)} החודש</div>
+          <div className={styles.netSub} dir="ltr">{income > 0 ? `↑ +${fmt(Math.max(0, income - expenses))} נחסך` : 'הזן הכנסה צפויה בהגדרות'}</div>
         </div>
         <div className={styles.netDivider} />
         <div className={styles.netCol}>
@@ -152,8 +152,8 @@ export default function Dashboard({
       <div className={styles.statRow}>
         <div className={styles.statBox}>
           <div className={styles.statLabel}>הכנסות</div>
-          <div className={`${styles.statVal} ${styles.gold}`} dir="ltr">{fmt(income || plannedIncome)}</div>
-          <div className={styles.statSub}>✓ משכורות</div>
+          <div className={`${styles.statVal} ${styles.gold}`} dir="ltr">{fmt(income)}</div>
+          <div className={styles.statSub}>{income > 0 ? '✓ נרשמו' : 'לא נרשמו הכנסות'}</div>
         </div>
         <div className={styles.statBox}>
           <div className={styles.statLabel}>הוצאות</div>
