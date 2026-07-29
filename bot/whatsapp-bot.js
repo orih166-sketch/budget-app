@@ -241,6 +241,28 @@ client.on('message_create', handleMessage)
 
 client.initialize()
 
+function detectCategory(desc) {
+  const d = (desc || '').toLowerCase()
+  const rules = [
+    { cat: 'home',      words: ['לבית', 'לדירה', 'ריהוט', 'שעון', 'מנורה', 'כלים', 'מגבת', 'סדין', 'כרית', 'שמיכה', 'ספה', 'שולחן', 'כיסא', 'ארון', 'מדף', 'קישוט', 'עיצוב', 'ניקיון', 'ניקוי', 'אביזרי', 'מטבח', 'אמבטיה', 'וילון', 'שטיח', 'מראה', 'מדיח', 'מקרר', 'תנור', 'כיריים', 'מצעים', 'מוצר בית'] },
+    { cat: 'super',     words: ['סופר', 'שופרסל', 'רמי לוי', 'מחסני', 'מגה', 'קרפור', 'ויקטורי', 'מכולת', 'ירקות', 'פירות'] },
+    { cat: 'dining',    words: ['מסעדה', 'קפה', 'פיצה', 'בורגר', 'סושי', 'גלידה', 'שוורמה', 'פלאפל', 'הומוס', 'מאפה', 'קפיטריה', 'בית קפה', 'מקדונלדס', 'פיצריה', 'סטייק'] },
+    { cat: 'car',       words: ['דלק', 'מוסך', 'טסט', 'חניה', 'גלגלים', 'שמן מנוע', 'פנצ', 'קנס נסיעה', 'גרירה', 'סדנת רכב'] },
+    { cat: 'health',    words: ['תרופה', 'תרופות', 'רופא', 'קופת חולים', 'מרפאה', 'בדיקת דם', 'אפטיקה', 'משקפיים', 'שיניים', 'דנטיסט', 'פיזיו', 'ויטמין', 'ביטוח בריאות'] },
+    { cat: 'education', words: ['לימודים', 'קורס', 'חוג', 'בית ספר', 'שכר לימוד', 'אוניברסיטה', 'מכללה', 'שיעור פרטי'] },
+    { cat: 'bigud',     words: ['חולצה', 'מכנסיים', 'נעליים', 'תיק', 'ביגוד', 'זארה', 'ג\'ינס', 'שמלה', 'מעיל', 'כובע'] },
+    { cat: 'pampering', words: ['קולנוע', 'תיאטרון', 'בידור', 'בילוי', 'ספא', 'עיסוי', 'הופעה', 'מנוי', 'כרטיס'] },
+    { cat: 'children',  words: ['צהרון', 'פעוטון', 'גן ילדים', 'צעצוע', 'חוג ילדים', 'גנון', 'טיולון'] },
+    { cat: 'bills',     words: ['חשמל', 'מים', 'גז', 'ארנונה', 'אינטרנט', 'בזק', 'כבלים', 'ביטוח דירה', 'שכר דירה', 'משכנתא', 'ועד בית'] },
+    { cat: 'savings',   words: ['חיסכון', 'חסכון', 'קרן השתלמות', 'גמל', 'פנסיה'] },
+    { cat: 'cosmet',    words: ['קוסמטיקה', 'שמפו', 'מייק אפ', 'שפתון', 'פרפיום', 'בושם', 'קרם פנים'] },
+  ]
+  for (const rule of rules) {
+    if (rule.words.some(w => d.includes(w))) return rule.cat
+  }
+  return 'other'
+}
+
 function parseTextExpense(text) {
   // Remove currency words
   const cleaned = text.replace(/ש[״"]ח|שח|₪|NIS/gi, '').trim()
@@ -248,13 +270,15 @@ function parseTextExpense(text) {
   // Pattern: number first — "260 דלק" / "260.5 קפה"
   let m = cleaned.match(/^(\d+(?:[.,]\d+)?)\s+(.{2,})$/)
   if (m) {
-    return { amount: parseFloat(m[1].replace(',', '.')), desc: m[2].trim(), type: 'expense' }
+    const desc = m[2].trim()
+    return { amount: parseFloat(m[1].replace(',', '.')), desc, type: 'expense', category: detectCategory(desc) }
   }
 
   // Pattern: description first — "דלק 260"
   m = cleaned.match(/^(.{2,})\s+(\d+(?:[.,]\d+)?)$/)
   if (m) {
-    return { amount: parseFloat(m[2].replace(',', '.')), desc: m[1].trim(), type: 'expense' }
+    const desc = m[1].trim()
+    return { amount: parseFloat(m[2].replace(',', '.')), desc, type: 'expense', category: detectCategory(desc) }
   }
 
   return null

@@ -46,6 +46,42 @@ function mapCategory(cat) {
   return map[(cat || '').trim()] || 'other';
 }
 
+// ── Smart category from description — used when category = "שונות" / "other" ──
+function smartCategoryFromDesc(description) {
+  var d = (description || '').toLowerCase();
+
+  var rules = [
+    { cat: 'home', words: ['לבית', 'לדירה', 'ריהוט', 'שעון', 'מנורה', 'כלים', 'מגבת', 'סדין', 'כרית', 'שמיכה', 'ספה', 'שולחן', 'כיסא', 'ארון', 'מדף', 'קישוט', 'עיצוב', 'ניקיון', 'ניקוי', 'אביזרי', 'מטבח', 'אמבטיה', 'וילון', 'שטיח', 'מראה', 'מדיח', 'מקרר', 'תנור', 'כיריים', 'מכונת', 'כלי מיטה', 'מצעים', 'מוצר בית'] },
+    { cat: 'super', words: ['סופר', 'שופרסל', 'רמי לוי', 'מחסני', 'מגה', 'קרפור', 'ויקטורי', 'מכולת', 'ירקות', 'פירות'] },
+    { cat: 'dining', words: ['מסעדה', 'קפה', 'פיצה', 'בורגר', 'סושי', 'גלידה', 'שוורמה', 'פלאפל', 'הומוס', 'מאפה', 'קפיטריה', 'בית קפה', 'מקדונלדס', 'ברקינג', 'פיצריה', 'סטייק'] },
+    { cat: 'car', words: ['דלק', 'מוסך', 'טסט', 'חניה', 'גלגלים', 'שמן מנוע', 'מכונית', 'פנצ', 'קנס נסיעה', 'גרירה', 'סדנה'] },
+    { cat: 'health', words: ['תרופה', 'תרופות', 'רופא', 'קופת חולים', 'מרפאה', 'בדיקת דם', 'אפטיקה', 'משקפיים', 'שיניים', 'דנטיסט', 'פיזיו', 'קרם', 'ויטמין', 'ביטוח בריאות'] },
+    { cat: 'education', words: ['לימודים', 'קורס', 'חוג', 'בית ספר', 'שכר לימוד', 'אוניברסיטה', 'מכללה', 'ספרי לימוד', 'שיעור פרטי'] },
+    { cat: 'bigud', words: ['חולצה', 'מכנסיים', 'נעליים', 'תיק', 'ביגוד', 'זארה', 'בגד', 'ג\'ינס', 'שמלה', 'חצאית', 'גרביים', 'תחתונים', 'ג\'קט', 'מעיל', 'כובע'] },
+    { cat: 'pampering', words: ['קולנוע', 'תיאטרון', 'בידור', 'בילוי', 'ספא', 'עיסוי', 'חופשה', 'בריכה', 'כרטיס', 'הופעה', 'מנוי'] },
+    { cat: 'children', words: ['צהרון', 'פעוטון', 'גן ילדים', 'צעצוע', 'חוג ילדים', 'גני', 'גנון', 'טיולון'] },
+    { cat: 'bills', words: ['חשמל', 'מים', 'גז', 'ארנונה', 'אינטרנט', 'בזק', 'hot', 'yes ', 'כבלים', 'ביטוח דירה', 'שכר דירה', 'משכנתא', 'ועד בית', 'גנרטור'] },
+    { cat: 'savings', words: ['חיסכון', 'חסכון', 'קרן השתלמות', 'גמל', 'פנסיה', 'ביטוח מנהלים'] },
+    { cat: 'cosmet', words: ['קוסמטיקה', 'קרם פנים', 'שמפו', 'תכשיר', 'מייק אפ', 'אייליינר', 'פודרה', 'שפתון', 'פרפיום', 'בושם'] },
+  ];
+
+  for (var i = 0; i < rules.length; i++) {
+    var rule = rules[i];
+    for (var j = 0; j < rule.words.length; j++) {
+      if (d.indexOf(rule.words[j]) !== -1) return rule.cat;
+    }
+  }
+  return null; // לא זוהה — שמור שונות
+}
+
+// מחזיר קטגוריה סופית: אם category הוא "שונות"/"other", נסה לזהות לפי תיאור
+function resolveCategory(description, rawCategory) {
+  var mapped = mapCategory(rawCategory);
+  if (mapped !== 'other') return mapped; // יש קטגוריה ברורה מה-sheet
+  var smart = smartCategoryFromDesc(description);
+  return smart || 'other';
+}
+
 // ── Date helpers ─────────────────────────────────────────────
 function toISODate(day, monthNum, rawDate) {
   let year = new Date().getFullYear();
@@ -239,6 +275,7 @@ function syncWhatsAppExpenses() {
 
     const isoDate    = toISODate(day, monthNum, rawDate);
     const externalId = 'wa_' + isoDate + '_r' + (i + 2);
+    const resolvedCat = resolveCategory(description, category);
 
     // 1. Write to budget Google Sheet
     const monthSheet = budgetSS.getSheetByName(String(monthNum));
@@ -247,13 +284,13 @@ function syncWhatsAppExpenses() {
     } else {
       const insertRow = findNextTransactionRow(monthSheet);
       monthSheet.getRange(insertRow, 1, 1, 4).setValues([[
-        description, day + '/' + monthNum, category, amount
+        description, day + '/' + monthNum, toCategoryLabel(resolvedCat), amount
       ]]);
-      Logger.log('📋 Sheets row ' + insertRow + ': ' + description + ' ₪' + amount);
+      Logger.log('📋 Sheets row ' + insertRow + ': ' + description + ' ₪' + amount + ' [' + resolvedCat + ']');
     }
 
     // 2. Write to Supabase → get UUID back
-    const supabaseId = insertToSupabase(description, isoDate, category, amount, sender, externalId);
+    const supabaseId = insertToSupabase(description, isoDate, resolvedCat, amount, sender, externalId);
 
     // 3. Mark as synced + store UUID in column H
     automationSheet.getRange(i + 2, SYNCED_COL).setValue('✓');
