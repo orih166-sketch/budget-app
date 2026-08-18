@@ -42,7 +42,7 @@ export default function Dashboard({
 
   const income = useMemo(() => monthTx.filter(t => t.type === 'income').reduce((a, t) => a + t.amount, 0), [monthTx])
   const expenses = useMemo(() => monthTx.filter(t => t.type === 'expense').reduce((a, t) => a + t.amount, 0), [monthTx])
-  const plannedIncome = expectedIncome > 0 ? expectedIncome : income
+  const plannedIncome = income > 0 ? income : expectedIncome
   const remaining = plannedIncome - expenses
   const savingsPct = plannedIncome > 0 ? Math.round((remaining / plannedIncome) * 100) : 0
 
