@@ -1,0 +1,903 @@
+<title>מחכים לבייבי</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Varela+Round&family=Assistant:wght@400;600;700;800&display=swap">
+<style>
+/* Layout: one-column phone app — soft header with countdown, content cards, fixed bottom tab bar, full-screen "birth mode" overlay */
+:root {
+  --bg: #f3f7fb;
+  --surface: #ffffff;
+  --surface2: #e8f0f8;
+  --ink: #1f3550;
+  --ink2: #5a6f88;
+  --ink3: #93a3b6;
+  --line: #d8e3ee;
+  --sky: #6fa8dc;
+  --sky-soft: #dcebf8;
+  --peach: #f4a88c;
+  --peach-soft: #fde9e1;
+  --mint: #5bb59a;
+  --mint-soft: #ddf2ea;
+  --honey: #e9b54a;
+  --honey-soft: #fbf0d6;
+  --alert: #e0605a;
+  --alert-soft: #fbe3e1;
+  --shadow: 0 2px 10px rgba(31, 53, 80, .07);
+  --display: "Varela Round", "Assistant", system-ui, sans-serif;
+  --body: "Assistant", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --r: 18px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111a28; --surface: #18243a; --surface2: #1f2d47; --ink: #e8eef7; --ink2: #a8b8cc; --ink3: #6b7f99;
+    --line: #2a3a55; --sky: #8fbde8; --sky-soft: #22385a; --peach: #f6b39b; --peach-soft: #3d2b2a;
+    --mint: #72c8ad; --mint-soft: #1d3b36; --honey: #f0c66a; --honey-soft: #3a3222; --alert: #f07a74; --alert-soft: #45262a;
+    --shadow: 0 2px 12px rgba(0, 0, 0, .3); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111a28; --surface: #18243a; --surface2: #1f2d47; --ink: #e8eef7; --ink2: #a8b8cc; --ink3: #6b7f99;
+  --line: #2a3a55; --sky: #8fbde8; --sky-soft: #22385a; --peach: #f6b39b; --peach-soft: #3d2b2a;
+  --mint: #72c8ad; --mint-soft: #1d3b36; --honey: #f0c66a; --honey-soft: #3a3222; --alert: #f07a74; --alert-soft: #45262a;
+  --shadow: 0 2px 12px rgba(0, 0, 0, .3); color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); }
+body { color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.5; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+#app { max-width: 720px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 12px calc(96px + env(safe-area-inset-bottom, 0px)); }
+h1, h2, h3 { font-family: var(--display); font-weight: 400; text-wrap: balance; margin: 0; }
+h2 { font-size: 1.45rem; }
+h3 { font-size: 1.1rem; }
+p { margin: 0; }
+a { color: var(--sky); }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, a:focus-visible { outline: 3px solid var(--sky); outline-offset: 2px; }
+input, select, textarea { font: inherit; color: var(--ink); background: var(--surface); border: 1.5px solid var(--line); border-radius: 12px; padding: 10px 12px; width: 100%; min-width: 0; }
+textarea { resize: vertical; min-height: 70px; }
+label.f { display: grid; gap: 4px; font-size: .85rem; color: var(--ink2); font-weight: 600; }
+.stack { display: grid; gap: 14px; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.grow { flex: 1; min-width: 0; }
+.muted { color: var(--ink2); }
+.small { font-size: .85rem; }
+.tiny { font-size: .75rem; color: var(--ink3); }
+.num { font-variant-numeric: tabular-nums; }
+
+/* header */
+.top { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-block: 4px 12px; }
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand h1 { font-size: 1.35rem; }
+.sync { font-size: .72rem; padding: 3px 9px; border-radius: 99px; background: var(--surface2); color: var(--ink2); white-space: nowrap; }
+.sync.on { background: var(--mint-soft); color: var(--mint); }
+.iconbtn { border: 0; background: var(--surface2); width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; }
+
+/* hero */
+.hero { position: relative; overflow: hidden; border-radius: 26px; padding: 22px 20px 20px; background: linear-gradient(160deg, var(--sky-soft), var(--surface) 75%); border: 1px solid var(--line); }
+.hero .clouds { position: absolute; inset: 0; pointer-events: none; opacity: .9; }
+.hero .inner { position: relative; display: grid; gap: 6px; }
+.hero .big { font-family: var(--display); font-size: 3.2rem; line-height: 1; color: var(--ink); }
+.hero .big small { font-size: 1.1rem; color: var(--ink2); }
+.weekbar { height: 10px; border-radius: 99px; background: var(--surface2); overflow: hidden; margin-top: 10px; }
+.weekbar i { display: block; height: 100%; background: linear-gradient(90deg, var(--sky), var(--mint)); border-radius: 99px; }
+.weeklbl { display: flex; justify-content: space-between; font-size: .75rem; color: var(--ink3); margin-top: 4px; }
+
+.birthbtn { width: 100%; border: 0; border-radius: 22px; padding: 18px; background: var(--alert); color: #fff; font-family: var(--display); font-size: 1.35rem; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 6px 18px rgba(224, 96, 90, .35); }
+.birthbtn:active { transform: scale(.98); }
+
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; box-shadow: var(--shadow); }
+.card.flat { box-shadow: none; }
+.banner { border-radius: var(--r); padding: 14px 16px; display: grid; gap: 4px; }
+.banner.honey { background: var(--honey-soft); }
+.banner.peach { background: var(--peach-soft); }
+.banner.mint { background: var(--mint-soft); }
+.banner.sky { background: var(--sky-soft); }
+.banner b { font-family: var(--display); font-weight: 400; font-size: 1.05rem; }
+
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 12px; display: grid; gap: 2px; }
+.stat .v { font-family: var(--display); font-size: 1.35rem; font-variant-numeric: tabular-nums; }
+.stat .l { font-size: .75rem; color: var(--ink2); }
+.ring { height: 6px; border-radius: 99px; background: var(--surface2); overflow: hidden; margin-top: 6px; }
+.ring i { display: block; height: 100%; background: var(--mint); }
+
+/* section tabs inside a view */
+.chips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+.chips::-webkit-scrollbar { display: none; }
+.chip { flex: none; border: 1.5px solid var(--line); background: var(--surface); border-radius: 99px; padding: 6px 14px; font-size: .9rem; font-weight: 600; color: var(--ink2); }
+.chip.on { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+
+/* checklist */
+.group { display: grid; gap: 8px; }
+.ghead { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; padding-top: 6px; }
+.ghead .cnt { font-size: .8rem; color: var(--ink3); font-variant-numeric: tabular-nums; }
+.phase-now { font-size: .7rem; font-weight: 800; color: var(--sky); background: var(--sky-soft); border-radius: 99px; padding: 2px 8px; margin-inline-start: 6px; letter-spacing: .02em; }
+.item { display: flex; gap: 12px; align-items: flex-start; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px; }
+.item.done { background: var(--surface2); border-color: transparent; }
+.item.done .t { text-decoration: line-through; color: var(--ink3); }
+.check { flex: none; width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--ink3); background: transparent; display: grid; place-items: center; margin-top: 1px; padding: 0; }
+.done .check { background: var(--mint); border-color: var(--mint); }
+.check svg { width: 14px; height: 14px; opacity: 0; }
+.done .check svg { opacity: 1; }
+.item .t { font-weight: 600; }
+.item .d { font-size: .88rem; color: var(--ink2); margin-top: 2px; }
+.xbtn { border: 0; background: none; color: var(--ink3); font-size: 1.1rem; padding: 2px 6px; }
+.addrow { display: flex; gap: 8px; }
+.addrow input { flex: 1; }
+.btn { border: 0; border-radius: 12px; padding: 10px 16px; font-weight: 700; background: var(--ink); color: var(--bg); white-space: nowrap; }
+.btn.soft { background: var(--surface2); color: var(--ink); }
+.btn.sky { background: var(--sky); color: #fff; }
+.btn.small { padding: 6px 12px; font-size: .85rem; }
+
+/* shopping */
+.prod { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+.prod.done { opacity: .75; }
+.prod-h { display: flex; gap: 12px; align-items: flex-start; padding: 14px; }
+.prod-h .main { flex: 1; min-width: 0; display: grid; gap: 4px; }
+.prod-h .name { font-weight: 700; font-size: 1.02rem; }
+.tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.tag { font-size: .72rem; font-weight: 700; border-radius: 99px; padding: 2px 9px; background: var(--surface2); color: var(--ink2); }
+.tag.must { background: var(--peach-soft); color: var(--alert); }
+.tag.rec { background: var(--sky-soft); color: var(--sky); }
+.tag.opt { background: var(--surface2); color: var(--ink2); }
+.tag.used-ok { background: var(--mint-soft); color: var(--mint); }
+.tag.used-no { background: var(--alert-soft); color: var(--alert); }
+.tag.gift { background: var(--honey-soft); color: var(--honey); }
+.price { font-family: var(--display); font-size: 1rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.expand { border: 0; background: none; color: var(--sky); font-weight: 700; padding: 0; font-size: .88rem; justify-self: start; }
+.prod-b { border-top: 1px dashed var(--line); padding: 14px; display: grid; gap: 12px; background: var(--bg); }
+.pick { display: grid; gap: 2px; padding: 10px 12px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); }
+.pick .pn { font-weight: 700; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.pick .pt { font-size: .7rem; font-weight: 800; padding: 1px 8px; border-radius: 99px; background: var(--sky-soft); color: var(--sky); }
+.pick .pt.prem { background: var(--honey-soft); color: var(--honey); }
+.pick .pt.val { background: var(--mint-soft); color: var(--mint); }
+.tip { font-size: .88rem; background: var(--honey-soft); border-radius: 12px; padding: 10px 12px; }
+.quotes { display: grid; gap: 6px; }
+.quote { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 10px; background: var(--surface); border: 1px solid var(--line); font-size: .9rem; }
+.quote.best { border-color: var(--mint); background: var(--mint-soft); }
+.qform { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) auto; gap: 6px; }
+
+/* rights */
+.right { display: grid; gap: 8px; }
+.right .amt { font-family: var(--display); font-size: 1.6rem; color: var(--ink); font-variant-numeric: tabular-nums; }
+.right .who { font-size: .72rem; font-weight: 800; color: var(--sky); letter-spacing: .02em; }
+.todo { display: flex; gap: 8px; align-items: flex-start; font-size: .9rem; background: var(--sky-soft); border-radius: 12px; padding: 10px 12px; }
+.src { font-size: .78rem; color: var(--ink3); }
+.src a { color: var(--ink2); }
+.calc { display: grid; gap: 10px; }
+.calc .res { font-family: var(--display); font-size: 1.5rem; font-variant-numeric: tabular-nums; }
+
+/* expenses */
+.bars { display: grid; gap: 10px; }
+.bar { display: grid; gap: 4px; }
+.bar .lbl { display: flex; justify-content: space-between; font-size: .88rem; }
+.bar .track { height: 10px; background: var(--surface2); border-radius: 99px; overflow: hidden; }
+.bar .track i { display: block; height: 100%; border-radius: 99px; background: var(--sky); }
+.exp { display: flex; gap: 10px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.exp:last-child { border-bottom: 0; }
+.exp .dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+.eform { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.eform .full { grid-column: 1 / -1; }
+.budget-meter { height: 14px; border-radius: 99px; background: var(--surface2); overflow: hidden; display: flex; }
+.budget-meter i { display: block; height: 100%; }
+
+/* bottom nav */
+nav.tabs { position: fixed; inset: auto 0 0 0; z-index: 20; background: var(--surface); border-top: 1px solid var(--line); padding-left: max(6px, env(safe-area-inset-left, 0px)); padding-right: max(6px, env(safe-area-inset-right, 0px)); padding-bottom: env(safe-area-inset-bottom, 0px); }
+nav.tabs .in { max-width: 720px; margin: 0 auto; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); }
+nav.tabs button { border: 0; background: none; padding: 8px 2px 9px; display: grid; justify-items: center; gap: 2px; font-size: .7rem; font-weight: 700; color: var(--ink3); }
+nav.tabs button svg { width: 24px; height: 24px; }
+nav.tabs button.on { color: var(--sky); }
+
+/* birth mode overlay */
+.birth { position: fixed; inset: 0; z-index: 50; background: var(--bg); overflow-y: auto; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.birth .wrap { max-width: 640px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 16px 40px; display: grid; gap: 14px; }
+.birth-h { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.timer { display: grid; justify-items: center; gap: 10px; padding: 22px 16px; border-radius: 26px; background: var(--surface); border: 1px solid var(--line); }
+.timer .clock { font-family: var(--display); font-size: 3.6rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.cbtn { width: 170px; height: 170px; border-radius: 50%; border: 0; font-family: var(--display); font-size: 1.35rem; background: var(--sky); color: #fff; box-shadow: 0 8px 24px rgba(111, 168, 220, .4); }
+.cbtn.live { background: var(--alert); box-shadow: 0 8px 24px rgba(224, 96, 90, .4); animation: pulse 1.6s ease-in-out infinite; }
+@keyframes pulse { 50% { transform: scale(1.04); } }
+@media (prefers-reduced-motion: reduce) { .cbtn.live { animation: none; } }
+.clog { width: 100%; display: grid; gap: 4px; font-size: .9rem; }
+.clog .r { display: grid; grid-template-columns: 1fr 1fr 1fr; padding: 6px 4px; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+.clog .r.h { font-size: .75rem; color: var(--ink3); font-weight: 700; }
+.actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.act { border: 1px solid var(--line); background: var(--surface); border-radius: 18px; padding: 14px; display: grid; gap: 4px; text-decoration: none; color: var(--ink); text-align: start; }
+.act b { font-family: var(--display); font-weight: 400; font-size: 1.05rem; }
+.act span { font-size: .8rem; color: var(--ink2); }
+
+.toast { position: fixed; z-index: 60; left: 50%; transform: translateX(-50%); bottom: calc(90px + env(safe-area-inset-bottom, 0px)); background: var(--ink); color: var(--bg); padding: 10px 18px; border-radius: 99px; font-weight: 700; font-size: .9rem; max-width: calc(100% - 32px); }
+.empty { text-align: center; padding: 24px 12px; color: var(--ink2); display: grid; gap: 6px; justify-items: center; }
+details.more summary { cursor: pointer; font-weight: 700; color: var(--sky); }
+@media (max-width: 420px) {
+  .hero .big { font-size: 2.7rem; }
+  .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+  .stat .v { font-size: 1.1rem; }
+  .qform { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .qform .btn { grid-column: 1 / -1; }
+}
+</style>
+
+<div id="app" dir="rtl" lang="he"></div>
+<nav class="tabs" dir="rtl" lang="he" aria-label="ניווט"><div class="in" id="tabs"></div></nav>
+<div id="birth" class="birth" dir="rtl" lang="he" hidden></div>
+<div id="toast" class="toast" role="status" hidden></div>
+
+<script>
+/* ============================================================
+   תוכן — כל המידע של האפליקציה. לעריכה קלה.
+   ============================================================ */
+const SRC = {
+  btlGrant: { t: "ביטוח לאומי — סכום מענק לידה", u: "https://www.btl.gov.il/benefits/maternity/maanakleda/Pages/ShiurMaanakLeda.aspx" },
+  btlMat: { t: "ביטוח לאומי — אתר ראשי", u: "https://www.btl.gov.il/" },
+  kzMat: { t: "כל זכות — דמי לידה", u: "https://www.kolzchut.org.il/he/דמי_לידה" },
+  kzPreg: { t: "כל זכות — היריון ולידה", u: "https://www.kolzchut.org.il/he/הריון_ולידה" },
+  kzTeach: { t: "כל זכות — גננות ועובדי הוראה", u: "https://www.kolzchut.org.il/he/גננות_ועובדי_הוראה" },
+  wrMom: { t: "זכויות העובדים — משרת אם למורה", u: "https://www.workrights.co.il/משרת-אם-מורה" },
+  kzPartner: { t: "כל זכות — דמי לידה לבן זוג של יולדת", u: "https://www.kolzchut.org.il/he/דמי_לידה_לבן_זוג_של_יולדת" },
+  forty: { t: "תקרת דמי לידה 2026", u: "https://www.forty.co.il/blog/post/%D7%97%D7%95%D7%A4%D7%A9%D7%AA-%D7%9C%D7%99%D7%93%D7%94-15-%D7%90%D7%95-26-%D7%A9%D7%91%D7%95%D7%A2%D7%95%D7%AA" },
+  iceKids: { t: "קצבת ילדים 2026", u: "https://www.ice.co.il/consumerism/news/article/1102211" },
+  btlKids: { t: "כל זכות — חיסכון לכל ילד", u: "https://www.kolzchut.org.il/he/חיסכון_לכל_ילד" },
+  kzStudent: { t: "כל זכות — התאמות לסטודנטים בהיריון ולידה", u: "https://www.kolzchut.org.il/he/פטור_מנוכחות_בשיעורים_לסטודנט_בן_זוג_של_סטודנטית_בהריון" },
+  midrag: { t: "מידרג — מחיר מוהל", u: "https://www.midrag.co.il/Content/Tip/22020" },
+  shamir: { t: "המרכז הרפואי שמיר (אסף הרופא)", u: "https://www.shamir.org/" },
+};
+
+const TASK_PHASES = [
+  { id: "p1", title: "עכשיו · שבועות 27–30", from: 0, to: 30, items: [
+    { id: "t-market", t: "לסגור החלטה על הדברים הגדולים", d: "עגלה, סלקל ועריסה. ההחלטה צריכה להיות מוכנה לפני בלאק פריידיי (27.11)." },
+    { id: "t-course", t: "להירשם לקורס הכנה ללידה", d: "בשמיר או דרך קופת החולים. כדאי לבדוק אם יש מפגש מיוחד לבני זוג." },
+    { id: "t-tour", t: "לקבוע סיור בחדרי הלידה בשמיר", d: "לברר באתר בית החולים או בטלפון מתי יש סיורים ואיך נרשמים." },
+    { id: "t-edu", t: "לברר עם משרד החינוך / ארגון המורים", d: "מתי לצאת לחופשת לידה, תשלום על חופשות (פסח וחופש גדול), משרת אם ומועד ההודעה על חל״ת." },
+    { id: "t-uni", t: "לפנות לרכז ההתאמות באוניברסיטה", d: "לשאול מה מגיע לך כבן זוג של יולדת: היעדרות, מועד מבחן נוסף והגשות מאוחרות. כדאי לתכנן את סמסטר ב׳ מראש." },
+    { id: "t-gift", t: "לשתף את המשפחה ברשימת המתנות", d: "בלשונית ׳קניות׳ אפשר לסמן מי קונה מה." },
+    { id: "t-pump", t: "לבדוק בקופת החולים ובביטוח המשלים", d: "הטבות היריון ולידה: משאבת חלב, יועצת הנקה, קורסים וערכות." },
+  ]},
+  { id: "p2", title: "שבועות 31–34 · קניות והכנת הבית", from: 31, to: 34, items: [
+    { id: "t-bf", t: "לקנות את הדברים הגדולים בבלאק פריידיי / סייבר מאנדיי", d: "27–30 בנובמבר. כדאי להשוות מחירים בזאפ ולשמור קבלות בשביל האחריות." },
+    { id: "t-ped", t: "לבחור רופא/ת ילדים", d: "דרך הקופה, קרוב לבית. מומלץ לשאול חברים." },
+    { id: "t-cpr", t: "לעשות קורס החייאה ועזרה ראשונה לתינוקות", d: "שעתיים-שלוש שכדאי לעשות יחד. יש קורסים של מד״א ושל גופים פרטיים." },
+    { id: "t-mohel", t: "לבחור מוהל לברית", d: "מוהל מוסמך, ולוודא הסמכה. כדאי לסגור איתו מראש ולשמור את הטלפון." },
+    { id: "t-room", t: "להרכיב את מיטת התינוק ואת העריסה הצמודה", d: "מזרן קשיח בגודל מדויק, בלי מגינים, כריות ובובות." },
+    { id: "t-wash", t: "לכבס את הבגדים והמצעים הראשונים", d: "בסבון עדין ובלי מרכך." },
+    { id: "t-plan", t: "לכתוב תוכנית לידה", d: "אפידורל, מי נמצא בחדר, מגע עור לעור, חיתוך חבל הטבור והנקה. להדפיס ולשים בתיק." },
+    { id: "t-daycare", t: "לבדוק מעונות ולהירשם לרשימות המתנה", d: "בהרבה מעונות נרשמים חודשים מראש. כדאי לבדוק גם זכאות לסבסוד מעון." },
+  ]},
+  { id: "p3", title: "שבועות 35–37 · מוכנים ליציאה", from: 35, to: 37, items: [
+    { id: "t-bag", t: "לארוז את תיק הלידה ולשים אותו ליד הדלת", d: "הרשימה המלאה בלשונית ׳תיק לידה׳." },
+    { id: "t-carseat", t: "להתקין את הסלקל ברכב", d: "עם בסיס ISOFIX ופנים לאחור. כדאי לבקש מהחנות לבדוק את ההתקנה." },
+    { id: "t-route", t: "לתכנן את הנסיעה לשמיר", d: "מסלול, חניה, ואיזה כניסה מובילה לחדר הלידה. לשמור כתובת בוויז." },
+    { id: "t-docs", t: "להכין תיקייה עם המסמכים", d: "תעודות זהות, כרטיסי קופה, סוג דם, סקירות, תוצאות בדיקות ותוכנית הלידה." },
+    { id: "t-freezer", t: "לבשל ולהקפיא אוכל לשבועיים", d: "מנות שאפשר לחמם ביד אחת." },
+    { id: "t-stroller", t: "להתאמן על פתיחה וקיפול של העגלה", d: "כולל הכנסה לתא המטען וחיבור הסלקל לעגלה." },
+    { id: "t-phones", t: "לשמור בטלפון את המספרים החשובים", d: "חדר לידה, רופאה, מוהל, דולה (אם יש) ומי שמשגיח על הבית." },
+  ]},
+  { id: "p4", title: "שבועות 38–40 · בכוננות", from: 38, to: 45, items: [
+    { id: "t-tank", t: "שהמכונית תמיד תהיה עם דלק", d: "ושהטלפונים טעונים בלילה." },
+    { id: "t-home", t: "לסדר מי מטפל בבית ובחיות", d: "לתת מפתח למישהו ולהשאיר רשימה." },
+    { id: "t-mode", t: "לעבור יחד על ׳מצב לידה׳ באפליקציה", d: "טיימר צירים, למי מתקשרים ומה לוקחים." },
+    { id: "t-follow", t: "להגיע לכל מעקבי סוף ההיריון", d: "לפי מה שהרופא/ה ממליץ/ה." },
+  ]},
+  { id: "p5", title: "בבית החולים", post: true, items: [
+    { id: "t-name", t: "לרשום את התינוק ולמסור את השם", d: "הודעת הלידה נמסרת למשרד הפנים מבית החולים. כדאי לבדוק שהפרטים נכונים." },
+    { id: "t-bank", t: "לוודא שנמסרו פרטי חשבון בנק לביטוח לאומי", d: "בלידה ראשונה מענק הלידה מועבר לחשבון שנמסר בבית החולים." },
+    { id: "t-tests", t: "לבדוק אילו בדיקות וחיסונים התינוק קיבל", d: "בדיקת שמיעה, סקר יילודים, ויטמין K וחיסון צהבת B. לשמור את המכתב." },
+    { id: "t-update", t: "לעדכן את המשפחה", d: "את רשימת האנשים לעדכן אפשר לערוך ב׳מצב לידה׳." },
+  ]},
+  { id: "p6", title: "שבוע ראשון בבית", post: true, items: [
+    { id: "t-brit", t: "ברית מילה ביום השמיני", d: "לתאם עם המוהל, שיבדוק גם את מצב הצהבת. לסגור מקום וכיבוד." },
+    { id: "t-tipat", t: "להירשם לטיפת חלב", d: "רישום וביקור ראשון בשבוע-שבועיים הראשונים." },
+    { id: "t-pedv", t: "ביקור ראשון אצל רופא/ת הילדים", d: "בדרך כלל בימים הראשונים אחרי השחרור." },
+    { id: "t-claim", t: "לוודא שדמי הלידה בתהליך", d: "לבדוק באזור האישי בביטוח לאומי, ולהשלים מסמכים אם מבקשים." },
+  ]},
+  { id: "p7", title: "החודשים הראשונים", post: true, items: [
+    { id: "t-savings", t: "לבחור קופה ומסלול ל׳חיסכון לכל ילד׳", d: "אם לא בוחרים, הכסף הולך למסלול ברירת מחדל. כדאי לבחור כבר בחודש הראשון ולשקול הפקדה כפולה." },
+    { id: "t-101", t: "לעדכן טופס 101 אצל המעסיק", d: "בשביל נקודות הזיכוי במס על ילד קטן." },
+    { id: "t-back", t: "להחליט על מועד החזרה לעבודה", d: "15 שבועות בתשלום ועד 26 שבועות חופשה. לשים לב לחופשות של מערכת החינוך ולמועד ההודעה על חל״ת." },
+    { id: "t-insure", t: "לבדוק ביטוח בריאות משלים לתינוק", d: "דרך הקופה, לרוב בעלות נמוכה." },
+  ]},
+];
+
+const SHOP = [
+  { id: "big", cat: "ציוד גדול", items: [
+    { id: "s-carseat", name: "סלקל לתינוק (i-Size) + בסיס ISOFIX", prio: "must", est: [900, 2000], used: "no", q: "סלקל i-Size",
+      picks: [
+        { n: "Cybex Aton B2 i-Size", tag: "val", why: "קל, ציונים טובים במבחני הבטיחות, ומתחבר ישירות לעגלות Cybex ולעגלות רבות אחרות עם מתאם." },
+        { n: "Maxi-Cosi Pebble 360 Pro + בסיס FamilyFix 360", tag: "prem", why: "מסתובב על הבסיס, ולכן הרבה יותר קל להכניס ולהוציא את התינוק. מתאים במיוחד אם יש רכב אחד." },
+        { n: "Britax Römer Baby-Safe Pro", tag: "", why: "מותג ותיק עם איכות ייצור גבוהה. נוח וחזק." },
+      ],
+      tip: "חובה תקן i-Size (R129) ונסיעה עם הפנים לאחור. לא קונים יד שנייה: אי אפשר לדעת אם הסלקל היה בתאונה. בחורף לא מושיבים את התינוק במעיל עבה, אלא מהדקים את הרצועות ופורשים שמיכה מעליהן." },
+    { id: "s-stroller", name: "עגלה עם אמבטיה (שלדה + אמבטיה + מושב)", prio: "must", est: [2500, 6500], used: "ok", q: "עגלת תינוק אמבטיה",
+      picks: [
+        { n: "Cybex Balios S Lux", tag: "val", why: "אמבטיה ומושב במחיר נוח, גלגלים טובים, ומתחברת ישירות לסלקל של Cybex." },
+        { n: "Joolz Day+ / Day 5", tag: "", why: "נוחה מאוד לדחיפה, עם סל קניות גדול ושלדה יציבה. נחשבת אחת המאוזנות בשוק." },
+        { n: "Bugaboo Fox 5", tag: "prem", why: "בולמים מעולים, נדחפת ביד אחת ומתקפלת בתנועה אחת." },
+      ],
+      tip: "בדירת קרקע עם 3–4 מדרגות כדאי לבחור עגלה במשקל סביר (פחות מ-12 ק״ג שלדה) עם גלגלים גדולים. לנסות בחנות קיפול והרמה, ולמדוד מראש את תא המטען. עגלה טובה יד שנייה זו דרך מצוינת לחסוך." },
+    { id: "s-bedside", name: "עריסה צמודה למיטה שלכם", prio: "must", est: [800, 1800], used: "ok", q: "עריסה צמודה למיטה",
+      picks: [
+        { n: "Chicco Next2Me Air / Magic", tag: "val", why: "הכי נפוצה. דופן נפתחת, גובה מתכוונן ורשת לאוורור." },
+        { n: "babybay Original (עץ מלא, גרמניה)", tag: "prem", why: "עץ מלא ויציב מאוד. אפשר להפוך אותה בהמשך לספסל או לשולחן." },
+      ],
+      tip: "מתאימה לחודשים הראשונים בחדר שלכם. מזרן קשיח בגודל מדויק. התינוק ישן על הגב, ובלי כריות, שמיכות ובובות." },
+    { id: "s-crib", name: "מיטת תינוק לחדר + מזרן קשיח", prio: "rec", est: [1000, 3000], used: "ok", q: "מיטת תינוק 60x120",
+      picks: [
+        { n: "IKEA SNIGLAR / SUNDVIK", tag: "val", why: "עץ, פשוטה ויציבה, ועומדת בתקן האירופי. המחיר נמוך מאוד." },
+        { n: "מיטה מעץ מלא מנגרייה / רשת ישראלית", tag: "", why: "אפשר לבחור מיטה שהופכת למיטת מעבר. חשוב לוודא שיש תקן ישראלי." },
+        { n: "Stokke Sleepi", tag: "prem", why: "עיצוב עגול ואיכות גבוהה. גדלה עם הילד." },
+      ],
+      tip: "מזרן 60×120 קשיח, שנכנס בדיוק למיטה: לא יותר משתי אצבעות רווח בצדדים. מיטה יד שנייה זה בסדר, אבל מזרן תמיד חדש." },
+    { id: "s-carrier", name: "מנשא", prio: "rec", est: [400, 1000], used: "ok", q: "מנשא תינוק Ergobaby",
+      picks: [
+        { n: "Ergobaby Omni Breeze", tag: "", why: "מתאים מגיל לידה בלי תוספת, ומאוורר." },
+        { n: "BabyBjörn Mini / Harmony", tag: "", why: "קל לשים ולהוריד. ה-Mini מתאים מאוד לחודשים הראשונים." },
+      ],
+      tip: "לשים לב לתנוחת M: ברכיים גבוהות מהטוסיק. כדאי לנסות בחנות עם בובה, כל אחד מכם בנפרד." },
+    { id: "s-monitor", name: "מוניטור תינוק", prio: "rec", est: [500, 1600], used: "ok", q: "מוניטור תינוק וידאו",
+      picks: [
+        { n: "Philips Avent SCD891 / SCD893", tag: "val", why: "וידאו בלי וויי-פיי, עם מסך ייעודי. אמין ופשוט." },
+        { n: "Nanit Pro", tag: "prem", why: "אפליקציה עם מעקב שינה ונשימה. חלק מהפיצ׳רים דורשים מנוי." },
+      ],
+      tip: "התינוק עובר לחדר שלו רק בהמשך, אז אפשר לקנות את זה אחרי הלידה ולא לרוץ." },
+    { id: "s-bouncer", name: "טרמפולינה / כיסא נדנדה", prio: "opt", est: [300, 1200], used: "ok", q: "טרמפולינה לתינוק",
+      picks: [
+        { n: "BabyBjörn Bliss", tag: "prem", why: "מתנדנד מתנועות התינוק, איכותי ומחזיק שנים." },
+        { n: "Chicco Hooplà", tag: "val", why: "מתקפל שטוח וזול יותר." },
+      ],
+      tip: "מקום בטוח להניח את התינוק כשאתם מתקלחים או מבשלים. לא מקום לשינה." },
+    { id: "s-bag", name: "תיק החתלה", prio: "rec", est: [150, 500], used: "ok", q: "תיק החתלה",
+      picks: [ { n: "Skip Hop / תיק גב החתלה", tag: "", why: "תיק גב משאיר את הידיים חופשיות ועדיף על תיק צד." } ],
+      tip: "תיק גב רגיל וטוב עם תאים מספיק." },
+  ]},
+  { id: "feed", cat: "הנקה והאכלה", items: [
+    { id: "s-pump", name: "משאבת חלב חשמלית", prio: "rec", est: [600, 1500], used: "no", q: "משאבת חלב חשמלית",
+      picks: [
+        { n: "Spectra S1 Plus", tag: "val", why: "חזקה, שקטה ועם סוללה. מאוד פופולרית בישראל." },
+        { n: "Medela Swing Maxi", tag: "", why: "כפולה, קומפקטית ואיכותית." },
+        { n: "Haakaa (סיליקון ידנית)", tag: "val", why: "כ-₪80, אוספת חלב מהצד השני בזמן הנקה. שווה גם אם יש משאבה." },
+      ],
+      tip: "לבדוק קודם בקופה ובביטוח המשלים: לפעמים יש השתתפות או השאלה. אפשר לחכות עם הקנייה עד שמבינים כמה צריך." },
+    { id: "s-bottles", name: "2–4 בקבוקים + פטמות בזרימה איטית", prio: "must", est: [100, 250], used: "no", q: "בקבוק תינוק Philips Avent Natural",
+      picks: [
+        { n: "Philips Avent Natural Response", tag: "", why: "פטמה רחבה שקל לעבור אליה מהנקה." },
+        { n: "Dr. Brown's Options+", tag: "", why: "מערכת נגד גזים, טובה לתינוקות עם כאבי בטן." },
+      ],
+      tip: "לא לקנות הרבה מראש. כל תינוק מעדיף בקבוק אחר." },
+    { id: "s-pillow", name: "כרית הנקה", prio: "rec", est: [100, 250], used: "ok", q: "כרית הנקה", picks: [], tip: "שומרת על הגב של אשתך בהנקות. כדאי כרית עם ציפה שאפשר לכבס." },
+    { id: "s-nursing", name: "רפידות הנקה + משחת לנולין", prio: "must", est: [60, 150], used: "no", q: "Lansinoh לנולין",
+      picks: [ { n: "Lansinoh HPA Lanolin", tag: "", why: "הסטנדרט לפטמות סדוקות. בטוחה לתינוק." } ], tip: "" },
+    { id: "s-bras", name: "2–3 חזיות הנקה", prio: "must", est: [150, 400], used: "no", q: "חזיית הנקה", picks: [], tip: "לקנות בשבוע 36 בערך. מידה אחת יותר גדולה מהרגיל." },
+    { id: "s-paci", name: "2–3 מוצצים", prio: "rec", est: [40, 100], used: "no", q: "מוצץ MAM 0-2",
+      picks: [ { n: "MAM Start 0–2 / Philips Avent Soothie", tag: "", why: "סיליקון רך. מתאים לגיל לידה." } ], tip: "" },
+    { id: "s-steril", name: "מעקר בקבוקים בקיטור", prio: "opt", est: [200, 500], used: "ok", q: "מעקר בקבוקים",
+      picks: [ { n: "Philips Avent 3-in-1", tag: "", why: "מהיר ופשוט." } ], tip: "אפשר גם להרתיח בסיר. זה לא חובה." },
+  ]},
+  { id: "hyg", cat: "חיתולים ורחצה", items: [
+    { id: "s-diapers", name: "חיתולים מידה 1 (חבילה-שתיים)", prio: "must", est: [150, 300], used: "no", q: "חיתולים האגיס מידה 1",
+      picks: [ { n: "Huggies / Pampers Premium", tag: "", why: "בבית החולים יש חיתולים. מתחילים במידה 1 ולא קונים הרבה מראש." } ],
+      tip: "מידת NB קטנה מהר מאוד. לחכות למבצעי סופר ולקנות במידה 2 ומעלה בכמויות." },
+    { id: "s-wipes", name: "מגבונים על בסיס מים", prio: "must", est: [60, 150], used: "no", q: "WaterWipes",
+      picks: [ { n: "WaterWipes", tag: "", why: "99.9% מים. עדינים מאוד לעור של יילוד." } ], tip: "בשבועות הראשונים אפשר גם צמר גפן ומים חמים." },
+    { id: "s-cream", name: "משחת החתלה", prio: "must", est: [30, 70], used: "no", q: "סודוקרם",
+      picks: [ { n: "Sudocrem / Bepanthen", tag: "", why: "מניעה וטיפול בגירויים." } ], tip: "" },
+    { id: "s-bath", name: "אמבטיה מתקפלת", prio: "must", est: [200, 400], used: "ok", q: "Stokke Flexi Bath",
+      picks: [
+        { n: "Stokke Flexi Bath + תושבת ליילוד", tag: "", why: "מתקפלת שטוח ומחזיקה שנים." },
+        { n: "Shnuggle Baby Bath", tag: "val", why: "תמיכה לגב ולטוסיק. נוחה מאוד בחודשים הראשונים." },
+      ], tip: "" },
+    { id: "s-towels", name: "2–3 מגבות עם כובע + בד חיתול", prio: "must", est: [80, 200], used: "ok", q: "מגבת תינוק כובע", picks: [], tip: "" },
+    { id: "s-thermo", name: "מדחום דיגיטלי", prio: "must", est: [40, 200], used: "no", q: "מדחום דיגיטלי תינוק",
+      picks: [
+        { n: "Braun / Microlife דיגיטלי", tag: "val", why: "למדידה רקטלית או בבית השחי. הכי מדויק ליילוד." },
+        { n: "Braun ThermoScan 7 (אוזן)", tag: "prem", why: "נוח בהמשך. ליילודים עדיף מדחום דיגיטלי רגיל." },
+      ], tip: "חום ביילוד צעיר מחייב פנייה לרופא/ה מיד." },
+    { id: "s-nose", name: "שואב אף", prio: "rec", est: [50, 100], used: "no", q: "NoseFrida", picks: [ { n: "NoseFrida", tag: "", why: "פשוט ועובד. חורף = נזלת." } ], tip: "" },
+    { id: "s-nails", name: "קוצץ ציפורניים / מספריים לתינוק", prio: "must", est: [20, 60], used: "no", q: "מספריים לתינוק", picks: [], tip: "" },
+    { id: "s-wash", name: "סבון ושמפו עדין לתינוק", prio: "must", est: [30, 80], used: "no", q: "סבון תינוק", picks: [ { n: "Mustela / Aveeno Baby", tag: "", why: "כמות קטנה מספיקה. בשבועות הראשונים רוחצים בעיקר במים." } ], tip: "" },
+  ]},
+  { id: "clothes", cat: "ביגוד (לידה בחורף)", items: [
+    { id: "s-bodys", name: "6–8 בגדי גוף מעטפת (0–3 חודשים)", prio: "must", est: [150, 300], used: "ok", q: "בגד גוף תינוק 0-3", picks: [ { n: "Carter's / H&M / Next", tag: "", why: "כותנה רכה עם לחצנים בצד. נוח בזמן שהטבור מחלים." } ],
+      tip: "רוב הבגדים יגיעו כמתנה. כדאי להחזיק מעט במידת NB ויותר במידה 0–3." },
+    { id: "s-sleeps", name: "6–8 אוברולים עם רוכסן", prio: "must", est: [200, 400], used: "ok", q: "אוברול תינוק רוכסן", picks: [ { n: "Carter's Sleep & Play", tag: "val", why: "רוכסן דו-כיווני הוא הצלה בהחלפת חיתול בלילה." } ], tip: "" },
+    { id: "s-sack", name: "2 שקי שינה / חיתול עטיפה, 2.5 TOG", prio: "must", est: [200, 450], used: "ok", q: "Love to Dream Swaddle Up",
+      picks: [ { n: "Love to Dream Swaddle UP (משקל חורף)", tag: "", why: "ידיים למעלה, קל לסגור, ומרגיע הרבה תינוקות." } ],
+      tip: "בחורף: שק שינה במקום שמיכה. החדר צריך להיות בערך 20–22 מעלות." },
+    { id: "s-hats", name: "כובעים, גרביים וכפפות נגד שריטות", prio: "must", est: [60, 150], used: "ok", q: "כובע תינוק", picks: [], tip: "" },
+    { id: "s-suit", name: "חליפת פליז / חליפת יציאה", prio: "rec", est: [100, 250], used: "ok", q: "חליפת פליז תינוק", picks: [], tip: "לא מעיל נפוח בסלקל. פליז דק ושמיכה מעל הרצועות." },
+    { id: "s-blanket", name: "שמיכת עגלה + 2 שמיכות מוסלין", prio: "rec", est: [100, 250], used: "ok", q: "שמיכת מוסלין", picks: [], tip: "" },
+  ]},
+  { id: "room", cat: "חדר תינוק", items: [
+    { id: "s-changer", name: "שידת החתלה / משטח החתלה", prio: "rec", est: [150, 2000], used: "ok", q: "משטח החתלה", picks: [ { n: "IKEA HEMNES + משטח", tag: "val", why: "שידה רגילה עם משטח מעליה, ומשמשת שנים." } ], tip: "גובה המותניים חוסך כאבי גב." },
+    { id: "s-blackout", name: "וילון האפלה", prio: "rec", est: [100, 300], used: "ok", q: "וילון האפלה", picks: [], tip: "" },
+    { id: "s-night", name: "מנורת לילה עמומה", prio: "rec", est: [50, 200], used: "ok", q: "מנורת לילה תינוק", picks: [], tip: "אור חם וחלש להנקות בלילה." },
+    { id: "s-noise", name: "מכשיר רעש לבן", prio: "opt", est: [80, 400], used: "ok", q: "רעש לבן תינוק", picks: [ { n: "Hatch Rest / אפליקציה", tag: "", why: "עוזר להרבה תינוקות להירדם." } ], tip: "" },
+    { id: "s-hygro", name: "מדחום ומד לחות לחדר", prio: "rec", est: [40, 120], used: "ok", q: "מד לחות דיגיטלי", picks: [], tip: "" },
+  ]},
+  { id: "safety", cat: "בטיחות ובריאות", items: [
+    { id: "s-cpr", name: "קורס החייאה ועזרה ראשונה לתינוקות", prio: "must", est: [150, 400], used: "", q: "", picks: [], tip: "זה הדבר הכי חשוב ברשימה. כדאי לעשות אותו יחד." },
+    { id: "s-firstaid", name: "ערכת עזרה ראשונה + אקמול לתינוקות", prio: "must", est: [60, 150], used: "", q: "ערכת עזרה ראשונה", picks: [], tip: "את המינון של אקמול לתינוק מקבלים רק מהרופא/ה." },
+    { id: "s-smoke", name: "גלאי עשן (אם אין)", prio: "rec", est: [50, 150], used: "", q: "גלאי עשן", picks: [], tip: "" },
+    { id: "s-gates", name: "שערי בטיחות ומגיני פינות", prio: "opt", est: [150, 500], used: "ok", q: "שער בטיחות", picks: [], tip: "רק אחרי גיל 6 חודשים. אין צורך לקנות עכשיו." },
+  ]},
+  { id: "brit", cat: "ברית מילה", items: [
+    { id: "s-mohel", name: "מוהל מוסמך", prio: "must", est: [1000, 1500], used: "", q: "", picks: [],
+      tip: "המחיר המומלץ: כ-₪1,000 למוהל מוסמך וכ-₪1,500 למוהל מומחה, בלי נסיעה. לבדוק את ההסמכה מראש." },
+    { id: "s-venue", name: "מקום + כיבוד", prio: "must", est: [1500, 8000], used: "", q: "", picks: [], tip: "ברית בבוקר בבית כנסת או בבית חוסכת הרבה. אולם קטן עם בוקר חלבי זו אפשרות באמצע." },
+    { id: "s-britset", name: "בגד לברית + כרית", prio: "opt", est: [100, 300], used: "ok", q: "בגד לברית", picks: [], tip: "" },
+  ]},
+];
+
+const BAG = [
+  { id: "mom", title: "לאמא", items: [
+    ["b-ids", "תעודות זהות + כרטיסי קופת חולים"], ["b-tests", "תיקיית בדיקות: סוג דם, סקירות, תרבית GBS, העמסת סוכר"], ["b-plan", "תוכנית לידה מודפסת"],
+    ["b-robe", "חלוק, כפכפים וגרביים חמות"], ["b-bras", "2 חזיות הנקה"], ["b-under", "תחתונים נוחים / חד״פ"], ["b-pads", "תחבושות לאחר לידה"],
+    ["b-lan", "משחת לנולין + רפידות הנקה"], ["b-care", "מברשת שיניים, שפתון, גומיות שיער, קרם"], ["b-out", "בגדים נוחים ליציאה (בגדי היריון)"],
+    ["b-pillow", "כרית מהבית"], ["b-snack", "נשנושים + בקבוק מים עם קש"],
+  ]},
+  { id: "baby", title: "לתינוק", items: [
+    ["b-body", "2–3 בגדי גוף + 2 אוברולים"], ["b-hat", "כובע, גרביים וכפפות"], ["b-wrap", "שמיכה / חיתול עטיפה חם"],
+    ["b-dia", "כמה חיתולים מידה 1 + מגבונים"], ["b-fleece", "חליפת פליז ליציאה (לא מעיל נפוח)"], ["b-seat", "סלקל מותקן ברכב"],
+  ]},
+  { id: "dad", title: "לך", items: [
+    ["b-charger", "מטען עם כבל ארוך + סוללה ניידת"], ["b-food", "אוכל ושתייה (יכולות להיות שעות)"], ["b-clothes", "בגדים להחלפה + סוודר (מזגן)"],
+    ["b-tooth", "מברשת שיניים ודאודורנט"], ["b-pay", "אשראי / אפליקציה לחניה"], ["b-phones", "רשימת טלפונים לעדכון"], ["b-head", "אוזניות + רשימת שירים מרגיעה"],
+  ]},
+];
+
+const RIGHTS = [
+  { id: "r-grant", who: "אוטומטי · ביטוח לאומי", title: "מענק לידה", amt: "₪2,103",
+    body: "מענק חד-פעמי לילד ראשון (סכום 2026, מתעדכן כל ינואר). מועבר תוך כחודש מהלידה.",
+    todo: "לוודא שבבית החולים נמסרו פרטי חשבון הבנק. אין צורך להגיש תביעה.", src: ["btlGrant"] },
+  { id: "r-hosp", who: "אוטומטי · ביטוח לאומי", title: "מענק אשפוז (עלות הלידה)", amt: "₪0 מכם",
+    body: "ביטוח לאומי משלם ישירות לבית החולים על הלידה והאשפוז.", todo: "אין מה לעשות.", src: ["kzPreg"] },
+  { id: "r-mat", who: "אשתך · שכירה", title: "דמי לידה — 15 שבועות בתשלום", amt: "עד ₪1,752 ליום",
+    body: "105 ימים. החישוב לפי ממוצע השכר ב-3 החודשים שלפני היציאה לחופשה (או 6 חודשים, אם זה יותר טוב לכם), עד התקרה. בשנה השלישית במשרה היא זכאית לתקופה המלאה.",
+    todo: "להגיש תביעה לדמי לידה באתר ביטוח לאומי אחרי הלידה, ולבדוק שמשרד החינוך העביר את נתוני השכר.", src: ["kzMat", "forty", "btlMat"], calc: true },
+  { id: "r-leave", who: "אשתך", title: "חופשת לידה עד 26 שבועות", amt: "26 שבועות",
+    body: "15 שבועות בתשלום ועוד 11 שבועות בלי תשלום. אסור לפטר עובדת בזמן חופשת הלידה וב-60 הימים שאחריה.",
+    todo: "לסמן בלוח שנה את סוף 15 השבועות ואת סוף 26 השבועות. בלידה בסוף ינואר זה יוצא בערך אמצע מאי וסוף יולי.", src: ["kzPreg"] },
+  { id: "r-checks", who: "אשתך · עכשיו", title: "40 שעות לבדיקות היריון בתשלום", amt: "40 שעות",
+    body: "עובדת במשרה מלאה רשאית להיעדר עד 40 שעות במהלך ההיריון בשביל בדיקות, בלי הורדה מהשכר.", todo: "להשתמש בהן לבדיקות שנשארו.", src: ["kzPreg"] },
+  { id: "r-teach-mom", who: "אשתך · מורה", title: "משרת אם", amt: "שעה פחות ביום / +10%",
+    body: "מורה שהיא אם לילד עד גיל 14 ועובדת לפחות ב-79% משרה זכאית לקצר את יום העבודה בשעה בלי פגיעה בשכר. במקום זה היא יכולה לבחור לעבוד מלא ולקבל תוספת של 10%.",
+    todo: "להגיש בקשה דרך בית הספר או משרד החינוך כשהיא חוזרת לעבודה, ולוודא שהזכות נכנסת לתלוש.", src: ["wrMom", "kzTeach"] },
+  { id: "r-teach-daycare", who: "אשתך · מורה", title: "תוספת מעונות", amt: "תוספת לשכר",
+    body: "תוספת לעובדת הוראה שהיא אם לילד מתחת לגיל 5.", todo: "לבדוק בתלוש אחרי החזרה ולשאול את המזכירות אם התוספת לא מופיעה.", src: ["wrMom"] },
+  { id: "r-teach-vac", who: "אשתך · מורה · לבדוק!", title: "תשלום על חופשות (פסח / חופש גדול)", amt: "לבדוק",
+    body: "יש כללים מיוחדים במערכת החינוך לגבי תשלום על חופשות כשחופשת הלידה מסתיימת לפניהן. בפורומים מדווחים על דרישה לחזור כ-21 יום לפני חופשה כדי לקבל עליה תשלום. זה לא אומת במקור רשמי.",
+    todo: "לברר עם הסתדרות המורים / ארגון המורים לפני שבוחרים תאריך חזרה. זה יכול להיות שווה אלפי שקלים.", src: ["kzTeach"] },
+  { id: "r-kids", who: "אוטומטי · ביטוח לאומי", title: "קצבת ילדים", amt: "₪173 לחודש",
+    body: "לילד ראשון (סכום 2026), עד גיל 18. בלי תלות בהכנסה.", todo: "אוטומטי.", src: ["iceKids"] },
+  { id: "r-save", who: "אתם · חשוב!", title: "חיסכון לכל ילד", amt: "₪58 + ₪58",
+    body: "ביטוח לאומי מפקיד ₪58 בחודש בחיסכון על שם הילד. אתם יכולים להוסיף עוד ₪58 מתוך קצבת הילדים, וזה מכפיל את החיסכון. אם לא בוחרים קופה, הכסף הולך למסלול ברירת מחדל.",
+    todo: "לבחור בית השקעות ומסלול באתר ביטוח לאומי (לאופק של 18 שנה מסלול מנייתי מקובל) ולסמן הפקדה כפולה.", src: ["btlKids"] },
+  { id: "r-tax", who: "שניכם", title: "נקודות זיכוי במס", amt: "חיסכון במס",
+    body: "הורים לילדים קטנים מקבלים נקודות זיכוי, והמשמעות היא פחות מס הכנסה בכל חודש.",
+    todo: "לעדכן טופס 101 אצל המעסיק אחרי הלידה. אם אתה עובד בעבודה צדדית, גם אצלך.", src: ["kzPreg"] },
+  { id: "r-dad", who: "אתה · סטודנט", title: "זכויות לבן הזוג", amt: "לפי המצב",
+    body: "דמי לידה לאב (שיתוף בחופשה אחרי 6 שבועות) מגיעים רק לאב שעובד ומבוטח כשכיר או כעצמאי. אם אתה עובד במשרה חלקית, נבדוק את זה. באוניברסיטה יש התאמות להורים, ובחלק מהמוסדות גם לאב: היעדרות נוספת, מועד מבחן מיוחד והגשות מאוחרות.",
+    todo: "לפנות לרכז ההתאמות / דיקנט הסטודנטים עם אישור לידה, ולשאול על נוהל ׳הורות׳ של המוסד.", src: ["kzPartner", "kzStudent"] },
+  { id: "r-daycare", who: "בהמשך", title: "סבסוד מעון יום", amt: "לפי הכנסה",
+    body: "בגלל שאתה סטודנט ואשתך עובדת, ייתכן שאתם זכאים לסבסוד במעון מוכר. הכללים משתנים, ולכן כדאי לבדוק קרוב למועד.",
+    todo: "לבדוק זכאות באתר משרד העבודה כשבוחרים מעון.", src: ["kzPreg"] },
+  { id: "r-kupa", who: "קופת חולים", title: "הטבות היריון ולידה בקופה ובביטוח המשלים", amt: "לבדוק",
+    body: "בהרבה מקרים יש הנחות על קורסי הכנה ללידה, יועצות הנקה, משאבות, ערכות ליולדת ושיעורי החייאה.",
+    todo: "להיכנס לאפליקציה של הקופה, לחפש ׳היריון ולידה׳, ולעבור על כל מה שמגיע לכם.", src: ["kzPreg"] },
+];
+
+const DEALS = [
+  { t: "בלאק פריידיי · 27.11.2026", d: "ההזדמנות הכי טובה השנה לעגלה, סלקל ועריסה. כדאי להחליט על הדגמים לפני כן, כדי שיישאר רק לבדוק מחירים." },
+  { t: "סייבר מאנדיי · 30.11.2026", d: "עוד יום הנחות, בעיקר באונליין." },
+  { t: "זאפ להשוואת מחירים", d: "בכל מוצר יש כפתור ׳בדיקת מחיר בזאפ׳. אפשר לרשום את המחירים שמוצאים ולהשוות." },
+  { t: "מועדוני לקוחות", d: "להצטרף למועדונים של רשתות התינוקות (הנחת הצטרפות, ימי הולדת ומבצעי סוף עונה) ולבדוק את מועדון הצרכנות של ארגון המורים." },
+  { t: "יד שנייה חכמה", d: "עגלה, מיטה, אמבטיה, טרמפולינה ובגדים: בקבוצות פייסבוק וביד2 אפשר לחסוך 50% ויותר. סלקל, מזרן, בקבוקים ומשאבה תמיד קונים חדשים." },
+  { t: "אמזון", d: "על מוצרים קטנים (מוצצים, מגבונים, בגדי Carter's) כדאי לבדוק משלוח לישראל ומע״מ ולהשוות למחיר המקומי." },
+];
+
+const EXP_CATS = [
+  { id: "big", n: "ציוד גדול", c: "var(--sky)" }, { id: "feed", n: "הנקה והאכלה", c: "var(--peach)" }, { id: "hyg", n: "חיתולים ורחצה", c: "var(--mint)" },
+  { id: "clothes", n: "ביגוד", c: "var(--honey)" }, { id: "room", n: "חדר תינוק", c: "#a58fd6" }, { id: "safety", n: "בטיחות ובריאות", c: "var(--alert)" },
+  { id: "brit", n: "ברית מילה", c: "#7fb3b0" }, { id: "other", n: "אחר", c: "var(--ink3)" },
+];
+
+/* ============================================================
+   אחסון — משותף בין המכשירים (db) או מקומי כגיבוי
+   ============================================================ */
+const COLS = ["checks", "expenses", "quotes", "custom", "settings"];
+const LS_KEY = "baby-app-v1";
+const S = { mode: "local", db: null, data: { checks: {}, expenses: {}, quotes: {}, custom: {}, settings: {} }, readOnly: false };
+function lsGet(k, f) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : f; } catch (e) { return f; } }
+function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+(function loadLocal() { const d = lsGet(LS_KEY, null); if (d) COLS.forEach(c => { S.data[c] = d[c] || {}; }); })();
+function saveLocal() { if (S.mode === "local") lsSet(LS_KEY, S.data); }
+
+async function put(col, id, obj) {
+  if (S.readOnly) { toast("אין לך הרשאת עריכה בעמוד הזה"); return; }
+  if (S.mode === "db") {
+    S.data[col] = { ...S.data[col], [id]: obj }; render();
+    try { await S.db.collection(col).doc(id).set(obj); }
+    catch (e) { handleWriteError(e); }
+  } else { S.data[col] = { ...S.data[col], [id]: obj }; saveLocal(); render(); }
+}
+async function del(col, id) {
+  if (S.readOnly) { toast("אין לך הרשאת עריכה בעמוד הזה"); return; }
+  const next = { ...S.data[col] }; delete next[id]; S.data[col] = next;
+  if (S.mode === "db") { render(); try { await S.db.collection(col).doc(id).delete(); } catch (e) { handleWriteError(e); } }
+  else { saveLocal(); render(); }
+}
+function handleWriteError(e) {
+  if (e && e.code === "invalid_argument") { S.readOnly = true; toast("אין לך הרשאת עריכה. מוצג במצב קריאה בלבד"); }
+  else if (e && e.code === "quota_exceeded") toast("האחסון מלא. מחקו כמה רשומות ישנות");
+  else toast("השמירה נכשלה. נסו שוב בעוד רגע");
+}
+function newId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+
+async function initDb() {
+  try {
+    if (!window.claude || !window.claude.use) return;
+    const db = await window.claude.use("db");
+    if (!db) return;
+    S.db = db; S.mode = "db";
+    COLS.forEach(c => {
+      db.collection(c).onSnapshot(snap => {
+        const m = {}; snap.docs.forEach(d => { if (d.exists) m[d.id] = d.data(); });
+        S.data[c] = m; scheduleRender();
+      }, () => {});
+    });
+    render();
+  } catch (e) { /* נשאר מקומי */ }
+}
+
+/* ============================================================
+   עזרים
+   ============================================================ */
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
+const ils = n => "₪" + Math.round(n).toLocaleString("he-IL");
+const DAY = 864e5;
+function settings() { return Object.assign({ due: defaultDue(), budget: 15000, phone: "", notify: "אמא\nאבא\nחמותי\nחמי", mohel: "" }, S.data.settings.main || {}); }
+function defaultDue() { const d = new Date(2026, 9, 26); d.setMonth(d.getMonth() + 3); return d.toISOString().slice(0, 10); }
+function preg() {
+  const due = new Date(settings().due + "T00:00:00"); const now = new Date(); now.setHours(0, 0, 0, 0);
+  const days = Math.round((due - now) / DAY); const week = Math.max(0, Math.min(42, Math.floor((280 - days) / 7)));
+  return { days, week, due };
+}
+function isDone(id) { return !!(S.data.checks[id] && S.data.checks[id].done); }
+function toggle(id) { if (isDone(id)) del("checks", id); else put("checks", id, { done: true, at: Date.now() }); }
+let toastT; function toast(m) { const t = $("#toast"); t.textContent = m; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => { t.hidden = true; }, 2600); }
+const zap = q => "https://www.zap.co.il/search.aspx?keyword=" + encodeURIComponent(q);
+const fmtDate = d => new Date(d).toLocaleDateString("he-IL", { day: "numeric", month: "short" });
+
+const IC = {
+  home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>',
+  tasks: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2"/></svg>',
+  shop: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="19" r="1.6"/><circle cx="17" cy="19" r="1.6"/><path d="M3 4h2l2.4 11h10.2L20 8H6.2"/></svg>',
+  bag: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="3"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18"/></svg>',
+  rights: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg>',
+  money: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="12" rx="3"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v5M18 9.5v5"/></svg>',
+  gear: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>',
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  heart: '<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 21s-7.5-4.6-9.5-9.3C1 8 3.4 4.5 7 4.5c2 0 3.4 1.1 5 3 1.6-1.9 3-3 5-3 3.6 0 6 3.5 4.5 7.2C19.5 16.4 12 21 12 21z"/></svg>',
+};
+const LOGO = '<svg width="38" height="38" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="var(--sky-soft)"/><path d="M11 23a9 9 0 0 0 18 0z" fill="var(--sky)"/><circle cx="20" cy="15" r="6" fill="var(--peach)"/><circle cx="18" cy="14.5" r=".9" fill="var(--ink)"/><circle cx="22" cy="14.5" r=".9" fill="var(--ink)"/><path d="M18.3 17q1.7 1.3 3.4 0" stroke="var(--ink)" stroke-width=".9" fill="none" stroke-linecap="round"/></svg>';
+const CLOUDS = '<svg class="clouds" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><g fill="var(--surface)" opacity=".75"><ellipse cx="60" cy="40" rx="38" ry="14"/><ellipse cx="82" cy="32" rx="22" ry="14"/><ellipse cx="330" cy="150" rx="44" ry="15"/><ellipse cx="352" cy="140" rx="24" ry="15"/></g><g fill="var(--honey)" opacity=".7"><path d="M340 34l3 7 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z"/><circle cx="300" cy="60" r="2.5"/><circle cx="370" cy="80" r="2"/><circle cx="40" cy="120" r="2"/></g><path d="M372 22a14 14 0 1 0 14 18 11 11 0 0 1-14-18z" fill="var(--honey)" opacity=".55"/></svg>';
+
+/* ============================================================
+   מצב תצוגה
+   ============================================================ */
+const UI = lsGet("baby-ui", { tab: "home", shopCat: "big", bagTab: "mom", open: {} });
+function saveUI() { lsSet("baby-ui", UI); }
+const TABS = [["home", "בית", IC.home], ["tasks", "משימות", IC.tasks], ["shop", "קניות", IC.shop], ["bag", "תיק לידה", IC.bag], ["rights", "זכויות", IC.rights], ["money", "הוצאות", IC.money]];
+function go(tab) { UI.tab = tab; saveUI(); render(); window.scrollTo(0, 0); }
+
+let renderQueued = false, deferred = false;
+function scheduleRender() { if (renderQueued) return; renderQueued = true; requestAnimationFrame(() => { renderQueued = false; render(); }); }
+function render() {
+  const a = document.activeElement;
+  if (a && (a.tagName === "INPUT" || a.tagName === "TEXTAREA" || a.tagName === "SELECT") && $("#app").contains(a)) { deferred = true; return; }
+  deferred = false;
+  $("#tabs").innerHTML = TABS.map(([id, n, ic]) => `<button class="${UI.tab === id ? "on" : ""}" data-go="${id}" aria-current="${UI.tab === id ? "page" : "false"}">${ic}<span>${n}</span></button>`).join("");
+  const v = { home: vHome, tasks: vTasks, shop: vShop, bag: vBag, rights: vRights, money: vMoney, settings: vSettings }[UI.tab] || vHome;
+  $("#app").innerHTML = header() + v();
+  if (!$("#birth").hidden) renderBirth();
+}
+document.addEventListener("focusout", () => setTimeout(() => { if (deferred) render(); }, 50));
+
+function header() {
+  return `<div class="top"><div class="brand">${LOGO}<div><h1>מחכים לבייבי</h1><span class="sync ${S.mode === "db" ? "on" : ""}">${S.mode === "db" ? "● משותף בין המכשירים" : "נשמר במכשיר הזה"}</span></div></div>
+  <button class="iconbtn" data-go="settings" aria-label="הגדרות">${IC.gear}</button></div>`;
+}
+
+/* ---------- בית ---------- */
+function allTaskItems() { return TASK_PHASES.flatMap(p => p.items.map(i => i.id)).concat(customOf("tasks").map(c => c.id)); }
+function allShopItems() { return SHOP.flatMap(c => c.items); }
+function allBagIds() { return BAG.flatMap(b => b.items.map(i => i[0])).concat(customOf("bag").map(c => c.id)); }
+function pct(ids) { if (!ids.length) return 0; return Math.round(ids.filter(isDone).length / ids.length * 100); }
+function currentPhase() { const w = preg().week; return TASK_PHASES.find(p => !p.post && w >= p.from && w <= p.to) || TASK_PHASES[0]; }
+
+function vHome() {
+  const p = preg(); const st = settings();
+  const ph = currentPhase(); const next = ph.items.filter(i => !isDone(i.id)).slice(0, 3);
+  const shopMust = allShopItems().filter(i => i.prio === "must");
+  const spent = Object.values(S.data.expenses).reduce((s, e) => s + (+e.amount || 0), 0);
+  const bf = Math.round((new Date("2026-11-27T00:00:00") - new Date()) / DAY);
+  const dueTxt = p.due.toLocaleDateString("he-IL", { day: "numeric", month: "long", year: "numeric" });
+  return `<div class="stack">
+  <section class="hero">${CLOUDS}<div class="inner">
+    <span class="muted small">תאריך משוער · ${esc(dueTxt)}</span>
+    <div class="big num">${p.days > 0 ? p.days : "היום!"} ${p.days > 0 ? "<small>ימים לפגישה</small>" : ""}</div>
+    <p class="muted">שבוע ${p.week} מתוך 40 · ${p.week < 37 ? "יש עוד זמן להתארגן" : "בכוננות מלאה"}</p>
+    <div class="weekbar" role="progressbar" aria-valuenow="${p.week}" aria-valuemin="0" aria-valuemax="40"><i style="width:${Math.min(100, p.week / 40 * 100)}%"></i></div>
+    <div class="weeklbl"><span>שבוע 0</span><span>27</span><span>37</span><span>40</span></div>
+  </div></section>
+
+  <button class="birthbtn" data-birth="1">${IC.heart} מתחילה ללדת</button>
+
+  <div class="stats">
+    <button class="stat" data-go="tasks" style="text-align:start"><span class="v">${pct(allTaskItems())}%</span><span class="l">משימות</span><div class="ring"><i style="width:${pct(allTaskItems())}%"></i></div></button>
+    <button class="stat" data-go="shop" style="text-align:start"><span class="v">${shopMust.filter(i => isDone(i.id)).length}/${shopMust.length}</span><span class="l">פריטי חובה נקנו</span><div class="ring"><i style="width:${pct(shopMust.map(i => i.id))}%"></i></div></button>
+    <button class="stat" data-go="bag" style="text-align:start"><span class="v">${pct(allBagIds())}%</span><span class="l">תיק לידה</span><div class="ring"><i style="width:${pct(allBagIds())}%"></i></div></button>
+  </div>
+
+  ${bf > 0 && bf < 60 ? `<div class="banner honey"><b>בלאק פריידיי בעוד ${bf} ימים</b><span class="small">27.11 · כדאי לסגור עכשיו על דגם לעגלה, לסלקל ולעריסה, ולרשום מחירים כדי לזהות הנחה אמיתית.</span></div>` : ""}
+
+  <section class="card stack">
+    <div class="ghead"><h3>עכשיו על הפרק</h3><button class="expand" data-go="tasks">כל המשימות ←</button></div>
+    <span class="tiny">${esc(ph.title)}</span>
+    ${next.length ? next.map(taskRow).join("") : `<div class="banner mint"><b>סיימתם את השלב הזה!</b><span class="small">אפשר להתקדם לשלב הבא בלשונית המשימות.</span></div>`}
+  </section>
+
+  <section class="card stack">
+    <div class="ghead"><h3>תקציב</h3><button class="expand" data-go="money">פירוט ←</button></div>
+    <div class="row"><span class="price">${ils(spent)}</span><span class="muted small">הוצאו מתוך ${ils(st.budget)}</span></div>
+    <div class="budget-meter"><i style="width:${Math.min(100, spent / Math.max(1, st.budget) * 100)}%;background:${spent > st.budget ? "var(--alert)" : "var(--mint)"}"></i></div>
+  </section>
+  </div>`;
+}
+
+/* ---------- משימות ---------- */
+function customOf(list) { return Object.entries(S.data.custom).filter(([, c]) => c.list === list).map(([id, c]) => ({ id, ...c })).sort((a, b) => (a.at || 0) - (b.at || 0)); }
+function taskRow(i) {
+  const done = isDone(i.id);
+  return `<div class="item ${done ? "done" : ""}"><button class="check" data-toggle="${i.id}" aria-label="${done ? "בטל סימון" : "סמן כבוצע"}" aria-pressed="${done}">${IC.check}</button>
+  <div class="grow"><div class="t">${esc(i.t)}</div>${i.d ? `<div class="d">${esc(i.d)}</div>` : ""}</div>
+  ${i.custom ? `<button class="xbtn" data-delcustom="${i.id}" aria-label="מחק">×</button>` : ""}</div>`;
+}
+function vTasks() {
+  const cur = currentPhase().id;
+  const mine = customOf("tasks").map(c => ({ id: c.id, t: c.text, custom: true }));
+  return `<div class="stack"><h2>ציר זמן ומשימות</h2>
+  <p class="muted small">מסודר לפי שבועות ההיריון ואחרי הלידה. מה שמסמנים כאן מתעדכן אצל שניכם.</p>
+  ${TASK_PHASES.map(p => `<div class="group"><div class="ghead"><h3>${esc(p.title)}${p.id === cur ? '<span class="phase-now">עכשיו</span>' : ""}</h3><span class="cnt">${p.items.filter(i => isDone(i.id)).length}/${p.items.length}</span></div>${p.items.map(taskRow).join("")}</div>`).join("")}
+  <div class="group"><div class="ghead"><h3>המשימות שלנו</h3></div>${mine.map(taskRow).join("")}
+    <form class="addrow" data-addcustom="tasks"><input id="add-task" name="text" placeholder="להוסיף משימה…" autocomplete="off"><button class="btn" type="submit">הוספה</button></form></div>
+  </div>`;
+}
+
+/* ---------- קניות ---------- */
+function quotesOf(itemId) { return Object.entries(S.data.quotes).filter(([, q]) => q.item === itemId).map(([id, q]) => ({ id, ...q })).sort((a, b) => a.price - b.price); }
+function prodCard(i) {
+  const done = isDone(i.id); const open = UI.open[i.id]; const qs = quotesOf(i.id); const gift = S.data.checks["gift-" + i.id];
+  const prioTxt = { must: "חובה", rec: "מומלץ", opt: "אפשר לוותר" }[i.prio];
+  const best = qs[0];
+  return `<article class="prod ${done ? "done" : ""}">
+  <div class="prod-h ${done ? "done" : ""}"><button class="check" data-toggle="${i.id}" aria-label="${done ? "בטל: נקנה" : "סמן: נקנה"}" aria-pressed="${done}">${IC.check}</button>
+    <div class="main"><div class="name">${esc(i.name)}</div>
+      <div class="tags"><span class="tag ${i.prio}">${prioTxt}</span>${i.used === "ok" ? '<span class="tag used-ok">יד שנייה בסדר</span>' : i.used === "no" ? '<span class="tag used-no">רק חדש</span>' : ""}${gift && gift.by ? `<span class="tag gift">🎁 ${esc(gift.by)}</span>` : ""}</div>
+      <button class="expand" data-open="${i.id}" aria-expanded="${!!open}">${open ? "סגירה" : "המלצות, טיפים והשוואת מחירים"}</button>
+    </div>
+    <div style="text-align:end"><div class="price">${best ? ils(best.price) : `<span dir="ltr">${ils(i.est[0])}–${i.est[1].toLocaleString("he-IL")}</span>`}</div><div class="tiny">${best ? "המחיר הכי טוב שמצאתם" : "טווח משוער"}</div></div>
+  </div>
+  ${open ? `<div class="prod-b">
+    ${i.picks.length ? `<div class="stack" style="gap:8px">${i.picks.map(pk => `<div class="pick"><div class="pn">${esc(pk.n)}${pk.tag ? `<span class="pt ${pk.tag}">${pk.tag === "val" ? "תמורה מעולה" : "פרימיום"}</span>` : ""}</div><div class="small muted">${esc(pk.why)}</div></div>`).join("")}</div>` : ""}
+    ${i.tip ? `<div class="tip">${esc(i.tip)}</div>` : ""}
+    ${i.q ? `<a class="btn soft small" style="justify-self:start;text-decoration:none" href="${zap(i.picks[0] ? i.picks[0].n : i.q)}" target="_blank" rel="noopener">בדיקת מחיר בזאפ ↗</a>` : ""}
+    <div class="stack" style="gap:8px"><b class="small">השוואת מחירים שמצאנו</b>
+      ${qs.length ? `<div class="quotes">${qs.map((q, k) => `<div class="quote ${k === 0 && qs.length > 1 ? "best" : ""}"><span class="grow">${esc(q.store)}${q.note ? ` · <span class="muted">${esc(q.note)}</span>` : ""}</span><b class="num">${ils(q.price)}</b><button class="btn small sky" data-buyquote="${q.id}" title="רשום כהוצאה">קנינו</button><button class="xbtn" data-delquote="${q.id}" aria-label="מחק">×</button></div>`).join("")}</div>` : `<span class="tiny">עוד לא נרשמו מחירים. הוסיפו חנות ומחיר כדי להשוות.</span>`}
+      <form class="qform" data-addquote="${i.id}"><input id="qs-${i.id}" name="store" placeholder="חנות / אתר / דגם" required autocomplete="off"><input id="qp-${i.id}" name="price" type="number" inputmode="decimal" min="0" placeholder="מחיר ₪" required><button class="btn small" type="submit">הוספה</button></form>
+    </div>
+    <form class="addrow" data-gift="${i.id}"><input id="g-${i.id}" name="by" placeholder="מתנה מ… (סבתא, החברים מהעבודה)" value="${gift ? esc(gift.by) : ""}" autocomplete="off"><button class="btn soft small" type="submit">שמירה</button></form>
+  </div>` : ""}
+  </article>`;
+}
+function vShop() {
+  const cat = SHOP.find(c => c.id === UI.shopCat) || SHOP[0];
+  const est = allShopItems().filter(i => i.prio !== "opt").reduce((s, i) => [s[0] + i.est[0], s[1] + i.est[1]], [0, 0]);
+  return `<div class="stack"><h2>רשימת קניות</h2>
+  <p class="muted small">מותגים מוכרים עם ביקורות טובות, בכמה רמות מחיר. המחירים הם טווח משוער. לפני קנייה בודקים בזאפ ורושמים כאן מה מצאתם, כדי להשוות.</p>
+  <div class="banner sky"><b>הערכה כוללת (חובה + מומלץ): <span dir="ltr">${ils(est[0])}–${est[1].toLocaleString("he-IL")}</span></b><span class="small">הטווח תלוי בעיקר בעגלה ובסלקל. חלק מהדברים יגיעו כמתנות.</span></div>
+  <div class="chips" role="tablist">${SHOP.map(c => { const d = c.items.filter(i => isDone(i.id)).length; return `<button class="chip ${c.id === cat.id ? "on" : ""}" data-shopcat="${c.id}" role="tab" aria-selected="${c.id === cat.id}">${esc(c.cat)} <span class="num">${d}/${c.items.length}</span></button>`; }).join("")}<button class="chip ${UI.shopCat === "deals" ? "on" : ""}" data-shopcat="deals">איפה חוסכים</button></div>
+  ${UI.shopCat === "deals" ? DEALS.map(d => `<div class="card flat"><h3>${esc(d.t)}</h3><p class="small muted" style="margin-top:4px">${esc(d.d)}</p></div>`).join("") : cat.items.map(prodCard).join("")}
+  </div>`;
+}
+
+/* ---------- תיק לידה ---------- */
+function vBag() {
+  const b = BAG.find(x => x.id === UI.bagTab) || BAG[0];
+  const mine = customOf("bag-" + b.id).map(c => ({ id: c.id, t: c.text, custom: true }));
+  const items = b.items.map(([id, t]) => ({ id, t })).concat(mine);
+  return `<div class="stack"><h2>תיק לידה</h2>
+  <p class="muted small">לארוז עד שבוע 36 ולהשאיר ליד הדלת. הלידה צפויה בחורף, אז כדאי שכבות ובגדים חמים.</p>
+  <div class="chips">${BAG.map(x => { const ids = x.items.map(i => i[0]).concat(customOf("bag-" + x.id).map(c => c.id)); return `<button class="chip ${x.id === b.id ? "on" : ""}" data-bagtab="${x.id}">${esc(x.title)} <span class="num">${ids.filter(isDone).length}/${ids.length}</span></button>`; }).join("")}</div>
+  <div class="group">${items.map(taskRow).join("")}</div>
+  <form class="addrow" data-addcustom="bag-${b.id}"><input id="add-bag" name="text" placeholder="להוסיף פריט…" autocomplete="off"><button class="btn" type="submit">הוספה</button></form>
+  </div>`;
+}
+
+/* ---------- זכויות ---------- */
+function vRights() {
+  return `<div class="stack"><h2>הזכויות שלכם</h2>
+  <p class="muted small">זכויות בישראל לפי המצב שלכם: אשתך שכירה במשרד החינוך, ואתה סטודנט. הסכומים הם של 2026 ומתעדכנים בכל ינואר, ולכן לפני הגשה כדאי לבדוק באתר ביטוח לאומי. אפשר לסמן כל זכות אחרי שטיפלתם בה.</p>
+  ${RIGHTS.map(r => { const done = isDone(r.id); return `<article class="card right" style="${done ? "opacity:.7" : ""}">
+    <div class="row" style="justify-content:space-between;align-items:flex-start"><div class="grow"><div class="who">${esc(r.who)}</div><h3>${esc(r.title)}</h3></div><div class="amt">${esc(r.amt)}</div></div>
+    <p class="small">${esc(r.body)}</p>
+    <div class="todo ${done ? "done" : ""}"><button class="check" data-toggle="${r.id}" aria-label="סמן שטופל" aria-pressed="${done}">${IC.check}</button><span><b>מה עושים:</b> ${esc(r.todo)}</span></div>
+    ${r.calc ? matCalc() : ""}
+    <div class="src">מקור: ${r.src.map(k => `<a href="${SRC[k].u}" target="_blank" rel="noopener">${esc(SRC[k].t)}</a>`).join(" · ")}</div>
+  </article>`; }).join("")}
+  <div class="banner peach"><b>טיפ</b><span class="small">כל זכות אוטומטית שמגיעה לחשבון אפשר לרשום גם בלשונית ההוצאות כהכנסה, כדי לראות את התמונה המלאה.</span></div>
+  </div>`;
+}
+function matCalc() {
+  const sal = +(lsGet("baby-sal", 0)) || "";
+  return `<div class="calc card flat" style="background:var(--surface2);border:0"><b class="small">מחשבון דמי לידה (ברוטו, הערכה)</b>
+  <label class="f">השכר הברוטו הממוצע בחודש<input id="sal" type="number" inputmode="decimal" min="0" placeholder="למשל 11000" value="${sal}" data-sal="1"></label>
+  <div id="calcres">${calcText(sal)}</div></div>`;
+}
+function calcText(sal) {
+  if (!sal) return '<span class="tiny">הכניסו שכר כדי לראות הערכה.</span>';
+  const daily = Math.min(1752.33, (sal * 3) / 90); const total = daily * 105;
+  return `<div class="res">${ils(total)}</div><span class="tiny">${ils(daily)} ליום × 105 ימים. ההערכה לפני ניכוי מס, ביטוח לאומי ומס בריאות.</span>`;
+}
+
+/* ---------- הוצאות ---------- */
+function vMoney() {
+  const st = settings(); const ex = Object.entries(S.data.expenses).map(([id, e]) => ({ id, ...e })).sort((a, b) => (b.date || "").localeCompare(a.date || "") || (b.at || 0) - (a.at || 0));
+  const spent = ex.filter(e => !e.income).reduce((s, e) => s + (+e.amount || 0), 0);
+  const income = ex.filter(e => e.income).reduce((s, e) => s + (+e.amount || 0), 0);
+  const byCat = EXP_CATS.map(c => ({ ...c, sum: ex.filter(e => !e.income && e.cat === c.id).reduce((s, e) => s + (+e.amount || 0), 0) })).filter(c => c.sum > 0);
+  const max = Math.max(1, ...byCat.map(c => c.sum));
+  const today = new Date().toISOString().slice(0, 10);
+  return `<div class="stack"><h2>הוצאות ותקציב</h2>
+  <div class="stats">
+    <div class="stat"><span class="v">${ils(spent)}</span><span class="l">הוצאנו</span></div>
+    <div class="stat"><span class="v" style="color:${st.budget - spent < 0 ? "var(--alert)" : "var(--mint)"}">${ils(st.budget - spent)}</span><span class="l">נשאר מהתקציב</span></div>
+    <div class="stat"><span class="v">${ils(income)}</span><span class="l">התקבל (מענקים, מתנות)</span></div>
+  </div>
+  <div class="budget-meter" aria-label="ניצול תקציב">${byCat.map(c => `<i style="width:${c.sum / Math.max(st.budget, spent) * 100}%;background:${c.c}"></i>`).join("")}</div>
+  <p class="tiny">תקציב: ${ils(st.budget)} · אפשר לשנות בהגדרות</p>
+
+  <form class="card eform" data-addexp="1">
+    <h3 class="full">רישום הוצאה</h3>
+    <label class="f full">מה קנינו<input id="e-name" name="name" required placeholder="עגלת Joolz Day+" autocomplete="off"></label>
+    <label class="f">סכום ₪<input id="e-amount" name="amount" type="number" inputmode="decimal" min="0" required></label>
+    <label class="f">תאריך<input id="e-date" name="date" type="date" value="${today}"></label>
+    <label class="f">קטגוריה<select id="e-cat" name="cat">${EXP_CATS.map(c => `<option value="${c.id}">${c.n}</option>`).join("")}</select></label>
+    <label class="f">איפה<input id="e-store" name="store" placeholder="חנות / אתר" autocomplete="off"></label>
+    <label class="f full" style="display:flex;gap:8px;align-items:center;flex-direction:row"><input id="e-income" name="income" type="checkbox" style="width:auto"> זו הכנסה (מענק, מתנה כספית)</label>
+    <button class="btn full" type="submit">שמירה</button>
+  </form>
+
+  ${byCat.length ? `<section class="card stack"><h3>לפי קטגוריה</h3><div class="bars">${byCat.sort((a, b) => b.sum - a.sum).map(c => `<div class="bar"><div class="lbl"><span>${c.n}</span><b class="num">${ils(c.sum)}</b></div><div class="track"><i style="width:${c.sum / max * 100}%;background:${c.c}"></i></div></div>`).join("")}</div></section>` : ""}
+
+  <section class="card"><h3 style="margin-bottom:6px">כל הרשומות</h3>
+  ${ex.length ? ex.map(e => { const c = EXP_CATS.find(x => x.id === e.cat) || EXP_CATS[7]; return `<div class="exp"><span class="dot" style="background:${e.income ? "var(--mint)" : c.c}"></span><div class="grow"><div style="font-weight:600">${esc(e.name)}</div><div class="tiny">${e.date ? fmtDate(e.date) : ""}${e.store ? " · " + esc(e.store) : ""} · ${e.income ? "הכנסה" : c.n}</div></div><b class="num" style="color:${e.income ? "var(--mint)" : "var(--ink)"}">${e.income ? "+" : ""}${ils(e.amount)}</b><button class="xbtn" data-delexp="${e.id}" aria-label="מחק">×</button></div>`; }).join("") : `<div class="empty"><b>עוד לא נרשמו הוצאות</b><span class="small">רשמו כאן את הקנייה הראשונה, או לחצו ׳קנינו׳ על מחיר ששמרתם ברשימת הקניות.</span></div>`}
+  </section></div>`;
+}
+
+/* ---------- הגדרות ---------- */
+function vSettings() {
+  const st = settings();
+  return `<div class="stack"><div class="row"><button class="btn soft small" data-go="home">→ חזרה</button><h2>הגדרות</h2></div>
+  <form class="card stack" data-settings="1">
+    <label class="f">תאריך לידה משוער<input id="st-due" name="due" type="date" value="${esc(st.due)}"></label>
+    <label class="f">תקציב לציוד (₪)<input id="st-budget" name="budget" type="number" min="0" value="${esc(st.budget)}"></label>
+    <label class="f">טלפון חדר לידה / מיון יולדות בשמיר<input id="st-phone" name="phone" type="tel" value="${esc(st.phone)}" placeholder="לבדוק באתר בית החולים ולשמור כאן"></label>
+    <label class="f">טלפון המוהל<input id="st-mohel" name="mohel" type="tel" value="${esc(st.mohel)}"></label>
+    <label class="f">את מי לעדכן כשמתחילים (שורה לכל אחד)<textarea id="st-notify" name="notify">${esc(st.notify)}</textarea></label>
+    <button class="btn" type="submit">שמירה</button>
+  </form>
+  <div class="card flat small muted stack"><b style="color:var(--ink)">שיתוף עם אשתך</b><span>${S.mode === "db" ? "השינויים נשמרים בענן ומתעדכנים אצל כל מי שקיבל הרשאת עריכה. כדי לשתף, לחצו על Share בעמוד ותנו לאשתך הרשאת עריכה (Editor) לפי המייל שלה." : "כרגע הנתונים נשמרים רק במכשיר הזה. כשפותחים את האפליקציה דרך claude.ai, הנתונים מסונכרנים בין המכשירים."}</span>
+  <a href="${SRC.shamir.u}" target="_blank" rel="noopener">אתר המרכז הרפואי שמיר ↗</a></div>
+  </div>`;
+}
+
+/* ============================================================
+   מצב לידה — טיימר צירים
+   ============================================================ */
+const BIRTH = lsGet("baby-contractions", { list: [], cur: null });
+function saveBirth() { lsSet("baby-contractions", BIRTH); }
+let tick;
+function openBirth() { $("#birth").hidden = false; document.body.style.overflow = "hidden"; renderBirth(); clearInterval(tick); tick = setInterval(updClock, 500); }
+function closeBirth() { $("#birth").hidden = true; document.body.style.overflow = ""; clearInterval(tick); }
+const mmss = ms => { const s = Math.max(0, Math.round(ms / 1000)); return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); };
+function updClock() {
+  const el = $("#clock"); if (!el) return;
+  if (BIRTH.cur) el.textContent = mmss(Date.now() - BIRTH.cur);
+  else { const last = BIRTH.list[BIRTH.list.length - 1]; el.textContent = last ? mmss(Date.now() - last.e) : "0:00"; }
+}
+function analysis() {
+  const L = BIRTH.list.slice(-8); if (L.length < 3) return null;
+  const ints = []; for (let k = 1; k < L.length; k++) ints.push(L[k].s - L[k - 1].s);
+  const avgI = ints.reduce((a, b) => a + b, 0) / ints.length; const avgD = L.reduce((a, c) => a + (c.e - c.s), 0) / L.length;
+  return { avgI, avgD, ready: avgI <= 5.5 * 60e3 && avgD >= 45e3 };
+}
+function renderBirth() {
+  const st = settings(); const L = BIRTH.list; const an = analysis();
+  const rows = L.slice(-10).reverse().map((c, k, arr) => { const prev = arr[k + 1]; return `<div class="r"><span>${new Date(c.s).toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit" })}</span><span>${mmss(c.e - c.s)}</span><span>${prev ? mmss(c.s - prev.s) : "—"}</span></div>`; }).join("");
+  const waze = "https://waze.com/ul?q=" + encodeURIComponent("המרכז הרפואי שמיר אסף הרופא") + "&navigate=yes";
+  $("#birth").innerHTML = `<div class="wrap">
+  <div class="birth-h"><h2>מצב לידה 💛</h2><button class="btn soft" data-closebirth="1">סגירה</button></div>
+  <div class="banner peach"><b>נושמים. אתם מוכנים לזה.</b><span class="small">לנסוע מיד לבית החולים אם: ירדו מים, יש דימום, יש ירידה בתנועות התינוק, או כאב חזק ומתמשך. בכל מקרה של ספק, להתקשר לחדר הלידה.</span></div>
+  <section class="timer"><span class="muted small">${BIRTH.cur ? "ציר עכשיו" : "מאז הציר האחרון"}</span><div class="clock" id="clock">0:00</div>
+    <button class="cbtn ${BIRTH.cur ? "live" : ""}" data-contraction="1">${BIRTH.cur ? "הציר נגמר" : "התחיל ציר"}</button>
+    ${an ? `<div class="banner ${an.ready ? "peach" : "sky"}" style="width:100%"><b>${an.ready ? "הצירים סדירים וצפופים. זה הזמן להתקשר לחדר הלידה" : "ממשיכים לעקוב"}</b><span class="small">ממוצע: ציר כל ${mmss(an.avgI)} דק׳, באורך ${mmss(an.avgD)}. בלידה ראשונה הכלל המקובל לנסיעה הוא ציר כל 5 דקות, באורך דקה, במשך שעה (5-1-1), אלא אם הצוות אמר אחרת.</span></div>` : `<span class="tiny">לוחצים כשציר מתחיל ושוב כשהוא נגמר. אחרי 3 צירים יופיע ניתוח.</span>`}
+    ${L.length ? `<div class="clog"><div class="r h"><span>שעה</span><span>אורך</span><span>מרווח</span></div>${rows}</div><button class="btn soft small" data-resetc="1">${resetArm ? "ללחוץ שוב כדי לאשר מחיקה" : "איפוס הרשימה"}</button>` : ""}
+  </section>
+  <div class="actions">
+    <a class="act" href="${waze}" target="_blank" rel="noopener"><b>ניווט לשמיר ↗</b><span>Waze · צריפין, באר יעקב</span></a>
+    <div class="act"><b>חדר לידה</b><span class="num" style="user-select:all">${st.phone ? `<a href="tel:${esc(st.phone)}">${esc(st.phone)}</a>` : 'להוסיף מספר <button class="expand" data-go-settings="1">בהגדרות</button>'}</span></div>
+  </div>
+  <section class="card stack"><h3>לפני שיוצאים מהבית</h3>
+    ${["x-bag|תיק לידה", "x-docs|תיקיית מסמכים ותעודות זהות", "x-charge|מטענים וטלפונים", "x-seat|הסלקל מותקן ברכב", "x-home|לנעול, לכבות גז ולהשאיר אוכל לחיות"].map(s => { const [id, t] = s.split("|"); return taskRow({ id, t }); }).join("")}
+  </section>
+  <section class="card stack"><h3>את מי לעדכן</h3>
+    ${st.notify.split("\n").map(n => n.trim()).filter(Boolean).map((n, k) => taskRow({ id: "n-" + k, t: n })).join("") || '<span class="tiny">אפשר להוסיף אנשים בהגדרות.</span>'}
+  </section>
+  </div>`;
+  updClock();
+}
+let resetArm = false;
+
+/* ============================================================
+   אירועים
+   ============================================================ */
+document.addEventListener("click", e => {
+  const t = e.target.closest("button, a"); if (!t) return;
+  const d = t.dataset;
+  if (d.go) { go(d.go); return; }
+  if (d.goSettings) { closeBirth(); go("settings"); return; }
+  if (d.toggle) { toggle(d.toggle); return; }
+  if (d.open) { UI.open[d.open] = !UI.open[d.open]; saveUI(); render(); return; }
+  if (d.shopcat) { UI.shopCat = d.shopcat; saveUI(); render(); return; }
+  if (d.bagtab) { UI.bagTab = d.bagtab; saveUI(); render(); return; }
+  if (d.delcustom) { del("custom", d.delcustom); return; }
+  if (d.delquote) { del("quotes", d.delquote); return; }
+  if (d.delexp) { del("expenses", d.delexp); return; }
+  if (d.buyquote) {
+    const q = S.data.quotes[d.buyquote]; if (!q) return;
+    const it = allShopItems().find(i => i.id === q.item); const cat = SHOP.find(c => c.items.includes(it));
+    put("expenses", newId(), { name: it ? it.name : q.store, amount: q.price, store: q.store, cat: cat ? cat.id : "other", date: new Date().toISOString().slice(0, 10), at: Date.now() });
+    if (it && !isDone(it.id)) put("checks", it.id, { done: true, at: Date.now() });
+    toast("נרשם בהוצאות וסומן כנקנה ✓"); return;
+  }
+  if (d.birth) { openBirth(); return; }
+  if (d.closebirth) { closeBirth(); render(); return; }
+  if (d.contraction) {
+    if (BIRTH.cur) { BIRTH.list.push({ s: BIRTH.cur, e: Date.now() }); BIRTH.cur = null; } else BIRTH.cur = Date.now();
+    saveBirth(); renderBirth(); return;
+  }
+  if (d.resetc) { if (resetArm) { BIRTH.list = []; BIRTH.cur = null; saveBirth(); resetArm = false; } else { resetArm = true; setTimeout(() => { resetArm = false; if (!$("#birth").hidden) renderBirth(); }, 4000); } renderBirth(); return; }
+});
+document.addEventListener("submit", e => {
+  const f = e.target; e.preventDefault(); const d = f.dataset; const fd = new FormData(f);
+  if (d.addcustom) { const text = (fd.get("text") || "").trim(); if (!text) return; f.reset(); document.activeElement && document.activeElement.blur(); put("custom", newId(), { list: d.addcustom, text, at: Date.now() }); return; }
+  if (d.addquote) { const store = (fd.get("store") || "").trim(); const price = +fd.get("price"); if (!store || !(price >= 0)) return; f.reset(); document.activeElement.blur(); put("quotes", newId(), { item: d.addquote, store, price, at: Date.now() }); toast("המחיר נשמר"); return; }
+  if (d.gift) { const by = (fd.get("by") || "").trim(); document.activeElement.blur(); if (by) put("checks", "gift-" + d.gift, { by, at: Date.now() }); else del("checks", "gift-" + d.gift); toast(by ? "נרשם כמתנה 🎁" : "הוסר"); return; }
+  if (d.addexp) {
+    const name = (fd.get("name") || "").trim(); const amount = +fd.get("amount"); if (!name || !(amount >= 0)) return;
+    const obj = { name, amount, date: fd.get("date") || "", cat: fd.get("cat"), store: (fd.get("store") || "").trim(), income: !!fd.get("income"), at: Date.now() };
+    f.reset(); document.activeElement.blur(); put("expenses", newId(), obj); toast("נשמר ✓"); return;
+  }
+  if (d.settings) {
+    const obj = { due: fd.get("due") || defaultDue(), budget: +fd.get("budget") || 0, phone: (fd.get("phone") || "").trim(), mohel: (fd.get("mohel") || "").trim(), notify: fd.get("notify") || "" };
+    document.activeElement.blur(); put("settings", "main", obj); toast("ההגדרות נשמרו"); return;
+  }
+});
+document.addEventListener("input", e => {
+  if (e.target.dataset && e.target.dataset.sal) { const v = +e.target.value || 0; lsSet("baby-sal", v); const r = $("#calcres"); if (r) r.innerHTML = calcText(v); }
+});
+
+render();
+initDb();
+</script>
