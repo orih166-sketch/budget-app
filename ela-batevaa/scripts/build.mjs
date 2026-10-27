@@ -19,4 +19,5 @@ writeFileSync(join(root, 'preview', 'index.html'), html);
 mkdirSync(join(root, 'deploy'), { recursive: true });
 const inlined = src('Index.html').replace(/<\?!= include\('(\w+)'\); \?>/g, (_, name) => src(`${name}.html`));
 writeFileSync(join(root, 'deploy', 'Index.html'), inlined);
+writeFileSync(join(root, 'deploy', 'Code.gs'), src('Code.gs'));
 console.log('built src/Logo.html, preview/index.html and deploy/Index.html');
