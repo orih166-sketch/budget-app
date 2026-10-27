@@ -53,8 +53,8 @@ body { font-family: 'Assistant', sans-serif; color: var(--text); -webkit-font-sm
 .island { position: absolute; top: 16px; left: 50%; width: 170px; height: 44px; margin-left: -85px; border-radius: 24px; background: #111; z-index: 5; }
 .homebar { position: absolute; bottom: 12px; left: 50%; width: 220px; height: 8px; margin-left: -110px; border-radius: 6px; background: rgba(0, 0, 0, .55); z-index: 5; }
 
-.cursor { position: absolute; left: 0; top: 0; width: 66px; height: 66px; z-index: 20; transform-origin: 6px 4px; }
-.ripple { position: absolute; width: 40px; height: 40px; margin: -20px 0 0 -20px; border-radius: 50%; z-index: 19; border: 6px solid rgba(85, 96, 47, .75); background: rgba(162, 173, 130, .28); opacity: 0; }
+.cursor { position: absolute; left: 0; top: 0; width: 34px; height: 50px; z-index: 20; transform-origin: 3px 3px; filter: drop-shadow(0 3px 4px rgba(0, 0, 0, .35)); }
+.ripple { position: absolute; width: 30px; height: 30px; margin: -15px 0 0 -15px; border-radius: 50%; z-index: 19; border: 3px solid rgba(255, 255, 255, .95); box-shadow: 0 0 0 3px rgba(85, 96, 47, .7); background: rgba(162, 173, 130, .3); opacity: 0; }
 
 .card {
   position: absolute; inset: 0; background: var(--olive); z-index: 40; display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -97,8 +97,8 @@ body { font-family: 'Assistant', sans-serif; color: var(--text); -webkit-font-sm
       <div class="screen" id="screen"><div class="island"></div><div class="homebar"></div></div>
     </div>
     <div class="ripple" id="ripple"></div>
-    <svg class="cursor" id="cursor" viewBox="0 0 66 66" aria-hidden="true">
-      <path d="M6 4 L6 52 L18 41 L27 61 L36 57 L27 37 L44 37 Z" fill="#1A1A1A" stroke="#fff" stroke-width="4" stroke-linejoin="round"/>
+    <svg class="cursor" id="cursor" viewBox="0 0 34 50" aria-hidden="true">
+      <path d="M3 3 L3 39 L11.5 31 L17 44.5 L23 42 L17.5 28.8 L29 28.8 Z" fill="#111" stroke="#fff" stroke-width="2.6" stroke-linejoin="round"/>
     </svg>
   </div>
 
@@ -260,7 +260,7 @@ function renderAt(T) {
     if (st.to) {
       const mp = ease.inOut(prog(l, 0.45, 0.85));
       const a = toPx(st.from), b = toPx(st.to);
-      const arc = Math.sin(mp * Math.PI) * -40;
+      const arc = Math.sin(mp * Math.PI) * -30;
       pos = { x: a.x + (b.x - a.x) * mp, y: a.y + (b.y - a.y) * mp + arc };
       const prev = segs.find((x) => x.type === 'step' && x.i === st.i - 1);
       const prevHasTarget = prev && prev.start + prev.dur === st.start && story[prev.i].target;
@@ -270,13 +270,13 @@ function renderAt(T) {
         press = Math.sin(prog(l, 1.38, 0.24) * Math.PI);
         const rp = prog(l, 1.45, 0.55);
         rip.style.left = b.x + 'px'; rip.style.top = b.y + 'px';
-        rip.style.transform = 'scale(' + (0.6 + 2.6 * ease.out(rp)) + ')';
+        rip.style.transform = 'scale(' + (0.5 + 2.2 * ease.out(rp)) + ')';
         setOpacity(rip, rp > 0 && rp < 1 ? 1 - rp : 0);
       } else {
         const hp = prog(l, 1.35, 1.4);
         rip.style.left = b.x + 'px'; rip.style.top = b.y + 'px';
         const pulse = Math.sin(hp * Math.PI * 2);
-        rip.style.transform = 'scale(' + (1.6 + 0.35 * pulse) + ')';
+        rip.style.transform = 'scale(' + (1.3 + 0.3 * pulse) + ')';
         setOpacity(rip, hp > 0 && hp < 1 ? 0.55 * Math.sin(hp * Math.PI) : 0);
       }
     } else {
@@ -284,7 +284,7 @@ function renderAt(T) {
       curOp = 0;
       setOpacity(rip, 0);
     }
-    cur.style.transform = 'translate(' + (pos.x - 6) + 'px,' + (pos.y - 4) + 'px) scale(' + (1 - 0.14 * press) + ')';
+    cur.style.transform = 'translate(' + (pos.x - 3) + 'px,' + (pos.y - 3) + 'px) scale(' + (1 - 0.12 * press) + ')';
     setOpacity(cur, curOp);
   } else {
     // before first step: show first shot behind the first card
