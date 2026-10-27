@@ -693,18 +693,24 @@ const state = {
 const S = () => (state.data && state.data.settings) || {};
 const D = (t) => (state.data && state.data[t]) || [];
 
+// Emoji (characters outside the BMP) can get mangled by google.script.run, so every call
+// goes through a single rpc() entry point with JSON that has those characters \u-escaped.
+const packJson = (v) => JSON.stringify(v).replace(/[\ud800-\udfff]/g, (c) => '\\u' + c.charCodeAt(0).toString(16));
+const unpackJson = (r) => (typeof r === 'string' ? JSON.parse(r) : r);
+
 function call(fn) {
   const args = Array.prototype.slice.call(arguments, 1);
   setBusy(1);
   return new Promise((resolve, reject) => {
     google.script.run
-      .withSuccessHandler((r) => { setBusy(-1); resolve(r); })
+      .withSuccessHandler((r) => { setBusy(-1); resolve(unpackJson(r)); })
       .withFailureHandler((e) => {
         setBusy(-1);
         const msg = (e && e.message) || String(e);
         toast(msg.replace(/^Exception:\s*/, ''), { error: true });
         reject(e);
-      })[fn].apply(null, args);
+      })
+      .rpc(fn, packJson(args));
   });
 }
 function setBusy(d) {
@@ -2135,7 +2141,7 @@ function boot() {
   $('#splashLogo').src = LOGO_SRC;
   google.script.run
     .withSuccessHandler((data) => {
-      state.data = data;
+      state.data = unpackJson(data);
       $('#app').hidden = false;
       render();
       const sp = $('#splash');
@@ -2147,7 +2153,7 @@ function boot() {
       sp.classList.add('error');
       sp.innerHTML = '<img class="splash-logo" src="' + LOGO_SRC + '" alt="אלה בטבע"><b>לא הצלחתי לטעון את המערכת</b><div class="muted">' + esc((e && e.message) || e) + '</div><button class="btn" onclick="location.reload()">ניסיון נוסף</button>';
     })
-    .bootstrap();
+    .rpc('bootstrap', '[]');
 }
 boot();
 })();

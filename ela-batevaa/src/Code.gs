@@ -69,14 +69,14 @@ const DEFAULT_SETTINGS = {
 };
 
 const DEFAULT_TEMPLATES = [
-  ['בדיקה אחרי 3 ימים', 'check3', 'היי {שם} 🌿\nרציתי לבדוק איך הולך עם {מוצרים}?\nכבר התחלת להשתמש? אשמח לשמוע אם זה עוזר לך 💚\nאני כאן לכל שאלה,\nאלה'],
-  ['חידוש אחרי חודש', 'renew30', 'היי {שם} 🌿\nעבר כבר חודש מאז שלקחת {מוצרים}.\nאיך היה? מרגישה שינוי?\nרוצה שאשמור לך חידוש כדי שלא ייגמר? 💚\nאלה'],
-  ['ליד חדש – היכרות', 'lead', 'היי {שם}, כאן אלה מ״אלה בטבע״ 🌿\nשמחה שפנית! ספרי לי קצת מה מעניין אותך – טיפוח, בריאות או משהו אחר – ואתאים לך בדיוק את מה שמתאים 💚'],
-  ['ליד – חזרה אחרי שיחה', 'lead', 'היי {שם} 🌿\nרק מזכירה את מה שדיברנו עליו. אם יש שאלות או שתרצי לנסות – אני כאן 💚\nאלה'],
-  ['הזמנה מוכנה לאיסוף', 'general', 'היי {שם} 🌿\nההזמנה שלך מוכנה! מתי נוח לך לאסוף?\nאלה'],
-  ['שליחת קבלה', 'receipt', 'היי {שם} 🌿\nתודה רבה על הרכישה! 💚\nמצרפת את הקבלה: {קבלה}\nאלה בטבע'],
-  ['הזמנה למועדון', 'club', 'היי {שם} 🌿\nפתחתי מועדון לקוחות בוואטסאפ – טיפים, מוצרים חדשים והטבות רק לחברות המועדון 💚\nלהצטרפות: {קישור}'],
-  ['יום הולדת', 'general', 'מזל טוב {שם}! 🎉🌿\nמאחלת לך שנה בריאה, זוהרת ושמחה.\nמחכה לך הפתעה קטנה ממני בהזמנה הבאה 💚\nאלה'],
+  ['בדיקה אחרי 3 ימים', 'check3', 'היי {שם} \u{1F33F}\nרציתי לבדוק איך הולך עם {מוצרים}?\nכבר התחלת להשתמש? אשמח לשמוע אם זה עוזר לך \u{1F49A}\nאני כאן לכל שאלה,\nאלה'],
+  ['חידוש אחרי חודש', 'renew30', 'היי {שם} \u{1F33F}\nעבר כבר חודש מאז שלקחת {מוצרים}.\nאיך היה? מרגישה שינוי?\nרוצה שאשמור לך חידוש כדי שלא ייגמר? \u{1F49A}\nאלה'],
+  ['ליד חדש – היכרות', 'lead', 'היי {שם}, כאן אלה מ״אלה בטבע״ \u{1F33F}\nשמחה שפנית! ספרי לי קצת מה מעניין אותך – טיפוח, בריאות או משהו אחר – ואתאים לך בדיוק את מה שמתאים \u{1F49A}'],
+  ['ליד – חזרה אחרי שיחה', 'lead', 'היי {שם} \u{1F33F}\nרק מזכירה את מה שדיברנו עליו. אם יש שאלות או שתרצי לנסות – אני כאן \u{1F49A}\nאלה'],
+  ['הזמנה מוכנה לאיסוף', 'general', 'היי {שם} \u{1F33F}\nההזמנה שלך מוכנה! מתי נוח לך לאסוף?\nאלה'],
+  ['שליחת קבלה', 'receipt', 'היי {שם} \u{1F33F}\nתודה רבה על הרכישה! \u{1F49A}\nמצרפת את הקבלה: {קבלה}\nאלה בטבע'],
+  ['הזמנה למועדון', 'club', 'היי {שם} \u{1F33F}\nפתחתי מועדון לקוחות בוואטסאפ – טיפים, מוצרים חדשים והטבות רק לחברות המועדון \u{1F49A}\nלהצטרפות: {קישור}'],
+  ['יום הולדת', 'general', 'מזל טוב {שם}! \u{1F389}\u{1F33F}\nמאחלת לך שנה בריאה, זוהרת ושמחה.\nמחכה לך הפתעה קטנה ממני בהזמנה הבאה \u{1F49A}\nאלה'],
 ];
 
 /* ---------------- Web app entry ---------------- */
@@ -262,11 +262,36 @@ function seedTemplates_() {
 
 /* ---------------- Public API (called from the browser) ---------------- */
 
+// Single entry point for the browser. Arguments and results travel as JSON with emoji
+// (surrogate pairs) \u-escaped, because google.script.run can corrupt them otherwise.
+const API_ = {
+  bootstrap: bootstrap, saveRecord: saveRecord, deleteRecord: deleteRecord, saveSettings: saveSettings,
+  setReceiptStart: setReceiptStart, createSale: createSale, cancelSale: cancelSale, saveReceiptPdf: saveReceiptPdf,
+  adjustStock: adjustStock, receiveStock: receiveStock, importProducts: importProducts,
+};
+function rpc(name, argsJson) {
+  if (!Object.prototype.hasOwnProperty.call(API_, name)) throw new Error('פעולה לא מוכרת');
+  const result = API_[name].apply(null, JSON.parse(argsJson || '[]'));
+  return JSON.stringify(result).replace(/[\ud800-\udfff]/g, function (c) { return '\\u' + c.charCodeAt(0).toString(16); });
+}
+
+// Default templates saved before the emoji fix may contain U+FFFD; restore them from the defaults.
+function repairTemplates_(templates) {
+  templates.forEach(function (t) {
+    if (String(t.text).indexOf('\uFFFD') === -1) return;
+    const d = DEFAULT_TEMPLATES.filter(function (x) { return x[0] === t.title; })[0];
+    if (!d) return;
+    t.text = d[2];
+    upsert_('templates', t);
+  });
+}
+
 function bootstrap() {
   checkAccess_();
   const ss = ss_();
   const data = { settings: readSettings_() };
   Object.keys(SCHEMA).forEach(function (t) { data[t] = readAll_(t); });
+  repairTemplates_(data.templates);
   data.meta = {
     spreadsheetUrl: ss.getUrl(),
     email: Session.getActiveUser().getEmail(),

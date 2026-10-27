@@ -76,6 +76,10 @@
   }
 
   const api = {
+    async rpc(name, argsJson) {
+      if (name === 'rpc' || typeof api[name] !== 'function') throw new Error('פעולה לא מוכרת');
+      return api[name].apply(api, JSON.parse(argsJson || '[]'));
+    },
     async bootstrap() {
       const { data: { session } } = await sb.auth.getSession();
       const { data: allowed, error } = await sb.rpc('is_allowed');

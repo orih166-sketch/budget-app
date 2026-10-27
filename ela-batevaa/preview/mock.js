@@ -83,6 +83,7 @@
   const get = (t, id) => db[t].find((x) => x.id === id);
 
   const api = {
+    rpc(name, argsJson) { return JSON.stringify(api[name](...JSON.parse(argsJson || '[]'))); },
     bootstrap() {
       return Object.assign(clone(db), { meta: { spreadsheetUrl: 'https://docs.google.com/spreadsheets/', email: 'elah262@gmail.com', today: today() } });
     },
