@@ -117,11 +117,14 @@ function prettyPhone(p) {
   if (d.length === 10) return d.slice(0, 3) + '-' + d.slice(3, 6) + '-' + d.slice(6);
   return d;
 }
+// api.whatsapp.com directly: the wa.me redirect re-encodes the text and breaks emoji into "�".
 function waLink(phone, text) {
   let d = cleanPhone(phone);
   if (d.startsWith('0')) d = '972' + d.slice(1);
-  const q = text ? '?text=' + encodeURIComponent(text) : '';
-  return 'https://wa.me/' + (d || '') + q;
+  const params = [];
+  if (d) params.push('phone=' + d);
+  if (text) params.push('text=' + encodeURIComponent(text));
+  return 'https://api.whatsapp.com/send' + (params.length ? '?' + params.join('&') : '');
 }
 function openExternal(url) {
   const w = window.open(url, '_blank', 'noopener');
