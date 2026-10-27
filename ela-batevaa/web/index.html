@@ -1,0 +1,2157 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <title>אלה בטבע · ניהול העסק</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/icon.jpg">
+  <link rel="apple-touch-icon" href="/icon.jpg">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="אלה בטבע">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#FBF3E8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700;800&family=Frank+Ruhl+Libre:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+:root {
+  --bg: #FBF3E8;
+  --surface: #FFFDF8;
+  --surface-2: #F6EDDF;
+  --line: #E8DCC8;
+  --line-strong: #D8C8AE;
+  --olive: #55602F;
+  --olive-deep: #3F4822;
+  --olive-2: #707D3F;
+  --sage: #A2AD82;
+  --sage-soft: #E9ECDB;
+  --sage-softer: #F2F4E8;
+  --brown: #8B5E3C;
+  --brown-soft: #F3E6D6;
+  --text: #2D3020;
+  --muted: #736E5D;
+  --faint: #A39C88;
+  --danger: #A9472F;
+  --danger-soft: #F7E3DC;
+  --warn: #B07A1C;
+  --warn-soft: #F8EBCD;
+  --wa: #1F8F55;
+  --radius: 18px;
+  --radius-sm: 12px;
+  --shadow: 0 1px 2px rgba(63, 72, 34, .06), 0 6px 20px -8px rgba(63, 72, 34, .18);
+  --shadow-lg: 0 20px 50px -18px rgba(45, 48, 32, .38);
+  --font: 'Assistant', 'Segoe UI', Arial, sans-serif;
+  --font-display: 'Frank Ruhl Libre', 'Assistant', serif;
+  --sidebar: 252px;
+  --safe-b: env(safe-area-inset-bottom, 0px);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+[hidden] { display: none !important; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+a { color: var(--olive); }
+.num { font-variant-numeric: tabular-nums; direction: ltr; unicode-bidi: isolate; display: inline-block; }
+.muted { color: var(--muted); }
+.faint { color: var(--faint); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+/* ---------- splash ---------- */
+.splash {
+  position: fixed; inset: 0; display: grid; place-items: center; align-content: center; gap: 18px;
+  background: var(--bg); z-index: 100; transition: opacity .35s ease;
+}
+.splash-logo { width: min(280px, 70vw); height: auto; }
+.splash-dots { display: flex; gap: 8px; }
+.splash-dots span { width: 8px; height: 8px; border-radius: 50%; background: var(--sage); animation: pulse 1.2s infinite ease-in-out; }
+.splash-dots span:nth-child(2) { animation-delay: .15s; }
+.splash-dots span:nth-child(3) { animation-delay: .3s; }
+@keyframes pulse { 0%, 100% { opacity: .3; transform: scale(.85); } 50% { opacity: 1; transform: scale(1); } }
+.splash.error { gap: 10px; padding: 24px; text-align: center; }
+
+/* ---------- layout ---------- */
+.app { min-height: 100vh; display: flex; }
+.main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.view { padding: 8px 16px calc(110px + var(--safe-b)); max-width: 1120px; width: 100%; margin: 0 auto; }
+
+.sidebar {
+  width: var(--sidebar); flex-shrink: 0; position: sticky; top: 0; height: 100vh;
+  background: var(--bg); border-inline-start: 1px solid var(--line);
+  display: none; flex-direction: column; padding: 18px 14px; gap: 4px; overflow-y: auto;
+}
+.sidebar .brand { padding: 0 6px 14px; border-bottom: 1px solid var(--line); margin-bottom: 10px; }
+.sidebar .brand img { width: 100%; height: auto; display: block; }
+.navlink {
+  display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px;
+  border: 0; background: none; width: 100%; text-align: start; color: var(--muted); font-weight: 600; font-size: 15.5px;
+}
+.navlink svg { width: 20px; height: 20px; flex-shrink: 0; }
+.navlink:hover { background: var(--sage-softer); color: var(--olive-deep); }
+.navlink.active { background: var(--sage-soft); color: var(--olive-deep); }
+.navlink .badge { margin-inline-start: auto; }
+.sidebar .spacer { flex: 1; }
+.sidebar .side-foot { font-size: 13px; color: var(--faint); padding: 10px 12px 0; border-top: 1px solid var(--line); }
+
+.topbar {
+  display: flex; align-items: center; gap: 12px; padding: 14px 16px 6px; max-width: 1120px; width: 100%; margin: 0 auto;
+}
+.topbar .mini-logo { height: 58px; width: auto; display: block; }
+.topbar h1 {
+  font-family: var(--font-display); font-weight: 700; font-size: 26px; margin: 0; color: var(--olive-deep); line-height: 1.15;
+}
+.topbar .sub { color: var(--muted); font-size: 14px; }
+.topbar .actions { margin-inline-start: auto; display: flex; gap: 8px; }
+
+.bottomnav {
+  position: fixed; bottom: 0; inset-inline: 0; z-index: 30;
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  background: rgba(255, 253, 248, .96); backdrop-filter: blur(10px);
+  border-top: 1px solid var(--line); padding: 6px 4px calc(6px + var(--safe-b));
+}
+.bottomnav button {
+  border: 0; background: none; display: flex; flex-direction: column; align-items: center; gap: 2px;
+  font-size: 12px; font-weight: 600; color: var(--faint); padding: 6px 0; position: relative;
+}
+.bottomnav button svg { width: 24px; height: 24px; }
+.bottomnav button.active { color: var(--olive); }
+.bottomnav .dot {
+  position: absolute; top: 2px; inset-inline-end: calc(50% - 20px); min-width: 18px; height: 18px; padding: 0 5px;
+  border-radius: 9px; background: var(--brown); color: #fff; font-size: 11px; line-height: 18px;
+}
+
+.fab {
+  position: fixed; z-index: 31; bottom: calc(78px + var(--safe-b)); inset-inline-end: 16px;
+  display: flex; align-items: center; gap: 6px; border: 0; border-radius: 999px;
+  background: var(--olive); color: #fff; padding: 13px 20px 13px 18px; font-weight: 700; font-size: 16px;
+  box-shadow: 0 10px 24px -8px rgba(63, 72, 34, .6);
+}
+.fab svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 2.4; fill: none; stroke-linecap: round; }
+.fab:active { transform: scale(.97); }
+
+@media (min-width: 960px) {
+  .sidebar { display: flex; }
+  .bottomnav { display: none; }
+  .topbar .mini-logo { display: none; }
+  .topbar { padding: 28px 32px 8px; }
+  .view { padding: 12px 32px 60px; }
+  .fab { bottom: 28px; inset-inline-end: 32px; }
+  .mobile-only { display: none !important; }
+}
+
+/* ---------- icons ---------- */
+.ico { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+
+/* ---------- cards & sections ---------- */
+.card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow);
+}
+.card-pad { padding: 18px; }
+.section { margin-top: 22px; }
+.section-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 2px 10px; }
+.section-head h2 {
+  font-family: var(--font-display); font-weight: 700; font-size: 20px; margin: 0; color: var(--olive-deep);
+  display: flex; align-items: center; gap: 8px;
+}
+.section-head .link { border: 0; background: none; color: var(--olive); font-weight: 700; font-size: 14px; padding: 4px; }
+
+.grid { display: grid; gap: 12px; }
+.grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 720px) { .grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); } .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } .cols-2 { grid-template-columns: 1.15fr 1fr; } }
+@media (max-width: 719px) { .grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+.hello { margin: 4px 2px 2px; }
+.hello h1 { font-family: var(--font-display); font-weight: 700; font-size: 30px; margin: 0; color: var(--olive-deep); }
+.hello p { margin: 2px 0 0; color: var(--muted); }
+
+.stat { padding: 16px; position: relative; overflow: hidden; }
+.stat .label { font-size: 13.5px; color: var(--muted); font-weight: 600; }
+.stat .value { font-size: 26px; font-weight: 800; color: var(--olive-deep); margin-top: 4px; letter-spacing: -.01em; }
+.stat .value small { font-size: 15px; font-weight: 700; color: var(--muted); }
+.stat .hint { font-size: 12.5px; color: var(--faint); margin-top: 2px; }
+.stat.accent { background: var(--olive); border-color: var(--olive); color: #fff; }
+.stat.accent .label, .stat.accent .hint { color: rgba(255, 255, 255, .78); }
+.stat.accent .value { color: #fff; }
+.stat.accent .value small { color: rgba(255, 255, 255, .8); }
+.stat .leaf { position: absolute; inset-inline-end: -10px; bottom: -14px; width: 84px; opacity: .16; }
+
+.meter { height: 10px; background: var(--surface-2); border-radius: 999px; overflow: hidden; margin-top: 10px; }
+.meter > span { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--sage), var(--olive)); }
+.meter.warn > span { background: linear-gradient(90deg, #D9B266, var(--warn)); }
+.meter.danger > span { background: linear-gradient(90deg, #D38C77, var(--danger)); }
+
+/* ---------- quick actions ---------- */
+.quick { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 16px; }
+.quick button {
+  border: 1px solid var(--line); background: var(--surface); border-radius: 16px; padding: 14px 6px 12px;
+  display: flex; flex-direction: column; align-items: center; gap: 8px; font-weight: 700; font-size: 13.5px; color: var(--olive-deep);
+  box-shadow: var(--shadow);
+}
+.quick button .q-ico { width: 42px; height: 42px; border-radius: 14px; display: grid; place-items: center; background: var(--sage-soft); color: var(--olive); }
+.quick button:nth-child(2) .q-ico { background: var(--brown-soft); color: var(--brown); }
+.quick button:nth-child(3) .q-ico { background: #E6F1E9; color: var(--wa); }
+.quick button:nth-child(4) .q-ico { background: var(--warn-soft); color: var(--warn); }
+.quick button:active { transform: translateY(1px); }
+
+/* ---------- lists ---------- */
+.list { display: flex; flex-direction: column; }
+.row {
+  display: flex; align-items: center; gap: 12px; padding: 13px 16px; border-bottom: 1px solid var(--line);
+  background: none; border-inline: 0; border-top: 0; width: 100%; text-align: start;
+}
+.row:last-child { border-bottom: 0; }
+button.row:hover, .row.clickable:hover { background: var(--sage-softer); }
+.row .grow { flex: 1; min-width: 0; }
+.row .title { font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.row .meta { font-size: 13.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.row .end { text-align: end; flex-shrink: 0; }
+.row .amount { font-weight: 800; color: var(--olive-deep); }
+.row .amount.neg { color: var(--brown); }
+
+.avatar {
+  width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0; display: grid; place-items: center;
+  background: var(--sage-soft); color: var(--olive-deep); font-weight: 800; font-size: 16px;
+}
+.avatar.lead { background: var(--brown-soft); color: var(--brown); }
+.avatar.sm { width: 34px; height: 34px; font-size: 14px; }
+
+.empty { text-align: center; padding: 30px 20px; color: var(--muted); }
+.empty svg { width: 64px; height: 64px; opacity: .55; margin-bottom: 6px; }
+.empty b { display: block; color: var(--olive-deep); font-size: 17px; margin-bottom: 2px; }
+
+/* ---------- chips, badges ---------- */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px; border-radius: 999px; padding: 2px 10px;
+  font-size: 12.5px; font-weight: 700; background: var(--sage-soft); color: var(--olive-deep); white-space: nowrap;
+}
+.badge.brown { background: var(--brown-soft); color: var(--brown); }
+.badge.warn { background: var(--warn-soft); color: #8A5E10; }
+.badge.danger { background: var(--danger-soft); color: var(--danger); }
+.badge.plain { background: var(--surface-2); color: var(--muted); }
+.badge.solid { background: var(--olive); color: #fff; }
+
+.tabs { display: flex; gap: 6px; overflow-x: auto; padding: 2px 2px 4px; margin: 6px 0 12px; scrollbar-width: none; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  border: 1px solid var(--line); background: var(--surface); color: var(--muted); border-radius: 999px;
+  padding: 7px 15px; font-weight: 700; font-size: 14px; white-space: nowrap; display: inline-flex; gap: 6px; align-items: center;
+}
+.tab.active { background: var(--olive); border-color: var(--olive); color: #fff; }
+.tab .count { font-size: 12px; opacity: .8; }
+
+.toolbar { display: flex; gap: 8px; align-items: center; margin-top: 6px; flex-wrap: wrap; }
+.search {
+  flex: 1; min-width: 180px; display: flex; align-items: center; gap: 8px; background: var(--surface);
+  border: 1px solid var(--line); border-radius: 14px; padding: 0 12px; height: 44px;
+}
+.search input { border: 0; outline: 0; background: none; flex: 1; min-width: 0; height: 100%; }
+.search .ico { color: var(--faint); }
+
+/* ---------- buttons ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px; border-radius: 12px; border: 1px solid transparent;
+  padding: 0 16px; height: 44px; font-weight: 700; font-size: 15px; background: var(--olive); color: #fff; white-space: nowrap;
+}
+.btn:hover { background: var(--olive-deep); }
+.btn:disabled { opacity: .55; cursor: default; }
+.btn.secondary { background: var(--surface); color: var(--olive-deep); border-color: var(--line-strong); }
+.btn.secondary:hover { background: var(--sage-softer); }
+.btn.ghost { background: none; color: var(--olive); border-color: transparent; }
+.btn.ghost:hover { background: var(--sage-softer); }
+.btn.wa { background: var(--wa); }
+.btn.wa:hover { background: #17764A; }
+.btn.danger { background: var(--surface); color: var(--danger); border-color: #E7C3B7; }
+.btn.danger:hover { background: var(--danger-soft); }
+.btn.sm { height: 36px; padding: 0 12px; font-size: 14px; border-radius: 10px; }
+.btn.block { width: 100%; }
+.btn .ico { width: 18px; height: 18px; }
+.icon-btn {
+  width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface);
+  display: inline-grid; place-items: center; color: var(--olive-deep); flex-shrink: 0;
+}
+.icon-btn:hover { background: var(--sage-softer); }
+.icon-btn.wa { color: var(--wa); border-color: #CFE5D7; background: #F1F8F3; }
+.icon-btn.sm { width: 34px; height: 34px; border-radius: 10px; }
+.btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* ---------- follow-up items ---------- */
+.fu { display: flex; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--line); align-items: flex-start; }
+.fu:last-child { border-bottom: 0; }
+.fu .grow { flex: 1; min-width: 0; }
+.fu .top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.fu .name { font-weight: 800; }
+.fu .what { font-size: 14px; color: var(--muted); margin-top: 2px; }
+.fu .acts { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+
+/* ---------- products ---------- */
+.products { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+.product { padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+.product .p-top { display: flex; gap: 10px; align-items: flex-start; }
+.product .p-name { font-weight: 800; line-height: 1.3; }
+.product .p-cat { font-size: 13px; color: var(--muted); }
+.product .p-bottom { display: flex; align-items: center; gap: 10px; justify-content: space-between; }
+.product .price { font-weight: 800; color: var(--olive-deep); }
+.stepper { display: inline-flex; align-items: center; border: 1px solid var(--line-strong); border-radius: 12px; overflow: hidden; background: var(--surface); }
+.stepper button { width: 38px; height: 38px; border: 0; background: none; font-size: 20px; font-weight: 700; color: var(--olive); }
+.stepper button:hover { background: var(--sage-softer); }
+.stepper .q { min-width: 40px; text-align: center; font-weight: 800; font-size: 17px; }
+.product.low { border-color: #E9CF9C; }
+.product.out { border-color: #E7C3B7; }
+
+/* ---------- chart ---------- */
+.bars { display: grid; grid-template-columns: repeat(12, 1fr); gap: 6px; align-items: end; height: 150px; padding: 6px 2px 0; }
+.bars .b { display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; }
+.bars .b .col { width: 100%; max-width: 30px; display: flex; flex-direction: column-reverse; gap: 2px; height: calc(100% - 20px); justify-content: flex-start; }
+.bars .b .inc { background: var(--olive-2); border-radius: 6px 6px 3px 3px; min-height: 2px; }
+.bars .b .exp { background: #D7B998; border-radius: 6px 6px 3px 3px; min-height: 0; }
+.bars .b span { font-size: 11px; color: var(--muted); }
+.bars .b.cur span { color: var(--olive-deep); font-weight: 800; }
+.legend { display: flex; gap: 14px; font-size: 13px; color: var(--muted); margin-top: 10px; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-inline-end: 5px; vertical-align: -1px; }
+
+/* ---------- forms ---------- */
+.field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.field label { font-weight: 700; font-size: 14px; color: var(--olive-deep); }
+.field .help { font-size: 12.5px; color: var(--faint); }
+.input, select.input, textarea.input {
+  width: 100%; border: 1px solid var(--line-strong); background: #fff; border-radius: 12px; padding: 10px 12px; min-height: 46px;
+  outline: 0; transition: border-color .15s, box-shadow .15s;
+}
+textarea.input { min-height: 110px; resize: vertical; line-height: 1.55; }
+.input:focus { border-color: var(--olive-2); box-shadow: 0 0 0 3px rgba(112, 125, 63, .16); }
+.input[type="number"], .input[type="tel"], .input[type="date"] { direction: ltr; text-align: right; }
+.form-grid { display: grid; gap: 0 12px; grid-template-columns: 1fr 1fr; }
+.form-grid .full { grid-column: 1 / -1; }
+.segmented { display: flex; flex-wrap: wrap; gap: 6px; }
+.segmented button {
+  border: 1px solid var(--line-strong); background: #fff; border-radius: 10px; padding: 8px 14px; font-weight: 700; font-size: 14.5px; color: var(--muted);
+}
+.segmented button.on { background: var(--olive); border-color: var(--olive); color: #fff; }
+.switch { display: flex; align-items: center; gap: 10px; font-weight: 600; cursor: pointer; padding: 6px 0; }
+.switch input { width: 20px; height: 20px; accent-color: var(--olive); }
+
+/* ---------- modal ---------- */
+.overlay {
+  position: fixed; inset: 0; background: rgba(45, 48, 32, .38); z-index: 60; display: flex; align-items: flex-end; justify-content: center;
+  animation: fade .18s ease;
+}
+.modal {
+  background: var(--surface); width: 100%; max-width: 640px; max-height: 92vh; border-radius: 24px 24px 0 0;
+  display: flex; flex-direction: column; box-shadow: var(--shadow-lg); animation: up .22s cubic-bezier(.2, .8, .2, 1);
+}
+.modal.wide { max-width: 860px; }
+.modal-head { display: flex; align-items: center; gap: 10px; padding: 18px 20px 12px; border-bottom: 1px solid var(--line); }
+.modal-head h3 { font-family: var(--font-display); font-weight: 700; font-size: 21px; margin: 0; color: var(--olive-deep); flex: 1; }
+.modal-body { padding: 18px 20px; overflow-y: auto; }
+.modal-foot { padding: 12px 20px calc(14px + var(--safe-b)); border-top: 1px solid var(--line); display: flex; gap: 8px; justify-content: flex-start; flex-wrap: wrap; }
+.modal-foot .btn { flex: 1; }
+@media (min-width: 720px) {
+  .overlay { align-items: center; padding: 24px; }
+  .modal { border-radius: 24px; }
+  .modal-foot .btn { flex: 0 0 auto; min-width: 120px; }
+}
+@keyframes fade { from { opacity: 0; } }
+@keyframes up { from { transform: translateY(30px); opacity: .4; } }
+
+/* ---------- sale form ---------- */
+.picker { border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: #fff; max-height: 280px; overflow-y: auto; }
+.picker .row { padding: 10px 12px; }
+.picker .row.on { background: var(--sage-soft); }
+.cart { border: 1px dashed var(--line-strong); border-radius: 14px; padding: 4px 12px; background: var(--sage-softer); }
+.cart .line { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.cart .line:last-child { border-bottom: 0; }
+.cart .line .grow { flex: 1; min-width: 0; font-weight: 700; }
+.cart .line .input { width: 92px; min-height: 38px; padding: 6px 8px; }
+@media (max-width: 560px) {
+  .cart .line { flex-wrap: wrap; row-gap: 8px; }
+  .cart .line .grow { flex-basis: 100%; }
+  .cart .line .input { flex: 1; width: auto; }
+}
+.total-bar { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-radius: 14px; background: var(--olive); color: #fff; margin: 14px 0; }
+.total-bar b { font-size: 24px; }
+.selected-customer { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 14px; background: #fff; }
+
+/* ---------- message preview ---------- */
+.wa-preview {
+  background: #EFE7DA url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M30 8c6 8 6 16 0 24-6-8-6-16 0-24z' fill='%23d9ccb5' fill-opacity='.35'/%3E%3C/svg%3E");
+  border-radius: 16px; padding: 16px; margin-top: 4px;
+}
+.wa-bubble {
+  background: #DDF5C9; border-radius: 14px 14px 4px 14px; padding: 10px 12px; max-width: 92%; margin-inline-start: auto;
+  white-space: pre-wrap; box-shadow: 0 1px 1px rgba(0, 0, 0, .08); font-size: 15px;
+}
+
+/* ---------- detail ---------- */
+.detail-head { display: flex; gap: 14px; align-items: center; margin-bottom: 14px; }
+.detail-head .avatar { width: 58px; height: 58px; font-size: 22px; }
+.detail-head .nm { font-family: var(--font-display); font-weight: 700; font-size: 23px; color: var(--olive-deep); line-height: 1.2; }
+.kv { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 12px 0; }
+.kv > div { background: var(--surface-2); border-radius: 12px; padding: 10px 12px; }
+.kv .k { font-size: 12.5px; color: var(--muted); font-weight: 600; }
+.kv .v { font-weight: 800; color: var(--olive-deep); }
+.sub-h { font-weight: 800; color: var(--olive-deep); margin: 16px 0 6px; font-size: 15px; }
+
+/* ---------- club ---------- */
+.post { padding: 14px 16px; border-bottom: 1px solid var(--line); }
+.post:last-child { border-bottom: 0; }
+.post .p-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.post .p-title { font-weight: 800; flex: 1; min-width: 140px; }
+.post .p-body { white-space: pre-wrap; color: var(--muted); font-size: 14.5px; margin-top: 6px; max-height: 4.6em; overflow: hidden; }
+.idea-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+@media (min-width: 720px) { .idea-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.idea {
+  border: 1px solid var(--line); background: var(--surface); border-radius: 16px; padding: 14px; text-align: start;
+  display: flex; flex-direction: column; gap: 4px; box-shadow: var(--shadow);
+}
+.idea b { color: var(--olive-deep); }
+.idea span { font-size: 13px; color: var(--muted); }
+.idea .emo { font-size: 22px; }
+
+.banner {
+  display: flex; gap: 12px; align-items: center; padding: 14px 16px; border-radius: 16px; background: var(--warn-soft); color: #6B4A0E; margin-top: 14px;
+}
+.banner.ok { background: var(--sage-soft); color: var(--olive-deep); }
+.banner .ico { width: 24px; height: 24px; }
+
+/* ---------- toast ---------- */
+.toast-root { position: fixed; inset-inline: 0; bottom: calc(150px + var(--safe-b)); display: flex; flex-direction: column; align-items: center; gap: 8px; z-index: 90; pointer-events: none; }
+.toast {
+  pointer-events: auto; background: var(--olive-deep); color: #fff; border-radius: 14px; padding: 11px 16px; font-weight: 600;
+  box-shadow: var(--shadow-lg); display: flex; gap: 12px; align-items: center; animation: up .2s ease; max-width: calc(100vw - 32px);
+}
+.toast.err { background: var(--danger); }
+.toast button { border: 0; background: rgba(255, 255, 255, .16); color: #fff; border-radius: 9px; padding: 5px 10px; font-weight: 700; }
+@media (min-width: 960px) { .toast-root { bottom: 30px; } }
+
+.loading-bar { position: fixed; top: 0; inset-inline: 0; height: 3px; z-index: 95; overflow: hidden; }
+.loading-bar::after { content: ''; position: absolute; inset-block: 0; width: 40%; background: var(--olive-2); animation: load 1s infinite ease-in-out; }
+@keyframes load { from { inset-inline-start: -40%; } to { inset-inline-start: 100%; } }
+
+/* ---------- receipt (rendered off-screen, captured to PDF) ---------- */
+.receipt-stage { position: fixed; top: 0; left: -10000px; }
+.receipt {
+  width: 794px; min-height: 1123px; background: #fff; color: #2D3020; padding: 56px 64px; font-family: var(--font); position: relative;
+  direction: rtl; letter-spacing: 0;
+}
+.receipt .r-head { display: flex; justify-content: space-between; align-items: center; gap: 20px; background: #FBF3E8; border-radius: 20px; padding: 14px 28px 14px 32px; }
+.receipt .r-logo { width: 250px; height: auto; display: block; }
+.receipt .r-biz { text-align: left; font-size: 15px; line-height: 1.7; color: #4D4A3D; }
+.receipt .r-biz b { color: #3F4822; font-size: 17px; }
+.receipt .r-title { display: flex; justify-content: space-between; align-items: flex-end; margin: 30px 0 22px; }
+.receipt .r-title h2 { font-family: var(--font-display); font-size: 34px; margin: 0; color: #3F4822; font-weight: 700; }
+.receipt .r-title .orig { font-size: 14px; color: #8B5E3C; font-weight: 700; border: 1.5px solid #8B5E3C; border-radius: 8px; padding: 2px 10px; margin-inline-start: 10px; vertical-align: middle; }
+.receipt .r-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: #F6F7EF; border-radius: 14px; padding: 16px 20px; font-size: 16px; }
+.receipt .r-meta .k { color: #736E5D; font-size: 13.5px; }
+.receipt .r-meta .v { font-weight: 700; }
+.receipt table { width: 100%; border-collapse: collapse; margin-top: 26px; font-size: 16px; }
+.receipt th { background: #55602F; color: #fff; font-weight: 700; padding: 11px 14px; text-align: right; }
+.receipt th:first-child { border-radius: 0 10px 10px 0; }
+.receipt th:last-child { border-radius: 10px 0 0 10px; }
+.receipt td { padding: 12px 14px; border-bottom: 1px solid #EEE6D8; }
+.receipt td.n, .receipt th.n { text-align: left; width: 120px; }
+.receipt .r-total { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding: 16px 22px; background: #E9ECDB; border-radius: 14px; font-size: 18px; font-weight: 700; color: #3F4822; }
+.receipt .r-total b { font-size: 26px; }
+.receipt .r-pay { margin-top: 18px; font-size: 16px; }
+.receipt .r-note { margin-top: 10px; font-size: 15px; color: #736E5D; }
+.receipt .r-foot { position: absolute; bottom: 48px; left: 64px; right: 64px; border-top: 2px solid #E9ECDB; padding-top: 14px; display: flex; justify-content: space-between; font-size: 13.5px; color: #8E8874; }
+.receipt .r-cancel { position: absolute; top: 420px; left: 0; right: 0; text-align: center; font-size: 110px; font-weight: 800; color: rgba(169, 71, 47, .18); transform: rotate(-18deg); }
+
+@media print {
+  body > *:not(#printRoot) { display: none !important; }
+  #printRoot { display: block !important; }
+  #printRoot .receipt { box-shadow: none; }
+  @page { size: A4; margin: 0; }
+}
+</style>
+
+</head>
+<body>
+  <div id="splash" class="splash">
+    <img class="splash-logo" alt="אלה בטבע" id="splashLogo">
+    <div class="splash-dots"><span></span><span></span><span></span></div>
+  </div>
+
+  <div id="app" class="app" hidden>
+    <aside class="sidebar" id="sidebar"></aside>
+    <main class="main">
+      <header class="topbar" id="topbar"></header>
+      <section id="view" class="view"></section>
+    </main>
+    <nav class="bottomnav" id="bottomnav"></nav>
+    <button class="fab" data-action="newSale" aria-label="מכירה חדשה">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+      <span>מכירה</span>
+    </button>
+  </div>
+
+  <div id="modalRoot"></div>
+  <div id="toastRoot" class="toast-root" aria-live="polite"></div>
+  <div id="receiptStage" class="receipt-stage" aria-hidden="true"></div>
+
+  <script>window.LOGO_SRC = 'data:image/jpeg;base64,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';</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="/config.js"></script>
+<script src="/api.js"></script>
+
+  <script>
+(function () {
+'use strict';
+
+/* =========================================================
+   Constants
+   ========================================================= */
+const PAYMENTS = ['פייבוקס', 'ביט', 'מזומן', 'העברה בנקאית'];
+const EXPENSE_CATS = ['רכישת מוצרים מפוראבר', 'כנסים והדרכות', 'שירותים דיגיטליים', 'שיווק ופרסום', 'משלוחים ואריזה', 'נסיעות', 'ציוד', 'אחר'];
+const PRODUCT_CATS = ['שתייה ותזונה', 'תוספי תזונה', 'טיפוח הפנים', 'טיפוח הגוף', 'היגיינה', 'ספורט ואנרגיה', 'מארזים'];
+const LEAD_STAGES = ['חדש', 'בשיחה', 'נשלח מידע', 'לחזור בהמשך', 'לא רלוונטי'];
+const TEMPLATE_CATS = { check3: 'בדיקה אחרי רכישה', renew30: 'חידוש', lead: 'לידים', receipt: 'קבלה', club: 'מועדון', general: 'כללי' };
+const POST_TYPES = {
+  new_product: { label: 'מוצר חדש', emo: '✨', hint: 'הכרזה על מוצר עם מחיר' },
+  tip: { label: 'טיפ שבועי', emo: '🌿', hint: 'ערך וידע לחברי המועדון' },
+  promo: { label: 'הטבה למועדון', emo: '🎁', hint: 'מבצע מוגבל בזמן' },
+  testimonial: { label: 'המלצת לקוח', emo: '💚', hint: 'סיפור הצלחה אמיתי' },
+};
+const POST_STATUS = { draft: 'טיוטה', planned: 'מתוכנן', sent: 'נשלח' };
+const MONTHS = ['ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני', 'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר'];
+const MONTHS_SHORT = ['ינו׳', 'פבר׳', 'מרץ', 'אפר׳', 'מאי', 'יוני', 'יולי', 'אוג׳', 'ספט׳', 'אוק׳', 'נוב׳', 'דצמ׳'];
+const LIBS = {
+  html2canvas: 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',
+  jspdf: 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
+  xlsx: 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js',
+};
+
+/* =========================================================
+   Icons
+   ========================================================= */
+const P = {
+  home: '<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20h14V9.5"/><path d="M10 20v-6h4v6"/>',
+  users: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8"/><path d="M18 14.8c2 .7 3.2 2.4 3.5 5.2"/>',
+  bell: '<path d="M6 16V11a6 6 0 1 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>',
+  wallet: '<rect x="3" y="6" width="18" height="14" rx="3"/><path d="M3 10h18"/><path d="M16 15h2"/><path d="M6 6l9-3 1.5 3"/>',
+  box: '<path d="M12 3 3.5 7.5v9L12 21l8.5-4.5v-9z"/><path d="M3.5 7.5 12 12l8.5-4.5"/><path d="M12 12v9"/>',
+  leaf: '<path d="M5 19C5 10.5 11 4 20 4c0 9-6.5 15-15 15z"/><path d="M5 19 14.5 9.5"/>',
+  msg: '<path d="M4 5h16v11H9l-5 4z"/><path d="M8 9.5h8M8 12.5h5"/>',
+  gear: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
+  wa: '<path d="M4 20l1.3-4A8 8 0 1 1 8 18.7z"/><path d="M9 9.2c0 3 2.8 5.8 5.8 5.8l1.2-1.6-2-1-1 .8c-1-.4-1.8-1.2-2.2-2.2l.8-1-1-2z"/>',
+  copy: '<rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>',
+  edit: '<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>',
+  trash: '<path d="M4 7h16"/><path d="M9 7V4.5h6V7"/><path d="M6 7l1 13h10l1-13"/>',
+  check: '<path d="m5 12.5 4.5 4.5L19 7.5"/>',
+  clock: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+  receipt: '<path d="M6 3h12v18l-2-1.3-2 1.3-2-1.3-2 1.3-2-1.3L6 21z"/><path d="M9 8h6M9 12h6M9 16h3"/>',
+  upload: '<path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/>',
+  truck: '<path d="M3 6h11v10H3z"/><path d="M14 9h4l3 3.5V16h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17.5" cy="17.5" r="1.8"/>',
+  ext: '<path d="M14 4h6v6"/><path d="M20 4 11 13"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
+  print: '<path d="M7 9V3h10v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M7 14h10v7H7z"/>',
+  x: '<path d="M6 6l12 12M18 6 6 18"/>',
+  more: '<circle cx="6" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18" cy="12" r="1.3"/>',
+  chevL: '<path d="m15 6-6 6 6 6"/>',
+  chevR: '<path d="m9 6 6 6-6 6"/>',
+  phone: '<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1z"/>',
+  spark: '<path d="M12 3v4M12 17v4M3 12h4M17 12h4"/><path d="m6 6 2.5 2.5M15.5 15.5 18 18M18 6l-2.5 2.5M8.5 15.5 6 18"/>',
+  alert: '<path d="M12 4 2.5 20h19z"/><path d="M12 10v4.5M12 17.3v.2"/>',
+  cart: '<path d="M3 4h2.5l2.2 11h10.6l2-8H6.3"/><circle cx="9" cy="19" r="1.5"/><circle cx="17" cy="19" r="1.5"/>',
+  doc: '<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/><path d="M9 12h6M9 16h6"/>',
+  logout: '<path d="M10 4H5v16h5"/><path d="M14 8l4 4-4 4"/><path d="M18 12H9"/>',
+  gift: '<rect x="3.5" y="9" width="17" height="11" rx="1.5"/><path d="M2.5 9h19v-3h-19z"/><path d="M12 6v14"/><path d="M12 6C10 2.5 6.5 3.5 7.5 6M12 6c2-3.5 5.5-2.5 4.5 0"/>',
+};
+const icon = (n, cls) => '<svg class="ico ' + (cls || '') + '" viewBox="0 0 24 24" aria-hidden="true">' + (P[n] || '') + '</svg>';
+const LEAF_DECOR = '<svg class="leaf" viewBox="0 0 100 100" aria-hidden="true"><path d="M10 90C10 45 40 10 92 8c0 52-34 82-82 82z" fill="currentColor"/></svg>';
+
+/* =========================================================
+   Utils
+   ========================================================= */
+const $ = (s, r) => (r || document).querySelector(s);
+const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+const esc = (s) => String(s === undefined || s === null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const num = (v) => { const n = Number(String(v === undefined || v === null ? '' : v).replace(/[^\d.\-]/g, '')); return isFinite(n) ? n : 0; };
+const round2 = (n) => Math.round((Number(n) || 0) * 100) / 100;
+const moneyText = (n) => '₪' + round2(n).toLocaleString('he-IL', { maximumFractionDigits: 2 });
+const money = (n) => '<span class="num">' + (n < 0 ? '−' : '') + moneyText(Math.abs(n)) + '</span>';
+const pad2 = (n) => String(n).padStart(2, '0');
+const isoOf = (d) => d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
+const todayIso = () => isoOf(new Date());
+const parseIso = (s) => { const p = String(s || '').split('-').map(Number); return new Date(p[0], (p[1] || 1) - 1, p[2] || 1); };
+const addDays = (iso, n) => { const d = parseIso(iso); d.setDate(d.getDate() + Number(n)); return isoOf(d); };
+const daysBetween = (a, b) => Math.round((parseIso(b) - parseIso(a)) / 86400000);
+const firstName = (n) => String(n || '').trim().split(/\s+/)[0] || '';
+const initials = (n) => { const w = String(n || '').trim().split(/\s+/).filter(Boolean); return esc(((w[0] || '')[0] || '') + ((w[1] || '')[0] || '')); };
+const plural = (n, one, many) => (n === 1 ? one : n + ' ' + many);
+const uidLocal = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
+
+function fmtDate(iso, withYear) {
+  if (!iso) return '';
+  const d = parseIso(iso);
+  const sameYear = d.getFullYear() === new Date().getFullYear();
+  return d.getDate() + ' ב' + MONTHS[d.getMonth()] + (withYear || !sameYear ? ' ' + d.getFullYear() : '');
+}
+function fmtShort(iso) {
+  if (!iso) return '';
+  const d = parseIso(iso);
+  return d.getDate() + '.' + (d.getMonth() + 1) + '.' + String(d.getFullYear()).slice(2);
+}
+function relDays(iso) {
+  const n = daysBetween(todayIso(), iso);
+  if (n === 0) return 'היום';
+  if (n === 1) return 'מחר';
+  if (n === -1) return 'אתמול';
+  if (n === 2) return 'בעוד יומיים';
+  if (n === -2) return 'לפני יומיים';
+  return n > 0 ? 'בעוד ' + n + ' ימים' : 'לפני ' + Math.abs(n) + ' ימים';
+}
+function cleanPhone(p) {
+  let d = String(p || '').replace(/\D/g, '');
+  if (d.startsWith('972')) d = '0' + d.slice(3);
+  if (d.length === 9 && d[0] === '5') d = '0' + d;
+  return d;
+}
+function prettyPhone(p) {
+  const d = cleanPhone(p);
+  if (d.length === 10) return d.slice(0, 3) + '-' + d.slice(3, 6) + '-' + d.slice(6);
+  return d;
+}
+function waLink(phone, text) {
+  let d = cleanPhone(phone);
+  if (d.startsWith('0')) d = '972' + d.slice(1);
+  const q = text ? '?text=' + encodeURIComponent(text) : '';
+  return 'https://wa.me/' + (d || '') + q;
+}
+function openExternal(url) {
+  const w = window.open(url, '_blank', 'noopener');
+  if (!w) {
+    const a = document.createElement('a');
+    a.href = url; a.target = '_blank'; a.rel = 'noopener';
+    document.body.appendChild(a); a.click(); a.remove();
+  }
+}
+async function copyText(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch (e) {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    let ok = false;
+    try { ok = document.execCommand('copy'); } catch (e2) { ok = false; }
+    ta.remove();
+    return ok;
+  }
+}
+function fillTemplate(text, ctx) {
+  ctx = ctx || {};
+  const map = {
+    'שם': firstName(ctx.name) || '',
+    'שם מלא': ctx.name || '',
+    'מוצרים': ctx.products || 'המוצרים',
+    'מוצר': ctx.product || '',
+    'מחיר': ctx.price || '',
+    'קבלה': ctx.receipt || '',
+    'קישור': ctx.link || S().clubLink || '',
+  };
+  return String(text || '').replace(/\{([^}]+)\}/g, (m, k) => (k in map ? map[k] : m)).replace(/ {2,}/g, ' ');
+}
+function receiptLabel(no) {
+  if (!no) return '';
+  return String(no).padStart(Number(S().receiptDigits) || 4, '0');
+}
+function loadScript(key) {
+  if (key === 'html2canvas' && window.html2canvas) return Promise.resolve();
+  if (key === 'jspdf' && window.jspdf) return Promise.resolve();
+  if (key === 'xlsx' && window.XLSX) return Promise.resolve();
+  return new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = LIBS[key]; s.onload = res; s.onerror = () => rej(new Error('טעינת רכיב נכשלה. בדקי חיבור לאינטרנט.'));
+    document.head.appendChild(s);
+  });
+}
+
+/* =========================================================
+   State & server API
+   ========================================================= */
+const state = {
+  data: null,
+  view: 'home',
+  tab: {},
+  q: {},
+  year: new Date().getFullYear(),
+  month: 'all',
+  busy: 0,
+};
+const S = () => (state.data && state.data.settings) || {};
+const D = (t) => (state.data && state.data[t]) || [];
+
+function call(fn) {
+  const args = Array.prototype.slice.call(arguments, 1);
+  setBusy(1);
+  return new Promise((resolve, reject) => {
+    google.script.run
+      .withSuccessHandler((r) => { setBusy(-1); resolve(r); })
+      .withFailureHandler((e) => {
+        setBusy(-1);
+        const msg = (e && e.message) || String(e);
+        toast(msg.replace(/^Exception:\s*/, ''), { error: true });
+        reject(e);
+      })[fn].apply(null, args);
+  });
+}
+function setBusy(d) {
+  state.busy = Math.max(0, state.busy + d);
+  let bar = $('#loadingBar');
+  if (state.busy && !bar) {
+    bar = document.createElement('div'); bar.id = 'loadingBar'; bar.className = 'loading-bar';
+    document.body.appendChild(bar);
+  } else if (!state.busy && bar) bar.remove();
+}
+function applyResult(r) {
+  if (!r) return r;
+  if (r.settings) state.data.settings = r.settings;
+  Object.keys(r.changes || {}).forEach((t) => {
+    const list = state.data[t] || (state.data[t] = []);
+    (r.changes[t] || []).forEach((rec) => {
+      const i = list.findIndex((x) => x.id === rec.id);
+      if (i >= 0) list[i] = rec; else list.push(rec);
+    });
+  });
+  Object.keys(r.removed || {}).forEach((t) => {
+    state.data[t] = (state.data[t] || []).filter((x) => r.removed[t].indexOf(x.id) === -1);
+  });
+  return r;
+}
+async function mutate(fn) {
+  const args = Array.prototype.slice.call(arguments, 1);
+  const r = await call.apply(null, [fn].concat(args));
+  applyResult(r);
+  render();
+  return r;
+}
+const saveRec = (table, rec) => mutate('saveRecord', table, rec);
+const delRec = (table, id) => mutate('deleteRecord', table, id);
+
+/* =========================================================
+   Derived data
+   ========================================================= */
+function activeSales() { return D('sales').filter((s) => s.status !== 'cancelled'); }
+function customerStats() {
+  const m = {};
+  activeSales().forEach((s) => {
+    if (!s.customerId) return;
+    const c = m[s.customerId] || (m[s.customerId] = { count: 0, total: 0, last: '' });
+    c.count++; c.total += Number(s.total) || 0;
+    if (s.date > c.last) c.last = s.date;
+  });
+  return m;
+}
+function customerById(id) { return D('customers').find((c) => c.id === id); }
+function productById(id) { return D('products').find((p) => p.id === id); }
+function sumIncome(filter) { return activeSales().filter(filter).reduce((s, x) => s + (Number(x.total) || 0), 0); }
+function sumExpense(filter) { return D('expenses').filter(filter).reduce((s, x) => s + (Number(x.amount) || 0), 0); }
+function openFollowups() { return D('followups').filter((f) => f.status === 'open'); }
+function dueFollowups() { const t = todayIso(); return openFollowups().filter((f) => f.due <= t).sort((a, b) => a.due.localeCompare(b.due)); }
+function stockStatus(p) {
+  const s = Number(p.stock) || 0;
+  if (s <= 0) return 'out';
+  if (s <= (Number(p.minStock) || 0)) return 'low';
+  return 'ok';
+}
+function activeProducts() { return D('products').filter((p) => p.active !== false); }
+function followupLabel(type) {
+  if (type === 'check3') return 'בדיקה אחרי ' + (S().checkDays || 3) + ' ימים';
+  if (type === 'renew30') return 'הצעת חידוש';
+  if (type === 'lead') return 'מעקב ליד';
+  return 'תזכורת';
+}
+function templatesFor(cat) {
+  return D('templates').filter((t) => !cat || t.category === cat).sort((a, b) => (a.order || 0) - (b.order || 0));
+}
+
+/* =========================================================
+   Toast & modal
+   ========================================================= */
+function toast(msg, opts) {
+  opts = opts || {};
+  const el = document.createElement('div');
+  el.className = 'toast' + (opts.error ? ' err' : '');
+  el.innerHTML = '<span>' + esc(msg) + '</span>' + (opts.action ? '<button type="button">' + esc(opts.action) + '</button>' : '');
+  if (opts.action) el.querySelector('button').onclick = () => { el.remove(); opts.onAction(); };
+  $('#toastRoot').appendChild(el);
+  setTimeout(() => el.remove(), opts.action ? 7000 : (opts.error ? 6000 : 2800));
+}
+
+function modal(o) {
+  const ov = document.createElement('div');
+  ov.className = 'overlay';
+  ov.innerHTML =
+    '<div class="modal ' + (o.wide ? 'wide' : '') + '" role="dialog" aria-modal="true">' +
+      '<div class="modal-head"><h3>' + esc(o.title) + '</h3><button class="icon-btn sm" data-close aria-label="סגירה">' + icon('x') + '</button></div>' +
+      '<div class="modal-body">' + (o.body || '') + '</div>' +
+      (o.foot ? '<div class="modal-foot">' + o.foot + '</div>' : '') +
+    '</div>';
+  const close = () => { ov.remove(); if (o.onClose) o.onClose(); };
+  ov.addEventListener('mousedown', (e) => { if (e.target === ov) ov._down = true; });
+  ov.addEventListener('click', (e) => {
+    if ((e.target === ov && ov._down) || e.target.closest('[data-close]')) close();
+    ov._down = false;
+  });
+  $('#modalRoot').appendChild(ov);
+  const m = { el: ov, body: $('.modal-body', ov), close: close, $: (s) => $(s, ov), $$: (s) => $$(s, ov) };
+  if (o.onMount) o.onMount(m);
+  const first = $('[autofocus]', ov);
+  if (first && window.innerWidth > 720) setTimeout(() => first.focus(), 30);
+  return m;
+}
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    const all = $$('#modalRoot .overlay');
+    if (all.length) all[all.length - 1].querySelector('[data-close]').click();
+  }
+});
+
+function confirmBox(title, text, okLabel, danger) {
+  return new Promise((resolve) => {
+    let done = false;
+    const m = modal({
+      title: title,
+      body: '<p style="margin:0">' + esc(text) + '</p>',
+      foot: '<button class="btn ' + (danger ? 'danger' : '') + '" data-ok>' + esc(okLabel || 'אישור') + '</button><button class="btn secondary" data-close>ביטול</button>',
+      onClose: () => { if (!done) resolve(false); },
+    });
+    m.$('[data-ok]').onclick = () => { done = true; m.close(); resolve(true); };
+  });
+}
+
+/* =========================================================
+   Navigation
+   ========================================================= */
+const NAV = [
+  { id: 'home', label: 'בית', icon: 'home' },
+  { id: 'followups', label: 'פולואפים', icon: 'bell' },
+  { id: 'customers', label: 'לקוחות ולידים', short: 'לקוחות', icon: 'users' },
+  { id: 'finance', label: 'הכנסות והוצאות', short: 'כספים', icon: 'wallet' },
+  { id: 'inventory', label: 'מלאי מוצרים', icon: 'box' },
+  { id: 'club', label: 'מועדון לקוחות', icon: 'leaf' },
+  { id: 'templates', label: 'הודעות מהירות', icon: 'msg' },
+  { id: 'settings', label: 'הגדרות', icon: 'gear' },
+];
+const BOTTOM = ['home', 'customers', 'followups', 'finance'];
+
+function go(view) {
+  state.view = view;
+  render();
+  window.scrollTo(0, 0);
+}
+
+function renderChrome() {
+  const due = dueFollowups().length;
+  const badge = (id) => (id === 'followups' && due ? '<span class="badge solid">' + due + '</span>' : '');
+  $('#sidebar').innerHTML =
+    '<div class="brand"><img src="' + LOGO_SRC + '" alt="אלה בטבע"></div>' +
+    NAV.map((n) => '<button class="navlink ' + (state.view === n.id ? 'active' : '') + '" data-action="go" data-view="' + n.id + '">' + icon(n.icon) + '<span>' + n.label + '</span>' + badge(n.id) + '</button>').join('') +
+    '<div class="spacer"></div>' +
+    '<div class="side-foot">' + esc((state.data.meta && state.data.meta.email) || '') + '</div>';
+
+  $('#bottomnav').innerHTML = BOTTOM.map((id) => {
+    const n = NAV.find((x) => x.id === id);
+    return '<button class="' + (state.view === id ? 'active' : '') + '" data-action="go" data-view="' + id + '">' + icon(n.icon) +
+      '<span>' + (n.short || n.label) + '</span>' + (id === 'followups' && due ? '<span class="dot">' + due + '</span>' : '') + '</button>';
+  }).join('') +
+    '<button class="' + (BOTTOM.indexOf(state.view) === -1 ? 'active' : '') + '" data-action="moreMenu">' + icon('more') + '<span>עוד</span></button>';
+}
+
+function topbar(title, sub, actions) {
+  $('#topbar').innerHTML =
+    (state.view === 'home' ? '<img class="mini-logo" src="' + LOGO_SRC + '" alt="אלה בטבע">' : '<div><h1>' + esc(title) + '</h1>' + (sub ? '<div class="sub">' + sub + '</div>' : '') + '</div>') +
+    '<div class="actions">' + (actions || '') + '</div>';
+}
+
+function render() {
+  if (!state.data) return;
+  const focused = document.activeElement && document.activeElement.id === 'q' ? document.activeElement.selectionStart : null;
+  renderChrome();
+  const v = VIEWS[state.view] || VIEWS.home;
+  $('#view').innerHTML = v();
+  $('.fab').hidden = ['settings', 'templates'].indexOf(state.view) !== -1;
+  if (focused !== null) {
+    const q = $('#q');
+    if (q) { q.focus(); q.setSelectionRange(focused, focused); }
+  }
+}
+
+/* =========================================================
+   Shared fragments
+   ========================================================= */
+function emptyState(title, text, action) {
+  return '<div class="empty"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M12 54C12 30 28 12 54 10c0 26-17 44-42 44z" fill="#E9ECDB"/><path d="M12 54 38 28" stroke="#A2AD82" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>' +
+    '<b>' + esc(title) + '</b><div>' + esc(text || '') + '</div>' + (action ? '<div style="margin-top:14px">' + action + '</div>' : '') + '</div>';
+}
+function searchBox(view, placeholder) {
+  return '<label class="search">' + icon('search') + '<input id="q" data-input="search" data-view="' + view + '" placeholder="' + esc(placeholder) + '" value="' + esc(state.q[view] || '') + '" autocomplete="off"></label>';
+}
+function tabs(view, items) {
+  const cur = state.tab[view] || items[0][0];
+  return '<div class="tabs">' + items.map((t) => '<button class="tab ' + (cur === t[0] ? 'active' : '') + '" data-action="tab" data-view="' + view + '" data-tab="' + t[0] + '">' + esc(t[1]) +
+    (t[2] !== undefined ? ' <span class="count">' + t[2] + '</span>' : '') + '</button>').join('') + '</div>';
+}
+function curTab(view, def) { return state.tab[view] || def; }
+function matches(q, fields) {
+  if (!q) return true;
+  q = q.trim().toLowerCase();
+  return fields.some((f) => String(f || '').toLowerCase().indexOf(q) !== -1 || (cleanPhone(f) && cleanPhone(q) && cleanPhone(f).indexOf(cleanPhone(q)) !== -1));
+}
+
+function followupRow(f) {
+  const overdue = f.due < todayIso();
+  const cls = f.type === 'renew30' ? 'brown' : f.type === 'lead' ? 'warn' : '';
+  return '<div class="fu">' +
+    '<div class="avatar sm ' + (f.type === 'lead' ? 'lead' : '') + '">' + initials(f.customerName) + '</div>' +
+    '<div class="grow">' +
+      '<div class="top"><span class="name">' + esc(f.customerName) + '</span><span class="badge ' + cls + '">' + esc(followupLabel(f.type)) + '</span>' +
+      (f.status === 'open' ? '<span class="badge ' + (overdue ? 'danger' : 'plain') + '">' + icon('clock') + ' ' + relDays(f.due) + '</span>' : '<span class="badge plain">' + (f.status === 'done' ? 'בוצע' : 'דולג') + ' · ' + fmtShort(f.doneAt || f.due) + '</span>') + '</div>' +
+      (f.products || f.note ? '<div class="what">' + esc(f.products || '') + (f.products && f.note ? ' · ' : '') + esc(f.note || '') + '</div>' : '') +
+      (f.status === 'open' ? '<div class="acts">' +
+        '<button class="btn wa sm" data-action="fuWa" data-id="' + f.id + '">' + icon('wa') + 'שליחה בוואטסאפ</button>' +
+        '<button class="btn secondary sm" data-action="fuDone" data-id="' + f.id + '">' + icon('check') + 'בוצע</button>' +
+        '<button class="btn ghost sm" data-action="fuSnooze" data-id="' + f.id + '">' + icon('clock') + 'דחייה</button>' +
+        (f.type === 'renew30' ? '<button class="btn ghost sm" data-action="newSale" data-customer="' + f.customerId + '">' + icon('cart') + 'מכירה</button>' : '') +
+      '</div>' : '') +
+    '</div></div>';
+}
+
+function customerRow(c, stats) {
+  const st = stats[c.id];
+  let meta;
+  if (c.type === 'lead') meta = 'ליד · ' + esc(c.stage || 'חדש') + (c.createdAt ? ' · נוסף ' + relDays(c.createdAt.slice(0, 10)) : '');
+  else if (st) meta = plural(st.count, 'רכישה אחת', 'רכישות') + ' · אחרונה ' + relDays(st.last);
+  else meta = 'עדיין אין רכישות';
+  return '<button class="row" data-action="openCustomer" data-id="' + c.id + '">' +
+    '<div class="avatar ' + (c.type === 'lead' ? 'lead' : '') + '">' + initials(c.name) + '</div>' +
+    '<div class="grow"><div class="title">' + esc(c.name) + (c.club ? ' <span class="badge" style="vertical-align:1px">מועדון</span>' : '') + '</div><div class="meta">' + meta + '</div></div>' +
+    (c.phone ? '<span class="icon-btn wa sm" role="button" data-action="quickMsg" data-customer="' + c.id + '" aria-label="הודעה בוואטסאפ">' + icon('wa') + '</span>' : '') +
+  '</button>';
+}
+
+function saleRow(s) {
+  const items = (s.items || []).map((i) => i.name + (i.qty > 1 ? ' ×' + i.qty : '')).join(', ');
+  return '<button class="row" data-action="openSale" data-id="' + s.id + '">' +
+    '<div class="avatar sm">' + icon(s.kind === 'other' ? 'gift' : 'receipt') + '</div>' +
+    '<div class="grow"><div class="title">' + esc(s.customerName || items || 'הכנסה') + '</div>' +
+    '<div class="meta">' + fmtShort(s.date) + (s.receiptNo ? ' · קבלה ' + receiptLabel(s.receiptNo) : '') + ' · ' + esc(s.payment || '') + (s.customerName && items ? ' · ' + esc(items) : '') + '</div></div>' +
+    '<div class="end"><div class="amount">' + money(s.total) + '</div>' + (s.status === 'cancelled' ? '<span class="badge danger">בוטלה</span>' : '') + '</div>' +
+  '</button>';
+}
+
+function expenseRow(x) {
+  return '<button class="row" data-action="editExpense" data-id="' + x.id + '">' +
+    '<div class="avatar sm" style="background:var(--brown-soft);color:var(--brown)">' + icon('wallet') + '</div>' +
+    '<div class="grow"><div class="title">' + esc(x.description || x.category) + '</div><div class="meta">' + fmtShort(x.date) + ' · ' + esc(x.category) + (x.payment ? ' · ' + esc(x.payment) : '') + '</div></div>' +
+    '<div class="end"><div class="amount neg">' + money(x.amount) + '</div></div></button>';
+}
+
+/* =========================================================
+   Views
+   ========================================================= */
+const VIEWS = {};
+
+VIEWS.home = function () {
+  const s = S();
+  const t = todayIso();
+  const ym = t.slice(0, 7);
+  const y = t.slice(0, 4);
+  const incM = sumIncome((x) => x.date.slice(0, 7) === ym);
+  const expM = sumExpense((x) => x.date.slice(0, 7) === ym);
+  const incY = sumIncome((x) => x.date.slice(0, 4) === y);
+  const ceiling = num(s.ceiling) || 120000;
+  const pct = Math.min(100, Math.round((incY / ceiling) * 100));
+  const due = dueFollowups();
+  const low = activeProducts().filter((p) => stockStatus(p) !== 'ok').sort((a, b) => (a.stock || 0) - (b.stock || 0));
+  const leads = D('customers').filter((c) => c.type === 'lead' && c.stage !== 'לא רלוונטי').sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+  const stats = customerStats();
+  const inactiveDays = num(s.inactiveDays) || 60;
+  const sleepy = D('customers').filter((c) => c.type === 'customer' && stats[c.id] && daysBetween(stats[c.id].last, t) >= inactiveDays)
+    .sort((a, b) => stats[a.id].last.localeCompare(stats[b.id].last));
+  const h = new Date().getHours();
+  const greet = h < 5 ? 'לילה טוב' : h < 12 ? 'בוקר טוב' : h < 17 ? 'צהריים טובים' : h < 21 ? 'ערב טוב' : 'לילה טוב';
+
+  topbar('', '', '<button class="icon-btn mobile-only" data-action="go" data-view="settings" aria-label="הגדרות">' + icon('gear') + '</button>');
+
+  return '' +
+  '<div class="hello"><h1>' + greet + ', ' + esc(s.ownerName || 'אלה') + ' 🌿</h1><p>' + fmtDate(t, true) + ' · ' +
+    (due.length ? 'יש לך ' + (due.length === 1 ? 'פולואפ אחד' : due.length + ' פולואפים') + ' לטיפול היום' : 'אין פולואפים פתוחים להיום') + '</p></div>' +
+
+  '<div class="quick">' +
+    '<button data-action="newSale"><span class="q-ico">' + icon('cart') + '</span>מכירה חדשה</button>' +
+    '<button data-action="newLead"><span class="q-ico">' + icon('users') + '</span>ליד חדש</button>' +
+    '<button data-action="quickMsg"><span class="q-ico">' + icon('wa') + '</span>הודעה מהירה</button>' +
+    '<button data-action="newExpense"><span class="q-ico">' + icon('wallet') + '</span>הוצאה</button>' +
+  '</div>' +
+
+  '<div class="section grid grid-4">' +
+    '<div class="card stat accent">' + LEAF_DECOR + '<div class="label">הכנסות ' + MONTHS[new Date().getMonth()] + '</div><div class="value">' + money(incM) + '</div><div class="hint">' + plural(activeSales().filter((x) => x.date.slice(0, 7) === ym).length, 'מכירה אחת', 'מכירות') + ' החודש</div></div>' +
+    '<div class="card stat"><div class="label">הוצאות החודש</div><div class="value">' + money(expM) + '</div><div class="hint">' + plural(D('expenses').filter((x) => x.date.slice(0, 7) === ym).length, 'רשומה אחת', 'רשומות') + '</div></div>' +
+    '<div class="card stat"><div class="label">רווח החודש</div><div class="value">' + money(incM - expM) + '</div><div class="hint">הכנסות פחות הוצאות</div></div>' +
+    '<div class="card stat"><div class="label">מחזור ' + y + ' מול תקרת פטור</div><div class="value">' + pct + '<small>%</small></div>' +
+      '<div class="meter ' + (pct >= 95 ? 'danger' : pct >= 80 ? 'warn' : '') + '"><span style="width:' + pct + '%"></span></div><div class="hint">' + money(incY) + ' מתוך ' + money(ceiling) + '</div></div>' +
+  '</div>' +
+  (pct >= 80 ? '<div class="banner">' + icon('alert') + '<div><b>שימי לב:</b> המחזור השנתי הגיע ל־' + pct + '% מתקרת עוסק פטור. כדאי לדבר עם רואה החשבון.</div></div>' : '') +
+
+  '<div class="grid cols-2">' +
+    '<div class="section"><div class="section-head"><h2>' + icon('bell') + ' לטיפול היום</h2>' + (due.length ? '<button class="link" data-action="go" data-view="followups">הכול (' + due.length + ')</button>' : '') + '</div>' +
+      '<div class="card">' + (due.length ? due.slice(0, 5).map(followupRow).join('') : emptyState('הכול מטופל', 'פולואפים ייווצרו אוטומטית אחרי כל מכירה')) + '</div></div>' +
+
+    '<div>' +
+      '<div class="section"><div class="section-head"><h2>' + icon('box') + ' מלאי לתשומת לב</h2><button class="link" data-action="go" data-view="inventory">למלאי</button></div>' +
+        '<div class="card list">' + (low.length ? low.slice(0, 5).map((p) => '<button class="row" data-action="editProduct" data-id="' + p.id + '"><div class="grow"><div class="title">' + esc(p.name) + '</div><div class="meta">מינימום ' + (p.minStock || 0) + '</div></div>' +
+          '<span class="badge ' + (stockStatus(p) === 'out' ? 'danger' : 'warn') + '">' + (stockStatus(p) === 'out' ? 'אזל' : 'נשארו ' + p.stock) + '</span></button>').join('') : emptyState('המלאי מלא', activeProducts().length ? 'אין מוצרים מתחת למינימום' : 'עדיין לא הוזנו מוצרים')) + '</div></div>' +
+
+      '<div class="section"><div class="section-head"><h2>' + icon('users') + ' לידים פתוחים</h2><button class="link" data-action="tabGo" data-view="customers" data-tab="leads">לכל הלידים</button></div>' +
+        '<div class="card list">' + (leads.length ? leads.slice(0, 4).map((c) => customerRow(c, stats)).join('') : emptyState('אין לידים פתוחים', 'ליד חדש מוואטסאפ? הוסיפי בלחיצה', '<button class="btn sm" data-action="newLead">' + icon('plus') + 'ליד חדש</button>')) + '</div></div>' +
+    '</div>' +
+  '</div>' +
+
+  (sleepy.length ? '<div class="section"><div class="section-head"><h2>' + icon('leaf') + ' לקוחות לשימור</h2><button class="link" data-action="tabGo" data-view="customers" data-tab="sleepy">הכול (' + sleepy.length + ')</button></div>' +
+    '<div class="card list">' + sleepy.slice(0, 4).map((c) => customerRow(c, stats)).join('') + '</div><p class="faint" style="font-size:13px;margin:8px 4px 0">לקוחות שלא רכשו ' + inactiveDays + ' ימים ומעלה – הזדמנות טובה לשלוח הודעה אישית.</p></div>' : '');
+};
+
+VIEWS.followups = function () {
+  const t = todayIso();
+  const open = openFollowups();
+  const due = open.filter((f) => f.due <= t);
+  const week = open.filter((f) => f.due > t && f.due <= addDays(t, 7));
+  const later = open.filter((f) => f.due > addDays(t, 7));
+  const done = D('followups').filter((f) => f.status !== 'open').sort((a, b) => String(b.doneAt || b.due).localeCompare(String(a.doneAt || a.due)));
+  const tab = curTab('followups', 'due');
+  const q = state.q.followups;
+  let list = tab === 'due' ? due : tab === 'week' ? week : tab === 'later' ? later : done.slice(0, 80);
+  if (tab !== 'done') list = list.slice().sort((a, b) => a.due.localeCompare(b.due));
+  list = list.filter((f) => matches(q, [f.customerName, f.phone, f.products, f.note]));
+
+  topbar('פולואפים', 'מעקב אחרי לקוחות ולידים · נוצרים אוטומטית אחרי כל מכירה',
+    '<button class="btn sm" data-action="newReminder">' + icon('plus') + 'תזכורת</button>');
+
+  return tabs('followups', [['due', 'היום ובאיחור', due.length], ['week', '7 ימים קרובים', week.length], ['later', 'בהמשך', later.length], ['done', 'בוצעו']]) +
+    '<div class="toolbar" style="margin:0 0 12px">' + searchBox('followups', 'חיפוש לפי שם או מוצר') + '</div>' +
+    '<div class="card">' + (list.length ? list.map(followupRow).join('') : emptyState(tab === 'due' ? 'אין משימות להיום' : 'אין פריטים', tab === 'due' ? 'כל הכבוד, הכול מטופל 🌿' : '')) + '</div>';
+};
+
+VIEWS.customers = function () {
+  const stats = customerStats();
+  const t = todayIso();
+  const inactiveDays = num(S().inactiveDays) || 60;
+  const all = D('customers');
+  const leads = all.filter((c) => c.type === 'lead');
+  const custs = all.filter((c) => c.type !== 'lead');
+  const club = all.filter((c) => c.club);
+  const sleepy = custs.filter((c) => stats[c.id] && daysBetween(stats[c.id].last, t) >= inactiveDays);
+  const tab = curTab('customers', 'all');
+  const q = state.q.customers;
+  let list = tab === 'leads' ? leads : tab === 'customers' ? custs : tab === 'club' ? club : tab === 'sleepy' ? sleepy : all;
+  list = list.filter((c) => matches(q, [c.name, c.phone, c.notes]));
+  list.sort((a, b) => {
+    const la = (stats[a.id] && stats[a.id].last) || String(a.createdAt || '');
+    const lb = (stats[b.id] && stats[b.id].last) || String(b.createdAt || '');
+    return lb.localeCompare(la);
+  });
+
+  topbar('לקוחות ולידים', all.length + ' אנשי קשר · ' + leads.length + ' לידים',
+    '<button class="btn secondary sm" data-action="newCustomer">' + icon('plus') + 'לקוח</button><button class="btn sm" data-action="newLead">' + icon('plus') + 'ליד</button>');
+
+  return tabs('customers', [['all', 'הכול', all.length], ['leads', 'לידים', leads.length], ['customers', 'לקוחות', custs.length], ['club', 'במועדון', club.length], ['sleepy', 'לשימור', sleepy.length]]) +
+    '<div class="toolbar" style="margin:0 0 12px">' + searchBox('customers', 'חיפוש לפי שם או טלפון') + '</div>' +
+    '<div class="card list">' + (list.length ? list.map((c) => customerRow(c, stats)).join('') : emptyState('לא נמצאו אנשי קשר', q ? 'נסי חיפוש אחר' : 'הוסיפי ליד או לקוח ראשון', q ? '' : '<button class="btn sm" data-action="newLead">' + icon('plus') + 'ליד חדש</button>')) + '</div>';
+};
+
+VIEWS.finance = function () {
+  const y = String(state.year);
+  const s = S();
+  const inYear = (x) => x.date.slice(0, 4) === y;
+  const incY = sumIncome(inYear);
+  const expY = sumExpense(inYear);
+  const ceiling = num(s.ceiling) || 120000;
+  const pct = Math.min(100, Math.round((incY / ceiling) * 100));
+  const curM = (new Date().getFullYear() === state.year) ? new Date().getMonth() : -1;
+  const incByM = new Array(12).fill(0), expByM = new Array(12).fill(0);
+  activeSales().filter(inYear).forEach((x) => { incByM[Number(x.date.slice(5, 7)) - 1] += Number(x.total) || 0; });
+  D('expenses').filter(inYear).forEach((x) => { expByM[Number(x.date.slice(5, 7)) - 1] += Number(x.amount) || 0; });
+  const max = Math.max(1, Math.max.apply(null, incByM.concat(expByM)));
+  const tab = curTab('finance', 'income');
+  const month = state.month;
+  const inMonth = (x) => inYear(x) && (month === 'all' || Number(x.date.slice(5, 7)) - 1 === Number(month));
+  const q = state.q.finance;
+  const sales = D('sales').filter(inMonth).filter((x) => matches(q, [x.customerName, x.receiptNo, x.notes, (x.items || []).map((i) => i.name).join(' ')])).sort((a, b) => (b.date + b.createdAt).localeCompare(a.date + a.createdAt));
+  const exps = D('expenses').filter(inMonth).filter((x) => matches(q, [x.description, x.category, x.notes])).sort((a, b) => b.date.localeCompare(a.date));
+  const monthsWithData = incByM.map((v, i) => (v || expByM[i]) ? i : -1).filter((i) => i >= 0);
+
+  topbar('הכנסות והוצאות', 'עוסק פטור ' + esc(s.businessId || ''),
+    '<button class="btn secondary sm" data-action="newOtherIncome">' + icon('plus') + 'הכנסה</button><button class="btn sm" data-action="newExpense">' + icon('plus') + 'הוצאה</button>');
+
+  return '' +
+  '<div class="toolbar" style="margin:0 0 12px;justify-content:space-between">' +
+    '<div class="btn-row" style="align-items:center"><button class="icon-btn sm" data-action="year" data-d="1" aria-label="שנה הבאה">' + icon('chevR') + '</button>' +
+    '<b style="font-size:20px;min-width:56px;text-align:center" class="num">' + y + '</b><button class="icon-btn sm" data-action="year" data-d="-1" aria-label="שנה קודמת">' + icon('chevL') + '</button></div>' +
+    '<div class="btn-row"><button class="btn ghost sm" data-action="exportCsv">' + icon('doc') + 'ייצוא לרואה חשבון</button>' +
+    (state.data.meta && state.data.meta.spreadsheetUrl ? '<button class="btn ghost sm" data-action="openSheet">' + icon('ext') + 'הגיליון</button>' : '') + '</div>' +
+  '</div>' +
+  '<div class="grid grid-4">' +
+    '<div class="card stat accent">' + LEAF_DECOR + '<div class="label">הכנסות ' + y + '</div><div class="value">' + money(incY) + '</div><div class="hint">' + plural(activeSales().filter(inYear).length, 'תקבול אחד', 'תקבולים') + '</div></div>' +
+    '<div class="card stat"><div class="label">הוצאות ' + y + '</div><div class="value">' + money(expY) + '</div></div>' +
+    '<div class="card stat"><div class="label">רווח ' + y + '</div><div class="value">' + money(incY - expY) + '</div></div>' +
+    '<div class="card stat"><div class="label">ניצול תקרת עוסק פטור</div><div class="value">' + pct + '<small>%</small></div><div class="meter ' + (pct >= 95 ? 'danger' : pct >= 80 ? 'warn' : '') + '"><span style="width:' + pct + '%"></span></div><div class="hint">נותרו ' + money(Math.max(0, ceiling - incY)) + '</div></div>' +
+  '</div>' +
+  '<div class="section card card-pad"><div class="bars">' + incByM.map((v, i) =>
+    '<div class="b ' + (i === curM ? 'cur' : '') + '" title="' + MONTHS[i] + ': הכנסות ' + moneyText(v) + ', הוצאות ' + moneyText(expByM[i]) + '"><div class="col">' +
+    '<div class="inc" style="height:' + (v / max * 100) + '%"></div><div class="exp" style="height:' + (expByM[i] / max * 100) + '%"></div></div><span>' + MONTHS_SHORT[i] + '</span></div>').join('') +
+  '</div><div class="legend"><span><i style="background:var(--olive-2)"></i>הכנסות</span><span><i style="background:#D7B998"></i>הוצאות</span></div></div>' +
+
+  '<div class="section">' +
+    tabs('finance', [['income', 'הכנסות וקבלות', sales.length], ['expenses', 'הוצאות', exps.length]]) +
+    '<div class="toolbar" style="margin:0 0 12px"><select class="input" style="width:auto;min-height:44px" data-input="month">' +
+      '<option value="all">כל השנה</option>' + MONTHS.map((m, i) => '<option value="' + i + '" ' + (String(month) === String(i) ? 'selected' : '') + '>' + m + (monthsWithData.indexOf(i) >= 0 ? '' : ' (ריק)') + '</option>').join('') +
+    '</select>' + searchBox('finance', tab === 'income' ? 'חיפוש לפי שם, מוצר או מספר קבלה' : 'חיפוש בהוצאות') + '</div>' +
+    '<div class="card list">' + (tab === 'income'
+      ? (sales.length ? sales.map(saleRow).join('') : emptyState('אין הכנסות בתקופה הזו', 'מכירה חדשה מפיקה קבלה אוטומטית', '<button class="btn sm" data-action="newSale">' + icon('plus') + 'מכירה חדשה</button>'))
+      : (exps.length ? exps.map(expenseRow).join('') : emptyState('אין הוצאות בתקופה הזו', '', '<button class="btn sm" data-action="newExpense">' + icon('plus') + 'הוצאה חדשה</button>'))) + '</div>' +
+    (tab === 'income' && sales.length ? '<p class="faint" style="font-size:13px;margin:8px 4px">סה״כ בתצוגה: ' + money(sales.filter((x) => x.status !== 'cancelled').reduce((a, x) => a + (Number(x.total) || 0), 0)) + '</p>' : '') +
+    (tab === 'expenses' && exps.length ? '<p class="faint" style="font-size:13px;margin:8px 4px">סה״כ בתצוגה: ' + money(exps.reduce((a, x) => a + (Number(x.amount) || 0), 0)) + '</p>' : '') +
+  '</div>';
+};
+
+VIEWS.inventory = function () {
+  const prods = activeProducts();
+  const low = prods.filter((p) => stockStatus(p) === 'low');
+  const out = prods.filter((p) => stockStatus(p) === 'out');
+  const value = prods.reduce((s, p) => s + Math.max(0, Number(p.stock) || 0) * (Number(p.cost) || 0), 0);
+  const units = prods.reduce((s, p) => s + Math.max(0, Number(p.stock) || 0), 0);
+  const tab = curTab('inventory', 'all');
+  const q = state.q.inventory;
+  let list = tab === 'missing' ? out.concat(low) : prods;
+  list = list.filter((p) => matches(q, [p.name, p.code, p.category])).sort((a, b) => a.name.localeCompare(b.name, 'he'));
+
+  topbar('מלאי מוצרים', prods.length + ' מוצרים · ' + units + ' יחידות בבית',
+    '<button class="btn secondary sm" data-action="receiveStock">' + icon('truck') + 'קליטת סחורה</button><button class="btn sm" data-action="newProduct">' + icon('plus') + 'מוצר</button>');
+
+  return '' +
+  '<div class="grid grid-4">' +
+    '<div class="card stat"><div class="label">מוצרים פעילים</div><div class="value">' + prods.length + '</div></div>' +
+    '<div class="card stat"><div class="label">עומדים להיגמר</div><div class="value" style="color:var(--warn)">' + low.length + '</div></div>' +
+    '<div class="card stat"><div class="label">אזלו</div><div class="value" style="color:var(--danger)">' + out.length + '</div></div>' +
+    '<div class="card stat"><div class="label">שווי מלאי (עלות)</div><div class="value">' + money(value) + '</div></div>' +
+  '</div>' +
+  '<div class="section">' +
+    tabs('inventory', [['all', 'כל המוצרים', prods.length], ['missing', 'חסר / נמוך', low.length + out.length]]) +
+    '<div class="toolbar" style="margin:0 0 12px">' + searchBox('inventory', 'חיפוש מוצר או מק״ט') +
+      '<button class="btn ghost sm" data-action="copyMissing">' + icon('copy') + 'רשימת חוסרים</button>' +
+      '<button class="btn ghost sm" data-action="importProducts">' + icon('upload') + 'ייבוא מקובץ</button></div>' +
+    (list.length ? '<div class="products">' + list.map((p) => {
+      const st = stockStatus(p);
+      return '<div class="card product ' + st + '">' +
+        '<div class="p-top"><div class="grow" style="flex:1;min-width:0"><div class="p-name">' + esc(p.name) + '</div><div class="p-cat">' + esc(p.category || 'ללא קטגוריה') + (p.code ? ' · <span class="num">' + esc(p.code) + '</span>' : '') + '</div></div>' +
+        '<button class="icon-btn sm" data-action="editProduct" data-id="' + p.id + '" aria-label="עריכה">' + icon('edit') + '</button></div>' +
+        '<div class="p-bottom"><div><div class="price">' + money(p.price) + '</div>' +
+          '<span class="badge ' + (st === 'out' ? 'danger' : st === 'low' ? 'warn' : '') + '">' + (st === 'out' ? 'אזל מהמלאי' : st === 'low' ? 'מלאי נמוך' : 'במלאי') + '</span></div>' +
+        '<div class="stepper"><button data-action="stock" data-id="' + p.id + '" data-d="1" aria-label="הוספה">+</button><span class="q num">' + (p.stock || 0) + '</span><button data-action="stock" data-id="' + p.id + '" data-d="-1" aria-label="הורדה">−</button></div></div>' +
+      '</div>';
+    }).join('') + '</div>' : '<div class="card">' + emptyState(prods.length ? 'לא נמצאו מוצרים' : 'המלאי ריק', prods.length ? '' : 'אפשר להוסיף מוצר או לייבא את קובץ המלאי הקיים', prods.length ? '' : '<div class="btn-row" style="justify-content:center"><button class="btn sm" data-action="importProducts">' + icon('upload') + 'ייבוא מקובץ</button><button class="btn secondary sm" data-action="newProduct">' + icon('plus') + 'מוצר חדש</button></div>') + '</div>') +
+  '</div>';
+};
+
+VIEWS.club = function () {
+  const s = S();
+  const members = D('customers').filter((c) => c.club);
+  const nonMembers = D('customers').filter((c) => !c.club && c.type === 'customer' && c.phone);
+  const tab = curTab('club', 'planned');
+  const posts = D('posts').filter((p) => (p.status || 'draft') === tab).sort((a, b) => tab === 'sent' ? String(b.date).localeCompare(String(a.date)) : String(a.date).localeCompare(String(b.date)));
+  const counts = { planned: 0, draft: 0, sent: 0 };
+  D('posts').forEach((p) => { counts[p.status || 'draft'] = (counts[p.status || 'draft'] || 0) + 1; });
+
+  topbar('מועדון לקוחות', 'קבוצת הוואטסאפ · ' + members.length + ' חברים',
+    '<button class="btn sm" data-action="newPost">' + icon('plus') + 'תוכן חדש</button>');
+
+  return '' +
+  '<div class="grid grid-3">' +
+    '<div class="card stat accent">' + LEAF_DECOR + '<div class="label">חברי מועדון</div><div class="value">' + members.length + '</div><div class="hint">מתוך ' + D('customers').filter((c) => c.type === 'customer').length + ' לקוחות</div></div>' +
+    '<div class="card stat"><div class="label">תוכן מתוכנן</div><div class="value">' + counts.planned + '</div><div class="hint">' + (counts.draft || 0) + ' טיוטות</div></div>' +
+    '<div class="card stat"><div class="label">נשלחו החודש</div><div class="value">' + D('posts').filter((p) => p.status === 'sent' && String(p.date).slice(0, 7) === todayIso().slice(0, 7)).length + '</div></div>' +
+  '</div>' +
+
+  '<div class="section"><div class="section-head"><h2>' + icon('spark') + ' מה מעלים היום?</h2></div><div class="idea-grid">' +
+    Object.keys(POST_TYPES).map((k) => '<button class="idea" data-action="newPost" data-type="' + k + '"><span class="emo">' + POST_TYPES[k].emo + '</span><b>' + POST_TYPES[k].label + '</b><span>' + POST_TYPES[k].hint + '</span></button>').join('') +
+  '</div></div>' +
+
+  '<div class="section">' + tabs('club', [['planned', 'מתוכנן', counts.planned], ['draft', 'טיוטות', counts.draft], ['sent', 'נשלח', counts.sent]]) +
+    '<div class="card">' + (posts.length ? posts.map((p) =>
+      '<div class="post"><div class="p-head"><span class="p-title">' + (POST_TYPES[p.type] ? POST_TYPES[p.type].emo + ' ' : '') + esc(p.title || 'ללא כותרת') + '</span>' +
+      (p.date ? '<span class="badge plain">' + fmtDate(p.date) + '</span>' : '') +
+      '<button class="icon-btn sm" data-action="copyPost" data-id="' + p.id + '" aria-label="העתקה">' + icon('copy') + '</button>' +
+      '<button class="icon-btn sm wa" data-action="sendPost" data-id="' + p.id + '" aria-label="שליחה לקבוצה">' + icon('wa') + '</button>' +
+      '<button class="icon-btn sm" data-action="editPost" data-id="' + p.id + '" aria-label="עריכה">' + icon('edit') + '</button></div>' +
+      '<div class="p-body">' + esc(p.body) + '</div></div>').join('')
+      : emptyState(tab === 'sent' ? 'עוד לא נשלח תוכן' : 'אין כאן תוכן עדיין', 'בחרי סוג תוכן למעלה ונבנה יחד הודעה מוכנה לקבוצה')) + '</div></div>' +
+
+  '<div class="section grid cols-2">' +
+    '<div><div class="section-head"><h2>' + icon('users') + ' הזמנה למועדון</h2></div>' +
+      '<div class="card list">' + (nonMembers.length ? nonMembers.slice(0, 6).map((c) =>
+        '<div class="row"><div class="avatar sm">' + initials(c.name) + '</div><div class="grow"><div class="title">' + esc(c.name) + '</div><div class="meta">עדיין לא במועדון</div></div>' +
+        '<button class="btn wa sm" data-action="inviteClub" data-id="' + c.id + '">' + icon('wa') + 'הזמנה</button></div>').join('')
+        : emptyState('כל הלקוחות במועדון', '')) + '</div>' +
+      (s.clubLink ? '' : '<p class="faint" style="font-size:13px;margin:8px 4px">טיפ: הוסיפי את קישור ההצטרפות לקבוצה בהגדרות, והוא יצורף להזמנות.</p>') + '</div>' +
+    '<div><div class="section-head"><h2>' + icon('leaf') + ' חברי המועדון</h2><button class="link" data-action="tabGo" data-view="customers" data-tab="club">לרשימה</button></div>' +
+      '<div class="card list">' + (members.length ? members.slice(0, 6).map((c) => customerRow(c, customerStats())).join('') : emptyState('אין עדיין חברים', 'סמני לקוחות כחברי מועדון בכרטיס הלקוח')) + '</div></div>' +
+  '</div>';
+};
+
+VIEWS.templates = function () {
+  topbar('הודעות מהירות', 'נוסחים קבועים לוואטסאפ · {שם} יוחלף אוטומטית בשם הלקוח',
+    '<button class="btn sm" data-action="editTemplate">' + icon('plus') + 'נוסח חדש</button>');
+  const groups = Object.keys(TEMPLATE_CATS);
+  return groups.map((g) => {
+    const list = templatesFor(g);
+    if (!list.length) return '';
+    return '<div class="section"><div class="section-head"><h2>' + esc(TEMPLATE_CATS[g]) + '</h2></div><div class="card">' +
+      list.map((t) => '<div class="post"><div class="p-head"><span class="p-title">' + esc(t.title) + '</span>' +
+        '<button class="icon-btn sm" data-action="copyTemplate" data-id="' + t.id + '" aria-label="העתקה">' + icon('copy') + '</button>' +
+        '<button class="icon-btn sm wa" data-action="quickMsg" data-template="' + t.id + '" aria-label="שליחה">' + icon('wa') + '</button>' +
+        '<button class="icon-btn sm" data-action="editTemplate" data-id="' + t.id + '" aria-label="עריכה">' + icon('edit') + '</button></div>' +
+        '<div class="p-body">' + esc(t.text) + '</div></div>').join('') + '</div></div>';
+  }).join('') +
+  '<div class="banner ok">' + icon('msg') + '<div>אפשר להשתמש במשתנים: <b>{שם}</b> (שם פרטי), <b>{שם מלא}</b>, <b>{מוצרים}</b>, <b>{קבלה}</b> (קישור לקבלה), <b>{קישור}</b> (קישור למועדון).</div></div>';
+};
+
+VIEWS.settings = function () {
+  const s = S();
+  const meta = state.data.meta || {};
+  topbar('הגדרות', 'פרטי העסק, קבלות ופולואפים');
+  const f = (k, label, help, type) => '<div class="field"><label for="set_' + k + '">' + label + '</label><input class="input" id="set_' + k + '" data-setting="' + k + '" type="' + (type || 'text') + '" value="' + esc(s[k] || '') + '">' + (help ? '<span class="help">' + help + '</span>' : '') + '</div>';
+  return '' +
+  '<div class="grid cols-2">' +
+    '<div class="section card card-pad"><div class="section-head" style="margin:0 0 14px"><h2>' + icon('receipt') + ' פרטי העסק בקבלה</h2></div>' +
+      '<div class="form-grid">' + f('businessName', 'שם העסק') + f('ownerName', 'שם בעלת העסק') + f('businessId', 'מספר עוסק פטור', '', 'tel') + f('phone', 'טלפון', '', 'tel') + f('address', 'כתובת') + f('email', 'אימייל', '', 'email') + '</div>' +
+      '<div class="field"><label>מספר הקבלה הבאה</label><div class="btn-row" style="align-items:center"><span class="badge solid" style="font-size:16px;padding:6px 14px"><span class="num">' + receiptLabel(s.receiptNext) + '</span></span><button class="btn secondary sm" data-action="changeReceiptNo">שינוי</button></div><span class="help">מספור רץ ורציף. לא ניתן לחזור למספר שכבר הונפק.</span></div>' +
+    '</div>' +
+    '<div>' +
+      '<div class="section card card-pad"><div class="section-head" style="margin:0 0 14px"><h2>' + icon('bell') + ' פולואפים ושימור</h2></div>' +
+        '<div class="form-grid">' + f('checkDays', 'בדיקה אחרי רכישה (ימים)', 'האם התחילו להשתמש ואם זה עוזר', 'number') + f('renewDays', 'הצעת חידוש (ימים)', 'שאלה אם לחדש את המוצר', 'number') +
+        f('inactiveDays', 'לקוח לשימור אחרי (ימים)', 'לא רכש מאז', 'number') + f('ceiling', 'תקרת עוסק פטור (₪)', 'יש לוודא את התקרה העדכנית מול רשות המסים', 'number') + '</div></div>' +
+      '<div class="section card card-pad"><div class="section-head" style="margin:0 0 14px"><h2>' + icon('leaf') + ' מועדון הלקוחות</h2></div>' +
+        f('clubLink', 'קישור הצטרפות לקבוצת הוואטסאפ', 'בקבוצה: הגדרות ← הזמנה באמצעות קישור', 'url') + '</div>' +
+    '</div>' +
+  '</div>' +
+  '<div class="btn-row" style="margin-top:16px"><button class="btn" data-action="saveSettings">' + icon('check') + 'שמירת הגדרות</button>' +
+    (meta.spreadsheetUrl ? '<button class="btn secondary" data-action="openSheet">' + icon('ext') + 'פתיחת גיליון הנתונים</button>' : '') + '</div>' +
+  (window.__logout ? '<div class="btn-row" style="margin-top:10px"><button class="btn ghost" data-action="logout">' + icon('logout') + 'התנתקות</button></div>' : '') +
+  '<p class="faint" style="font-size:13px;margin-top:14px">מחוברת כ־' + esc(meta.email || '') + ' · ' + esc(meta.storageNote || 'הנתונים נשמרים בגיליון Google בחשבון שלך, והקבלות בתיקייה ״אלה בטבע – קבלות״ ב־Drive.') + '</p>';
+};
+
+/* =========================================================
+   Customer flows
+   ========================================================= */
+function customerForm(c, isLead) {
+  c = c || {};
+  const lead = isLead || c.type === 'lead';
+  return '<div class="form-grid">' +
+    '<div class="field full"><label for="c_name">שם מלא</label><input class="input" id="c_name" value="' + esc(c.name) + '" autofocus></div>' +
+    '<div class="field"><label for="c_phone">טלפון</label><input class="input" id="c_phone" type="tel" value="' + esc(c.phone) + '" placeholder="050-0000000"></div>' +
+    '<div class="field"><label for="c_bday">יום הולדת</label><input class="input" id="c_bday" type="date" value="' + esc(c.birthday) + '"></div>' +
+    (lead ? '<div class="field full"><label>שלב</label><div class="segmented" id="c_stage">' + LEAD_STAGES.map((s) => '<button type="button" class="' + ((c.stage || 'חדש') === s ? 'on' : '') + '" data-v="' + s + '">' + s + '</button>').join('') + '</div></div>' : '') +
+    '<div class="field full"><label for="c_notes">הערות</label><textarea class="input" id="c_notes" placeholder="מה מעניין אותה/אותו, רגישויות, העדפות...">' + esc(c.notes) + '</textarea></div>' +
+    '<label class="switch full"><input type="checkbox" id="c_club" ' + (c.club ? 'checked' : '') + '> חבר/ה במועדון הלקוחות</label>' +
+    (!c.id && lead ? '<label class="switch full"><input type="checkbox" id="c_remind" checked> תזכורת לחזור אליו/ה בעוד <input class="input" id="c_remind_days" type="number" value="2" style="width:70px;min-height:36px;padding:4px 8px"> ימים</label>' : '') +
+  '</div>';
+}
+function bindSegmented(root) {
+  $$('.segmented', root).forEach((seg) => seg.addEventListener('click', (e) => {
+    const b = e.target.closest('button');
+    if (!b) return;
+    $$('button', seg).forEach((x) => x.classList.toggle('on', x === b));
+  }));
+}
+function segValue(root, sel) { const b = $(sel + ' button.on', root); return b ? b.dataset.v : ''; }
+
+function editCustomer(c, isLead, after) {
+  const isNew = !c || !c.id;
+  const m = modal({
+    title: isNew ? (isLead ? 'ליד חדש' : 'לקוח/ה חדש/ה') : 'עריכת פרטים',
+    body: customerForm(c, isLead),
+    foot: '<button class="btn" data-save>' + icon('check') + 'שמירה</button>' + (!isNew ? '<button class="btn danger" data-del>' + icon('trash') + 'מחיקה</button>' : '') + '<button class="btn secondary" data-close>ביטול</button>',
+    onMount: (m) => bindSegmented(m.el),
+  });
+  m.$('#c_phone').addEventListener('blur', (e) => { e.target.value = prettyPhone(e.target.value) || e.target.value; });
+  m.$('[data-save]').onclick = async () => {
+    const name = m.$('#c_name').value.trim();
+    if (!name) { m.$('#c_name').focus(); return toast('נא להזין שם', { error: true }); }
+    const phone = cleanPhone(m.$('#c_phone').value);
+    const dup = phone && D('customers').find((x) => x.phone === phone && x.id !== (c && c.id));
+    if (dup && !(await confirmBox('מספר קיים', 'המספר כבר שמור אצל ' + dup.name + '. לשמור בכל זאת?', 'שמירה'))) return;
+    const rec = Object.assign({}, c || {}, {
+      name: name, phone: phone, birthday: m.$('#c_bday').value, notes: m.$('#c_notes').value.trim(), club: m.$('#c_club').checked,
+      type: (c && c.type) || (isLead ? 'lead' : 'customer'),
+    });
+    if (rec.type === 'lead') rec.stage = segValue(m.el, '#c_stage') || 'חדש';
+    const remind = m.$('#c_remind') && m.$('#c_remind').checked;
+    const days = m.$('#c_remind_days') ? num(m.$('#c_remind_days').value) : 2;
+    const r = await saveRec('customers', rec);
+    const saved = r.changes.customers[0];
+    if (remind) await saveRec('followups', { customerId: saved.id, customerName: saved.name, phone: saved.phone, type: 'lead', due: addDays(todayIso(), days || 2), status: 'open' });
+    m.close();
+    toast(isNew ? 'נשמר בהצלחה 🌿' : 'הפרטים עודכנו');
+    if (after) after(saved);
+  };
+  const del = m.$('[data-del]');
+  if (del) del.onclick = async () => {
+    if (D('sales').some((s) => s.customerId === c.id)) return toast('ללקוח יש קבלות במערכת ולכן לא ניתן למחוק אותו', { error: true });
+    if (!(await confirmBox('מחיקת איש קשר', 'למחוק את ' + c.name + '? הפעולה לא ניתנת לביטול.', 'מחיקה', true))) return;
+    for (const f of D('followups').filter((f) => f.customerId === c.id)) await call('deleteRecord', 'followups', f.id).then(applyResult);
+    await delRec('customers', c.id);
+    m.close();
+    $$('#modalRoot .overlay').forEach((o) => o.remove());
+    toast('נמחק');
+  };
+}
+
+function openCustomer(id) {
+  const c = customerById(id);
+  if (!c) return;
+  const st = customerStats()[id] || { count: 0, total: 0, last: '' };
+  const sales = D('sales').filter((s) => s.customerId === id).sort((a, b) => b.date.localeCompare(a.date));
+  const fus = D('followups').filter((f) => f.customerId === id && f.status === 'open').sort((a, b) => a.due.localeCompare(b.due));
+  const m = modal({
+    title: c.type === 'lead' ? 'כרטיס ליד' : 'כרטיס לקוח',
+    wide: true,
+    body:
+      '<div class="detail-head"><div class="avatar ' + (c.type === 'lead' ? 'lead' : '') + '">' + initials(c.name) + '</div><div style="flex:1;min-width:0"><div class="nm">' + esc(c.name) + '</div>' +
+      '<div class="btn-row" style="margin-top:4px;gap:6px">' + (c.phone ? '<span class="badge plain"><span class="num">' + esc(prettyPhone(c.phone)) + '</span></span>' : '') +
+      '<span class="badge ' + (c.type === 'lead' ? 'brown' : '') + '">' + (c.type === 'lead' ? 'ליד · ' + esc(c.stage || 'חדש') : 'לקוח/ה') + '</span>' + (c.club ? '<span class="badge solid">במועדון</span>' : '') +
+      (c.birthday ? '<span class="badge plain">🎂 ' + fmtDate(c.birthday) + '</span>' : '') + '</div></div></div>' +
+      '<div class="btn-row">' +
+        (c.phone ? '<button class="btn wa" data-action="quickMsg" data-customer="' + c.id + '">' + icon('wa') + 'הודעה בוואטסאפ</button>' : '') +
+        '<button class="btn" data-action="newSale" data-customer="' + c.id + '">' + icon('cart') + 'מכירה חדשה</button>' +
+        '<button class="btn secondary" data-edit>' + icon('edit') + 'עריכה</button>' +
+        '<button class="btn ghost" data-action="newReminder" data-customer="' + c.id + '">' + icon('bell') + 'תזכורת</button>' +
+      '</div>' +
+      (c.type !== 'lead' ? '<div class="kv"><div><div class="k">סה״כ רכישות</div><div class="v">' + money(st.total) + '</div></div><div><div class="k">מספר רכישות</div><div class="v">' + st.count + '</div></div><div><div class="k">רכישה אחרונה</div><div class="v">' + (st.last ? relDays(st.last) : '—') + '</div></div></div>' : '') +
+      (c.type === 'lead' ? '<div class="sub-h">שלב הליד</div><div class="segmented" id="stageQuick">' + LEAD_STAGES.map((s) => '<button type="button" class="' + ((c.stage || 'חדש') === s ? 'on' : '') + '" data-v="' + s + '">' + s + '</button>').join('') + '</div>' : '') +
+      (c.notes ? '<div class="sub-h">הערות</div><div style="white-space:pre-wrap;background:var(--surface-2);border-radius:12px;padding:10px 12px">' + esc(c.notes) + '</div>' : '') +
+      (fus.length ? '<div class="sub-h">פולואפים פתוחים</div><div class="card">' + fus.map(followupRow).join('') + '</div>' : '') +
+      '<div class="sub-h">היסטוריית רכישות</div>' + (sales.length ? '<div class="card list">' + sales.map(saleRow).join('') + '</div>' : '<div class="faint">עדיין אין רכישות</div>'),
+  });
+  m.$('[data-edit]').onclick = () => { m.close(); editCustomer(c, false, (s) => openCustomer(s.id)); };
+  const sq = m.$('#stageQuick');
+  if (sq) sq.addEventListener('click', async (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    $$('button', sq).forEach((x) => x.classList.toggle('on', x === b));
+    await saveRec('customers', Object.assign({}, c, { stage: b.dataset.v }));
+    toast('השלב עודכן: ' + b.dataset.v);
+  });
+}
+
+/* =========================================================
+   Quick WhatsApp message
+   ========================================================= */
+function quickMessage(opts) {
+  opts = opts || {};
+  let cust = opts.customerId ? customerById(opts.customerId) : null;
+  const tpls = templatesFor();
+  const startTpl = opts.templateId ? tpls.find((t) => t.id === opts.templateId) : null;
+  const lastProducts = () => {
+    if (!cust) return '';
+    const last = activeSales().filter((s) => s.customerId === cust.id && s.kind === 'sale').sort((a, b) => b.date.localeCompare(a.date))[0];
+    return last ? (last.items || []).map((i) => i.name).join(', ') : '';
+  };
+  const ctx = () => ({ name: cust ? cust.name : '', products: opts.products || lastProducts(), receipt: opts.receipt });
+  const m = modal({
+    title: 'הודעה מהירה',
+    body:
+      '<div class="field"><label>אל</label><div id="qm_to"></div></div>' +
+      '<div class="field"><label>נוסח</label><div class="tabs" style="margin:0" id="qm_tpls">' + tpls.map((t) => '<button class="tab ' + (startTpl && startTpl.id === t.id ? 'active' : '') + '" data-id="' + t.id + '">' + esc(t.title) + '</button>').join('') + '</div></div>' +
+      '<div class="field"><label for="qm_text">ההודעה</label><textarea class="input" id="qm_text" style="min-height:150px"></textarea></div>' +
+      '<div class="wa-preview"><div class="wa-bubble" id="qm_prev"></div></div>',
+    foot: '<button class="btn wa" data-send>' + icon('wa') + 'פתיחה בוואטסאפ</button><button class="btn secondary" data-copy>' + icon('copy') + 'העתקה</button>',
+  });
+  const ta = m.$('#qm_text');
+  const prev = () => { m.$('#qm_prev').textContent = ta.value || '...'; };
+  ta.value = opts.text || (startTpl ? fillTemplate(startTpl.text, ctx()) : '');
+  prev();
+  ta.addEventListener('input', prev);
+  function renderTo() {
+    m.$('#qm_to').innerHTML = cust
+      ? '<div class="selected-customer"><div class="avatar sm">' + initials(cust.name) + '</div><div class="grow" style="flex:1"><b>' + esc(cust.name) + '</b><div class="muted num" style="font-size:13px">' + esc(prettyPhone(cust.phone)) + '</div></div><button class="btn ghost sm" data-clear>החלפה</button></div>'
+      : '<input class="input" id="qm_search" placeholder="שם או מספר טלפון (ריק = בחירה בוואטסאפ)" autocomplete="off"><div class="picker" id="qm_res" hidden style="margin-top:6px"></div>';
+    if (cust) m.$('[data-clear]').onclick = () => { cust = null; renderTo(); };
+    else {
+      const inp = m.$('#qm_search'), res = m.$('#qm_res');
+      inp.addEventListener('input', () => {
+        const q = inp.value.trim();
+        const list = q ? D('customers').filter((c) => matches(q, [c.name, c.phone])).slice(0, 6) : [];
+        res.hidden = !list.length;
+        res.innerHTML = list.map((c) => '<button class="row" data-id="' + c.id + '"><div class="avatar sm">' + initials(c.name) + '</div><div class="grow"><div class="title">' + esc(c.name) + '</div><div class="meta num">' + esc(prettyPhone(c.phone)) + '</div></div></button>').join('');
+      });
+      res.addEventListener('click', (e) => {
+        const b = e.target.closest('[data-id]'); if (!b) return;
+        cust = customerById(b.dataset.id);
+        const active = m.$('#qm_tpls .tab.active');
+        if (active) ta.value = fillTemplate(tpls.find((t) => t.id === active.dataset.id).text, ctx());
+        prev(); renderTo();
+      });
+    }
+  }
+  renderTo();
+  m.$('#qm_tpls').addEventListener('click', (e) => {
+    const b = e.target.closest('.tab'); if (!b) return;
+    $$('#qm_tpls .tab', m.el).forEach((x) => x.classList.toggle('active', x === b));
+    ta.value = fillTemplate(tpls.find((t) => t.id === b.dataset.id).text, ctx());
+    prev();
+  });
+  m.$('[data-send]').onclick = () => {
+    const phone = cust ? cust.phone : (m.$('#qm_search') && /\d{7,}/.test(cleanPhone(m.$('#qm_search').value)) ? m.$('#qm_search').value : '');
+    openExternal(waLink(phone, ta.value));
+    if (opts.onSent) opts.onSent();
+    m.close();
+  };
+  m.$('[data-copy]').onclick = async () => { toast((await copyText(ta.value)) ? 'ההודעה הועתקה – אפשר להדביק בוואטסאפ' : 'ההעתקה נכשלה', { error: false }); };
+}
+
+/* =========================================================
+   Sale flow
+   ========================================================= */
+function newSale(opts) {
+  opts = opts || {};
+  const draft = {
+    customer: opts.customerId ? customerById(opts.customerId) : null,
+    newCustomer: null,
+    items: [],
+    payment: PAYMENTS[0],
+    date: todayIso(),
+    withReceipt: true,
+    followups: true,
+    notes: '',
+  };
+  const m = modal({
+    title: 'מכירה חדשה',
+    wide: true,
+    body:
+      '<div class="field"><label>לקוח/ה</label><div id="s_cust"></div></div>' +
+      '<div class="field"><label>מוצרים</label><input class="input" id="s_psearch" placeholder="חיפוש מוצר מהמלאי..." autocomplete="off"><div class="picker" id="s_pres" style="margin-top:6px"></div></div>' +
+      '<div id="s_cart"></div>' +
+      '<div class="total-bar"><span>סה״כ לתשלום</span><b id="s_total">₪0</b></div>' +
+      '<div class="field"><label>אמצעי תשלום</label><div class="segmented" id="s_pay">' + PAYMENTS.map((p, i) => '<button type="button" class="' + (i === 0 ? 'on' : '') + '" data-v="' + p + '">' + p + '</button>').join('') + '</div></div>' +
+      '<div class="form-grid"><div class="field"><label for="s_date">תאריך</label><input class="input" type="date" id="s_date" value="' + draft.date + '"></div>' +
+      '<div class="field"><label for="s_notes">הערה (תופיע בקבלה)</label><input class="input" id="s_notes" placeholder="לא חובה"></div></div>' +
+      '<label class="switch"><input type="checkbox" id="s_receipt" checked> הפקת קבלה דיגיטלית (מספר ' + receiptLabel(S().receiptNext) + ')</label>' +
+      '<label class="switch"><input type="checkbox" id="s_fu" checked> תזמון פולואפים: בדיקה אחרי ' + (S().checkDays || 3) + ' ימים וחידוש אחרי ' + (S().renewDays || 30) + ' יום</label>',
+    foot: '<button class="btn" data-save>' + icon('receipt') + 'שמירה והפקת קבלה</button><button class="btn secondary" data-close>ביטול</button>',
+    onMount: (m) => bindSegmented(m.el),
+  });
+
+  function renderCust() {
+    const box = m.$('#s_cust');
+    if (draft.customer) {
+      box.innerHTML = '<div class="selected-customer"><div class="avatar sm">' + initials(draft.customer.name) + '</div><div style="flex:1"><b>' + esc(draft.customer.name) + '</b><div class="muted num" style="font-size:13px">' + esc(prettyPhone(draft.customer.phone)) + '</div></div><button class="btn ghost sm" data-clear>החלפה</button></div>';
+      $('[data-clear]', box).onclick = () => { draft.customer = null; renderCust(); };
+      return;
+    }
+    if (draft.newCustomer) {
+      box.innerHTML = '<div class="form-grid" style="background:var(--sage-softer);border-radius:14px;padding:12px 12px 0"><div class="field"><label for="s_nc_name">שם</label><input class="input" id="s_nc_name" value="' + esc(draft.newCustomer.name) + '"></div>' +
+        '<div class="field"><label for="s_nc_phone">טלפון</label><input class="input" type="tel" id="s_nc_phone" value="' + esc(draft.newCustomer.phone) + '"></div></div>' +
+        '<button class="btn ghost sm" data-cancel style="margin-top:6px">בחירת לקוח קיים</button>';
+      $('#s_nc_name', box).oninput = (e) => { draft.newCustomer.name = e.target.value; };
+      $('#s_nc_phone', box).oninput = (e) => { draft.newCustomer.phone = e.target.value; };
+      $('[data-cancel]', box).onclick = () => { draft.newCustomer = null; renderCust(); };
+      setTimeout(() => $('#s_nc_name', box).focus(), 20);
+      return;
+    }
+    box.innerHTML = '<input class="input" id="s_csearch" placeholder="חיפוש לפי שם או טלפון..." autocomplete="off"><div class="picker" id="s_cres" style="margin-top:6px"></div>';
+    const inp = $('#s_csearch', box), res = $('#s_cres', box);
+    const draw = () => {
+      const q = inp.value.trim();
+      const stats = customerStats();
+      const list = D('customers').filter((c) => matches(q, [c.name, c.phone]))
+        .sort((a, b) => String((stats[b.id] || {}).last || b.createdAt).localeCompare(String((stats[a.id] || {}).last || a.createdAt))).slice(0, q ? 8 : 4);
+      res.innerHTML = list.map((c) => '<button class="row" data-id="' + c.id + '"><div class="avatar sm ' + (c.type === 'lead' ? 'lead' : '') + '">' + initials(c.name) + '</div><div class="grow"><div class="title">' + esc(c.name) + '</div><div class="meta num">' + esc(prettyPhone(c.phone)) + '</div></div>' + (c.type === 'lead' ? '<span class="badge brown">ליד</span>' : '') + '</button>').join('') +
+        '<button class="row" data-new><div class="avatar sm">' + icon('plus') + '</div><div class="grow"><div class="title">' + (q ? 'לקוח/ה חדש/ה: ' + esc(q) : 'לקוח/ה חדש/ה') + '</div></div></button>';
+    };
+    inp.addEventListener('input', draw);
+    res.addEventListener('click', (e) => {
+      const b = e.target.closest('.row'); if (!b) return;
+      if (b.hasAttribute('data-new')) {
+        const q = inp.value.trim();
+        const isPhone = /^[\d\-\s+]{7,}$/.test(q);
+        draft.newCustomer = { name: isPhone ? '' : q, phone: isPhone ? q : '' };
+      } else draft.customer = customerById(b.dataset.id);
+      renderCust();
+    });
+    draw();
+  }
+
+  function renderProducts() {
+    const q = m.$('#s_psearch').value.trim();
+    const list = activeProducts().filter((p) => matches(q, [p.name, p.code, p.category])).sort((a, b) => a.name.localeCompare(b.name, 'he')).slice(0, q ? 12 : 6);
+    m.$('#s_pres').innerHTML = list.map((p) => {
+      const inCart = draft.items.find((i) => i.productId === p.id);
+      return '<button class="row ' + (inCart ? 'on' : '') + '" data-id="' + p.id + '"><div class="grow"><div class="title">' + esc(p.name) + '</div><div class="meta">' + (Number(p.stock) > 0 ? 'במלאי: ' + p.stock : 'אזל מהמלאי') + '</div></div><b class="num">' + moneyText(p.price) + '</b>' + icon(inCart ? 'check' : 'plus') + '</button>';
+    }).join('') + '<button class="row" data-free><div class="grow"><div class="title">' + icon('plus') + ' פריט חופשי (לא מהמלאי)</div></div></button>';
+  }
+
+  function renderCart() {
+    const box = m.$('#s_cart');
+    if (!draft.items.length) { box.innerHTML = ''; }
+    else box.innerHTML = '<div class="cart">' + draft.items.map((i, idx) =>
+      '<div class="line"><div class="grow">' + (i.productId ? esc(i.name) : '<input class="input" data-name="' + idx + '" value="' + esc(i.name) + '" placeholder="תיאור הפריט" style="width:100%">') + '</div>' +
+      '<div class="stepper"><button type="button" data-inc="' + idx + '">+</button><span class="q num">' + i.qty + '</span><button type="button" data-dec="' + idx + '">−</button></div>' +
+      '<input class="input" type="number" inputmode="decimal" data-price="' + idx + '" value="' + i.price + '" aria-label="מחיר ליחידה">' +
+      '<button class="icon-btn sm" type="button" data-rm="' + idx + '" aria-label="הסרה">' + icon('x') + '</button></div>').join('') + '</div>';
+    m.$('#s_total').innerHTML = money(total());
+  }
+  const total = () => draft.items.reduce((s, i) => s + i.qty * (Number(i.price) || 0), 0);
+
+  m.$('#s_psearch').addEventListener('input', renderProducts);
+  m.$('#s_pres').addEventListener('click', (e) => {
+    const b = e.target.closest('.row'); if (!b) return;
+    if (b.hasAttribute('data-free')) draft.items.push({ productId: '', name: '', qty: 1, price: 0 });
+    else {
+      const p = productById(b.dataset.id);
+      const ex = draft.items.find((i) => i.productId === p.id);
+      if (ex) ex.qty++; else draft.items.push({ productId: p.id, name: p.name, qty: 1, price: Number(p.price) || 0 });
+    }
+    renderCart(); renderProducts();
+    if (b.hasAttribute('data-free')) { const inp = m.$('[data-name="' + (draft.items.length - 1) + '"]'); if (inp) inp.focus(); }
+  });
+  m.$('#s_cart').addEventListener('click', (e) => {
+    const t = e.target.closest('button'); if (!t) return;
+    if (t.dataset.inc) draft.items[t.dataset.inc].qty++;
+    else if (t.dataset.dec) { const it = draft.items[t.dataset.dec]; it.qty = Math.max(1, it.qty - 1); }
+    else if (t.dataset.rm) draft.items.splice(Number(t.dataset.rm), 1);
+    else return;
+    renderCart(); renderProducts();
+  });
+  m.$('#s_cart').addEventListener('input', (e) => {
+    const t = e.target;
+    if (t.dataset.price !== undefined) { draft.items[t.dataset.price].price = num(t.value); m.$('#s_total').innerHTML = money(total()); }
+    if (t.dataset.name !== undefined) draft.items[t.dataset.name].name = t.value;
+  });
+  m.$('#s_receipt').addEventListener('change', (e) => {
+    m.$('[data-save]').innerHTML = icon(e.target.checked ? 'receipt' : 'check') + (e.target.checked ? 'שמירה והפקת קבלה' : 'שמירת המכירה');
+  });
+
+  m.$('[data-save]').onclick = async () => {
+    const items = draft.items.filter((i) => i.name.trim());
+    if (!items.length) return toast('נא להוסיף לפחות מוצר אחד', { error: true });
+    if (total() <= 0) return toast('הסכום לתשלום חייב להיות גדול מאפס', { error: true });
+    const withReceipt = m.$('#s_receipt').checked;
+    const btn = m.$('[data-save]');
+    btn.disabled = true;
+    try {
+      let cust = draft.customer;
+      if (draft.newCustomer && draft.newCustomer.name.trim()) {
+        const r = await call('saveRecord', 'customers', { name: draft.newCustomer.name.trim(), phone: cleanPhone(draft.newCustomer.phone), type: 'customer', club: false });
+        applyResult(r);
+        cust = r.changes.customers[0];
+      }
+      const r = await call('createSale', {
+        date: m.$('#s_date').value || todayIso(),
+        customerId: cust ? cust.id : '', customerName: cust ? cust.name : '', customerPhone: cust ? cust.phone : '',
+        items: items, payment: segValue(m.el, '#s_pay'), kind: 'sale', notes: m.$('#s_notes').value.trim(),
+        withReceipt: withReceipt, followups: m.$('#s_fu').checked && !!cust,
+      });
+      applyResult(r);
+      m.close();
+      render();
+      const sale = r.changes.sales[0];
+      if (withReceipt) await finishReceipt(sale);
+      else toast('המכירה נשמרה 🌿');
+    } catch (e) {
+      btn.disabled = false;
+    }
+  };
+
+  renderCust(); renderProducts(); renderCart();
+}
+
+function newOtherIncome() {
+  const m = modal({
+    title: 'הכנסה נוספת',
+    body:
+      '<p class="muted" style="margin-top:0">למשל בונוס מפוראבר, או תשלום שאינו מכירת מוצר מהמלאי.</p>' +
+      '<div class="form-grid"><div class="field full"><label for="o_desc">תיאור</label><input class="input" id="o_desc" placeholder="בונוס מפוראבר" autofocus></div>' +
+      '<div class="field"><label for="o_amount">סכום (₪)</label><input class="input" type="number" inputmode="decimal" id="o_amount"></div>' +
+      '<div class="field"><label for="o_date">תאריך</label><input class="input" type="date" id="o_date" value="' + todayIso() + '"></div>' +
+      '<div class="field full"><label for="o_from">התקבל מ־</label><input class="input" id="o_from" placeholder="פוראבר ליבינג"></div>' +
+      '<div class="field full"><label>אמצעי תשלום</label><div class="segmented" id="o_pay">' + PAYMENTS.concat(['אחר']).map((p, i) => '<button type="button" class="' + (i === 3 ? 'on' : '') + '" data-v="' + p + '">' + p + '</button>').join('') + '</div></div></div>' +
+      '<label class="switch"><input type="checkbox" id="o_receipt"> הפקת קבלה</label>',
+    foot: '<button class="btn" data-save>' + icon('check') + 'שמירה</button><button class="btn secondary" data-close>ביטול</button>',
+    onMount: (m) => bindSegmented(m.el),
+  });
+  m.$('[data-save]').onclick = async () => {
+    const amount = num(m.$('#o_amount').value);
+    const desc = m.$('#o_desc').value.trim() || 'הכנסה';
+    if (amount <= 0) return toast('נא להזין סכום', { error: true });
+    const withReceipt = m.$('#o_receipt').checked;
+    const r = await call('createSale', {
+      date: m.$('#o_date').value || todayIso(), customerName: m.$('#o_from').value.trim(),
+      items: [{ name: desc, qty: 1, price: amount }], total: amount, payment: segValue(m.el, '#o_pay'), kind: 'other', withReceipt: withReceipt, followups: false,
+    });
+    applyResult(r); m.close(); render();
+    if (withReceipt) await finishReceipt(r.changes.sales[0]); else toast('ההכנסה נשמרה');
+  };
+}
+
+/* ---------- receipts ---------- */
+function receiptHtml(sale) {
+  const s = S();
+  const rows = (sale.items || []).map((i) => '<tr><td>' + esc(i.name) + '</td><td class="n">' + i.qty + '</td><td class="n">' + moneyText(i.price) + '</td><td class="n">' + moneyText(i.qty * i.price) + '</td></tr>').join('');
+  return '<div class="receipt">' +
+    (sale.status === 'cancelled' ? '<div class="r-cancel">מבוטלת</div>' : '') +
+    '<div class="r-head"><img class="r-logo" src="' + LOGO_SRC + '" alt="">' +
+      '<div class="r-biz"><b>' + esc(s.businessName) + '</b><br>' + (s.ownerName ? esc(s.ownerName) + '<br>' : '') + 'עוסק פטור ' + esc(s.businessId) + '<br>' + esc(s.address) + '<br><span dir="ltr">' + esc(prettyPhone(s.phone)) + '</span><br><span dir="ltr">' + esc(s.email) + '</span></div></div>' +
+    '<div class="r-title"><h2>קבלה מס׳&nbsp;<span class="num">' + receiptLabel(sale.receiptNo) + '</span><span class="orig">מקור</span></h2><div style="font-size:16px">תאריך: <b>' + fmtShort(sale.date).replace(/\.(\d\d)$/, '.20$1') + '</b></div></div>' +
+    '<div class="r-meta"><div><div class="k">התקבל מאת</div><div class="v">' + esc(sale.customerName || 'לקוח מזדמן') + '</div></div>' +
+      '<div><div class="k">טלפון</div><div class="v" dir="ltr" style="text-align:right">' + esc(prettyPhone(sale.customerPhone) || '—') + '</div></div></div>' +
+    '<table><thead><tr><th>תיאור</th><th class="n">כמות</th><th class="n">מחיר יחידה</th><th class="n">סה״כ</th></tr></thead><tbody>' + rows + '</tbody></table>' +
+    '<div class="r-total"><span>סה״כ התקבל</span><b>' + moneyText(sale.total) + '</b></div>' +
+    '<div class="r-pay">אמצעי תשלום: <b>' + esc(sale.payment) + '</b></div>' +
+    (sale.notes ? '<div class="r-note">הערה: ' + esc(sale.notes) + '</div>' : '') +
+    '<div class="r-foot"><span>עוסק פטור – לא חייב במע״מ</span><span>מסמך ממוחשב · ' + esc(s.businessName) + '</span></div>' +
+  '</div>';
+}
+
+async function buildReceiptPdf(sale) {
+  await Promise.all([loadScript('html2canvas'), loadScript('jspdf')]);
+  const stage = $('#receiptStage');
+  stage.innerHTML = receiptHtml(sale);
+  const el = stage.firstElementChild;
+  if (document.fonts && document.fonts.ready) await document.fonts.ready;
+  await Promise.all($$('img', el).map((img) => img.complete ? null : new Promise((r) => { img.onload = img.onerror = r; })));
+  const canvas = await window.html2canvas(el, { scale: 2, backgroundColor: '#ffffff', logging: false, windowWidth: 900 });
+  const pdf = new window.jspdf.jsPDF({ unit: 'pt', format: 'a4', compress: true });
+  const w = pdf.internal.pageSize.getWidth(), h = pdf.internal.pageSize.getHeight();
+  pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, w, h);
+  stage.innerHTML = '';
+  return pdf.output('datauristring').split(',')[1];
+}
+
+async function finishReceipt(sale) {
+  let current = sale;
+  try {
+    toast('מפיקה קבלה ' + receiptLabel(sale.receiptNo) + '...');
+    const b64 = await buildReceiptPdf(sale);
+    const r = await call('saveReceiptPdf', sale.id, b64, 'קבלה ' + receiptLabel(sale.receiptNo) + ' - ' + (sale.customerName || 'לקוח') + '.pdf');
+    applyResult(r);
+    current = r.changes.sales[0];
+    render();
+  } catch (e) {
+    toast('הקבלה נשמרה, אבל קובץ ה־PDF לא נוצר. אפשר לנסות שוב מכרטיס המכירה.', { error: true });
+  }
+  receiptDone(current);
+}
+
+function receiptDone(sale) {
+  const m = modal({
+    title: 'הקבלה מוכנה 🌿',
+    body: '<div style="text-align:center;padding:6px 0 4px"><div class="avatar" style="margin:0 auto 10px;width:64px;height:64px">' + icon('check') + '</div>' +
+      '<div style="font-family:var(--font-display);font-size:24px;color:var(--olive-deep);font-weight:700">קבלה מס׳ ' + receiptLabel(sale.receiptNo) + '</div>' +
+      '<div class="muted">' + esc(sale.customerName || '') + ' · ' + money(sale.total) + '</div></div>',
+    foot: (sale.customerPhone ? '<button class="btn wa" data-wa>' + icon('wa') + 'שליחה בוואטסאפ</button>' : '') +
+      (sale.pdfUrl ? '<button class="btn secondary" data-open>' + icon('ext') + 'פתיחת הקבלה</button>' : '') +
+      '<button class="btn secondary" data-print>' + icon('print') + 'הדפסה</button>',
+  });
+  const wa = m.$('[data-wa]');
+  if (wa) wa.onclick = () => { sendReceiptWa(sale); m.close(); };
+  const op = m.$('[data-open]');
+  if (op) op.onclick = () => openExternal(sale.pdfUrl);
+  m.$('[data-print]').onclick = () => printReceipt(sale);
+}
+
+function sendReceiptWa(sale) {
+  const t = templatesFor('receipt')[0];
+  const text = fillTemplate(t ? t.text : 'היי {שם}, תודה על הרכישה! הקבלה: {קבלה}', { name: sale.customerName, receipt: sale.pdfUrl || ('קבלה מס׳ ' + receiptLabel(sale.receiptNo)) });
+  openExternal(waLink(sale.customerPhone, text));
+}
+
+function printReceipt(sale) {
+  let root = $('#printRoot');
+  if (!root) { root = document.createElement('div'); root.id = 'printRoot'; root.style.display = 'none'; document.body.appendChild(root); }
+  root.innerHTML = receiptHtml(sale);
+  setTimeout(() => { window.print(); }, 150);
+}
+
+function openSale(id) {
+  const s = D('sales').find((x) => x.id === id);
+  if (!s) return;
+  const cancelled = s.status === 'cancelled';
+  const m = modal({
+    title: s.receiptNo ? 'קבלה מס׳ ' + receiptLabel(s.receiptNo) : 'פרטי הכנסה',
+    body:
+      (cancelled ? '<div class="banner" style="margin:0 0 12px;background:var(--danger-soft);color:var(--danger)">' + icon('alert') + '<div>הקבלה בוטלה ואינה נספרת בהכנסות.</div></div>' : '') +
+      '<div class="kv"><div><div class="k">תאריך</div><div class="v">' + fmtDate(s.date, true) + '</div></div><div><div class="k">סכום</div><div class="v">' + money(s.total) + '</div></div><div><div class="k">תשלום</div><div class="v">' + esc(s.payment || '—') + '</div></div></div>' +
+      (s.customerName ? '<div class="sub-h">התקבל מאת</div><div>' + esc(s.customerName) + (s.customerPhone ? ' · <span class="num">' + esc(prettyPhone(s.customerPhone)) + '</span>' : '') + '</div>' : '') +
+      '<div class="sub-h">פריטים</div><div class="card list">' + (s.items || []).map((i) => '<div class="row"><div class="grow"><div class="title">' + esc(i.name) + '</div><div class="meta">' + i.qty + ' × ' + moneyText(i.price) + '</div></div><b>' + money(i.qty * i.price) + '</b></div>').join('') + '</div>' +
+      (s.notes ? '<div class="sub-h">הערה</div><div>' + esc(s.notes) + '</div>' : ''),
+    foot:
+      (s.receiptNo && s.customerPhone && !cancelled ? '<button class="btn wa" data-wa>' + icon('wa') + 'שליחה</button>' : '') +
+      (s.pdfUrl ? '<button class="btn secondary" data-open>' + icon('ext') + 'PDF</button>' : '') +
+      (s.receiptNo ? '<button class="btn secondary" data-print>' + icon('print') + 'הדפסה</button>' : '') +
+      (s.receiptNo && !s.pdfUrl ? '<button class="btn secondary" data-regen>' + icon('receipt') + 'יצירת PDF</button>' : '') +
+      (!cancelled ? '<button class="btn danger" data-cancel>' + (s.receiptNo ? 'ביטול קבלה' : 'ביטול') + '</button>' : ''),
+  });
+  const on = (sel, fn) => { const el = m.$(sel); if (el) el.onclick = fn; };
+  on('[data-wa]', () => sendReceiptWa(s));
+  on('[data-open]', () => openExternal(s.pdfUrl));
+  on('[data-print]', () => printReceipt(s));
+  on('[data-regen]', async () => { m.close(); await finishReceipt(s); });
+  on('[data-cancel]', async () => {
+    const hasStock = (s.items || []).some((i) => i.productId);
+    const ok = await confirmBox('ביטול ' + (s.receiptNo ? 'קבלה' : 'הכנסה'), 'הרשומה תסומן כמבוטלת ותישאר בתיעוד (כנדרש בחוק). ' + (hasStock ? 'המוצרים יוחזרו למלאי.' : ''), 'ביטול הרשומה', true);
+    if (!ok) return;
+    await mutate('cancelSale', s.id, hasStock);
+    m.close();
+    toast('הרשומה בוטלה');
+  });
+}
+
+/* =========================================================
+   Expenses
+   ========================================================= */
+function editExpense(x) {
+  x = x || {};
+  const isNew = !x.id;
+  const m = modal({
+    title: isNew ? 'הוצאה חדשה' : 'עריכת הוצאה',
+    body:
+      '<div class="form-grid"><div class="field"><label for="e_amount">סכום (₪)</label><input class="input" type="number" inputmode="decimal" id="e_amount" value="' + esc(x.amount || '') + '" autofocus></div>' +
+      '<div class="field"><label for="e_date">תאריך</label><input class="input" type="date" id="e_date" value="' + esc(x.date || todayIso()) + '"></div>' +
+      '<div class="field full"><label>קטגוריה</label><div class="segmented" id="e_cat">' + EXPENSE_CATS.map((c, i) => '<button type="button" class="' + ((x.category || EXPENSE_CATS[0]) === c ? 'on' : '') + '" data-v="' + c + '">' + c + '</button>').join('') + '</div></div>' +
+      '<div class="field full"><label for="e_desc">תיאור</label><input class="input" id="e_desc" value="' + esc(x.description) + '" placeholder="למשל: הזמנת מוצרים, מנוי קנבה"></div>' +
+      '<div class="field full"><label>אמצעי תשלום</label><div class="segmented" id="e_pay">' + ['אשראי', 'העברה בנקאית', 'מזומן', 'ביט', 'פייבוקס'].map((p) => '<button type="button" class="' + ((x.payment || 'אשראי') === p ? 'on' : '') + '" data-v="' + p + '">' + p + '</button>').join('') + '</div></div>' +
+      '<div class="field full"><label for="e_notes">הערות</label><input class="input" id="e_notes" value="' + esc(x.notes) + '"></div></div>',
+    foot: '<button class="btn" data-save>' + icon('check') + 'שמירה</button>' + (!isNew ? '<button class="btn danger" data-del>' + icon('trash') + 'מחיקה</button>' : '') + '<button class="btn secondary" data-close>ביטול</button>',
+    onMount: (m) => bindSegmented(m.el),
+  });
+  m.$('[data-save]').onclick = async () => {
+    const amount = num(m.$('#e_amount').value);
+    if (amount <= 0) return toast('נא להזין סכום', { error: true });
+    await saveRec('expenses', Object.assign({}, x, {
+      amount: amount, date: m.$('#e_date').value || todayIso(), category: segValue(m.el, '#e_cat'),
+      description: m.$('#e_desc').value.trim(), payment: segValue(m.el, '#e_pay'), notes: m.$('#e_notes').value.trim(),
+    }));
+    m.close(); toast('ההוצאה נשמרה');
+  };
+  const del = m.$('[data-del]');
+  if (del) del.onclick = async () => {
+    if (!(await confirmBox('מחיקת הוצאה', 'למחוק את ההוצאה?', 'מחיקה', true))) return;
+    await delRec('expenses', x.id); m.close(); toast('נמחק');
+  };
+}
+
+/* =========================================================
+   Inventory
+   ========================================================= */
+function editProduct(p) {
+  p = p || {};
+  const isNew = !p.id;
+  const cats = Array.from(new Set(PRODUCT_CATS.concat(D('products').map((x) => x.category).filter(Boolean))));
+  const m = modal({
+    title: isNew ? 'מוצר חדש' : 'עריכת מוצר',
+    body:
+      '<div class="form-grid"><div class="field full"><label for="p_name">שם המוצר</label><input class="input" id="p_name" value="' + esc(p.name) + '" autofocus></div>' +
+      '<div class="field"><label for="p_code">מק״ט</label><input class="input" id="p_code" value="' + esc(p.code) + '" dir="ltr"></div>' +
+      '<div class="field"><label for="p_cat">קטגוריה</label><input class="input" id="p_cat" list="p_cats" value="' + esc(p.category) + '"><datalist id="p_cats">' + cats.map((c) => '<option value="' + esc(c) + '">').join('') + '</datalist></div>' +
+      '<div class="field"><label for="p_price">מחיר ללקוח (₪)</label><input class="input" type="number" inputmode="decimal" id="p_price" value="' + esc(p.price || '') + '"></div>' +
+      '<div class="field"><label for="p_cost">מחיר עלות (₪)</label><input class="input" type="number" inputmode="decimal" id="p_cost" value="' + esc(p.cost || '') + '"></div>' +
+      '<div class="field"><label for="p_stock">כמות במלאי</label><input class="input" type="number" id="p_stock" value="' + esc(p.stock || 0) + '"></div>' +
+      '<div class="field"><label for="p_min">התראה מתחת ל־</label><input class="input" type="number" id="p_min" value="' + esc(p.minStock === undefined ? 1 : p.minStock) + '"><span class="help">כשהמלאי מגיע לכמות הזו המוצר יסומן ״נמוך״</span></div>' +
+      '<div class="field full"><label for="p_notes">הערות</label><input class="input" id="p_notes" value="' + esc(p.notes) + '"></div></div>',
+    foot: '<button class="btn" data-save>' + icon('check') + 'שמירה</button>' + (!isNew ? '<button class="btn danger" data-del>' + icon('trash') + 'הסרה</button>' : '') + '<button class="btn secondary" data-close>ביטול</button>',
+  });
+  m.$('[data-save]').onclick = async () => {
+    const name = m.$('#p_name').value.trim();
+    if (!name) return toast('נא להזין שם מוצר', { error: true });
+    const r = await saveRec('products', Object.assign({}, p, {
+      name: name, code: m.$('#p_code').value.trim(), category: m.$('#p_cat').value.trim(), price: num(m.$('#p_price').value), cost: num(m.$('#p_cost').value),
+      stock: num(m.$('#p_stock').value), minStock: num(m.$('#p_min').value), notes: m.$('#p_notes').value.trim(), active: true,
+    }));
+    m.close();
+    if (isNew) toast('המוצר נוסף 🌿', { action: 'פוסט למועדון', onAction: () => editPost({ type: 'new_product', productId: r.changes.products[0].id }) });
+    else toast('המוצר עודכן');
+  };
+  const del = m.$('[data-del]');
+  if (del) del.onclick = async () => {
+    if (!(await confirmBox('הסרת מוצר', 'להסיר את ' + p.name + ' מהמלאי? מכירות קודמות יישמרו.', 'הסרה', true))) return;
+    if (D('sales').some((s) => (s.items || []).some((i) => i.productId === p.id))) await saveRec('products', Object.assign({}, p, { active: false }));
+    else await delRec('products', p.id);
+    m.close(); toast('המוצר הוסר');
+  };
+}
+
+const stockTimers = {};
+function bumpStock(id, d) {
+  const p = productById(id);
+  if (!p) return;
+  p.stock = (Number(p.stock) || 0) + d;
+  p._pending = (p._pending || 0) + d;
+  render();
+  clearTimeout(stockTimers[id]);
+  stockTimers[id] = setTimeout(async () => {
+    const delta = p._pending; p._pending = 0;
+    if (!delta) return;
+    try { applyResult(await call('adjustStock', id, delta)); } catch (e) { p.stock -= delta; }
+    render();
+  }, 700);
+}
+
+function receiveStock() {
+  const prods = activeProducts().slice().sort((a, b) => {
+    const o = { out: 0, low: 1, ok: 2 };
+    return o[stockStatus(a)] - o[stockStatus(b)] || a.name.localeCompare(b.name, 'he');
+  });
+  if (!prods.length) return toast('אין עדיין מוצרים במלאי', { error: true });
+  const m = modal({
+    title: 'קליטת סחורה מפוראבר',
+    wide: true,
+    body: '<p class="muted" style="margin-top:0">הזיני כמה יחידות הגיעו מכל מוצר. המלאי יתעדכן, ואפשר לרשום את ההזמנה כהוצאה.</p>' +
+      '<label class="search" style="margin-bottom:10px">' + icon('search') + '<input id="r_q" placeholder="סינון מוצרים"></label>' +
+      '<div class="card list" id="r_list" style="max-height:44vh;overflow:auto">' + prods.map((p) =>
+        '<div class="row" data-name="' + esc(p.name) + '"><div class="grow"><div class="title">' + esc(p.name) + '</div><div class="meta">במלאי: ' + (p.stock || 0) + '</div></div>' +
+        '<input class="input" type="number" inputmode="numeric" min="0" data-id="' + p.id + '" placeholder="0" style="width:84px;min-height:40px"></div>').join('') + '</div>' +
+      '<div class="form-grid" style="margin-top:14px"><div class="field"><label for="r_amount">עלות ההזמנה (₪)</label><input class="input" type="number" inputmode="decimal" id="r_amount" placeholder="לא חובה"></div>' +
+      '<div class="field"><label for="r_date">תאריך</label><input class="input" type="date" id="r_date" value="' + todayIso() + '"></div></div>',
+    foot: '<button class="btn" data-save>' + icon('truck') + 'עדכון מלאי</button><button class="btn secondary" data-close>ביטול</button>',
+  });
+  m.$('#r_q').addEventListener('input', (e) => { const q = e.target.value.trim(); $$('#r_list .row', m.el).forEach((r) => { r.hidden = q && r.dataset.name.indexOf(q) === -1; }); });
+  m.$('[data-save]').onclick = async () => {
+    const items = $$('#r_list input', m.el).map((i) => ({ productId: i.dataset.id, qty: num(i.value) })).filter((i) => i.qty > 0);
+    if (!items.length) return toast('לא הוזנו כמויות', { error: true });
+    const amount = num(m.$('#r_amount').value);
+    const desc = 'הזמנת מוצרים: ' + items.map((i) => productById(i.productId).name + ' ×' + i.qty).join(', ');
+    await mutate('receiveStock', items, amount ? { id: uidLocal(), date: m.$('#r_date').value || todayIso(), category: EXPENSE_CATS[0], description: desc.slice(0, 240), amount: amount, payment: 'אשראי' } : null);
+    m.close(); toast('המלאי עודכן' + (amount ? ' וההוצאה נרשמה' : ''));
+  };
+}
+
+async function copyMissing() {
+  const list = activeProducts().filter((p) => stockStatus(p) !== 'ok');
+  if (!list.length) return toast('אין מוצרים חסרים 🌿');
+  const text = 'רשימת חוסרים – ' + fmtShort(todayIso()) + '\n' + list.map((p) => '• ' + p.name + (p.code ? ' (' + p.code + ')' : '') + ' – במלאי ' + (p.stock || 0)).join('\n');
+  toast((await copyText(text)) ? 'הרשימה הועתקה (' + list.length + ' מוצרים)' : 'ההעתקה נכשלה');
+}
+
+async function importProducts() {
+  const m = modal({
+    title: 'ייבוא מלאי מקובץ',
+    wide: true,
+    body: '<p class="muted" style="margin-top:0">בחרי קובץ Excel או CSV של המלאי. בשלב הבא נתאים את העמודות. מוצרים קיימים (לפי מק״ט או שם) יתעדכנו.</p>' +
+      '<label class="btn secondary" style="cursor:pointer">' + icon('upload') + 'בחירת קובץ<input type="file" id="imp_file" accept=".xlsx,.xls,.csv" hidden></label>' +
+      '<div id="imp_map" style="margin-top:16px"></div>',
+    foot: '<button class="btn" data-save disabled>' + icon('upload') + 'ייבוא</button><button class="btn secondary" data-close>ביטול</button>',
+  });
+  let rows = [], header = [];
+  const FIELDS = [['name', 'שם מוצר', /שם|מוצר|name|product/i], ['code', 'מק״ט', /מק"?״?ט|קוד|code|sku|מספר/i], ['category', 'קטגוריה', /קטגור|סוג|category/i],
+    ['stock', 'כמות במלאי', /כמות|מלאי|stock|qty|יש/i], ['price', 'מחיר ללקוח', /מחיר(?!.*עלות)|לקוח|price|מכירה/i], ['cost', 'מחיר עלות', /עלות|cost|קניה|רכישה/i], ['minStock', 'מינימום', /מינ|min/i]];
+  m.$('#imp_file').addEventListener('change', async (e) => {
+    const file = e.target.files[0]; if (!file) return;
+    try {
+      await loadScript('xlsx');
+      const wb = window.XLSX.read(await file.arrayBuffer(), { type: 'array' });
+      const sheet = wb.Sheets[wb.SheetNames[0]];
+      const all = window.XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' }).filter((r) => r.some((c) => String(c).trim()));
+      let hi = all.findIndex((r) => r.filter((c) => String(c).trim()).length >= 2);
+      if (hi < 0) hi = 0;
+      header = all[hi].map((h, i) => String(h).trim() || 'עמודה ' + (i + 1));
+      rows = all.slice(hi + 1);
+      const used = {};
+      const guess = (re) => { const i = header.findIndex((h, idx) => !used[idx] && re.test(h)); if (i >= 0) used[i] = 1; return i; };
+      const guesses = FIELDS.map((f) => guess(f[2]));
+      m.$('#imp_map').innerHTML = '<div class="form-grid">' + FIELDS.map((f, fi) => '<div class="field"><label>' + f[1] + '</label><select class="input" data-f="' + f[0] + '"><option value="-1">— לא לייבא —</option>' +
+        header.map((h, i) => '<option value="' + i + '" ' + (guesses[fi] === i ? 'selected' : '') + '>' + esc(h) + '</option>').join('') + '</select></div>').join('') + '</div>' +
+        '<div class="banner ok">' + icon('doc') + '<div>נמצאו <b>' + rows.length + '</b> שורות בקובץ ״' + esc(file.name) + '״</div></div>';
+      m.$('[data-save]').disabled = false;
+    } catch (err) {
+      toast('לא הצלחתי לקרוא את הקובץ: ' + err.message, { error: true });
+    }
+  });
+  m.$('[data-save]').onclick = async () => {
+    const map = {};
+    $$('#imp_map select', m.el).forEach((s) => { map[s.dataset.f] = Number(s.value); });
+    if (map.name < 0) return toast('חובה לבחור את עמודת שם המוצר', { error: true });
+    const out = rows.map((r) => {
+      const o = {};
+      Object.keys(map).forEach((k) => { if (map[k] >= 0) o[k] = ['stock', 'price', 'cost', 'minStock'].indexOf(k) >= 0 ? num(r[map[k]]) : String(r[map[k]]).trim(); });
+      return o;
+    }).filter((o) => o.name);
+    const r = await mutate('importProducts', out);
+    m.close();
+    toast('יובאו ' + r.changes.products.length + ' מוצרים 🌿');
+  };
+}
+
+/* =========================================================
+   Follow-ups
+   ========================================================= */
+function followupText(f) {
+  const t = templatesFor(f.type)[0];
+  if (!t) return fillTemplate('היי {שם} 🌿 ' + (f.note || ''), { name: f.customerName });
+  return fillTemplate(t.text, { name: f.customerName, products: f.products });
+}
+async function markFollowup(f, status) {
+  await saveRec('followups', Object.assign({}, f, { status: status, doneAt: todayIso() }));
+}
+function newReminder(customerId) {
+  let cust = customerId ? customerById(customerId) : null;
+  const m = modal({
+    title: 'תזכורת חדשה',
+    body: '<div class="field"><label for="rm_c">למי</label>' + (cust ? '<div class="selected-customer"><div class="avatar sm">' + initials(cust.name) + '</div><b>' + esc(cust.name) + '</b></div>'
+        : '<select class="input" id="rm_c"><option value="">בחירה...</option>' + D('customers').slice().sort((a, b) => a.name.localeCompare(b.name, 'he')).map((c) => '<option value="' + c.id + '">' + esc(c.name) + '</option>').join('') + '</select>') + '</div>' +
+      '<div class="field"><label for="rm_date">מתי</label><input class="input" type="date" id="rm_date" value="' + addDays(todayIso(), 1) + '"></div>' +
+      '<div class="field"><label for="rm_note">על מה</label><input class="input" id="rm_note" placeholder="למשל: לשאול על הקרם החדש" autofocus></div>',
+    foot: '<button class="btn" data-save>' + icon('check') + 'שמירה</button><button class="btn secondary" data-close>ביטול</button>',
+  });
+  m.$('[data-save]').onclick = async () => {
+    if (!cust) cust = customerById(m.$('#rm_c').value);
+    if (!cust) return toast('נא לבחור איש קשר', { error: true });
+    await saveRec('followups', { customerId: cust.id, customerName: cust.name, phone: cust.phone, type: cust.type === 'lead' ? 'lead' : 'custom', due: m.$('#rm_date').value || todayIso(), status: 'open', note: m.$('#rm_note').value.trim() });
+    m.close(); toast('התזכורת נשמרה');
+  };
+}
+
+/* =========================================================
+   Club posts
+   ========================================================= */
+function postSkeleton(type, p) {
+  const name = p ? p.name : '{מוצר}';
+  const price = p && p.price ? moneyText(p.price) : '[מחיר]';
+  if (type === 'new_product') return '✨ חדש אצלי: ' + name + ' ✨\n\nלמה אני מתלהבת ממנו:\n• \n• \n• \n\nמחיר: ' + price + '\nלהזמנה – שלחו לי הודעה פרטית 💚\n\nאלה בטבע 🌿';
+  if (type === 'tip') return '🌿 הטיפ של אלה לשבוע\n\n[הטיפ במשפט או שניים]\n\n' + (p ? 'מוצר שיכול לעזור: ' + name + '\n\n' : '') + 'שאלות? אני כאן 💚';
+  if (type === 'promo') return '🎁 הטבה לחברי המועדון בלבד\n\n[פרטי ההטבה]' + (p ? '\nעל ' + name + ' – ' + price : '') + '\n\nבתוקף עד: [תאריך]\nלהזמנה – הודעה פרטית 💚\n\nאלה בטבע 🌿';
+  if (type === 'testimonial') return '💚 מה הלקוחות מספרים\n\n״[הציטוט]״\n– [שם]' + (p ? ', על ' + name : '') + '\n\nרוצים לשמוע עוד? כתבו לי 🌿';
+  return '';
+}
+function editPost(post) {
+  post = post || {};
+  const isNew = !post.id;
+  const type = post.type || 'new_product';
+  const prods = activeProducts().slice().sort((a, b) => a.name.localeCompare(b.name, 'he'));
+  const startProd = post.productId ? productById(post.productId) : null;
+  const m = modal({
+    title: isNew ? 'תוכן חדש למועדון' : 'עריכת תוכן',
+    wide: true,
+    body:
+      '<div class="field"><label>סוג</label><div class="segmented" id="po_type">' + Object.keys(POST_TYPES).map((k) => '<button type="button" class="' + (type === k ? 'on' : '') + '" data-v="' + k + '">' + POST_TYPES[k].emo + ' ' + POST_TYPES[k].label + '</button>').join('') + '</div></div>' +
+      '<div class="form-grid"><div class="field"><label for="po_prod">מוצר</label><select class="input" id="po_prod"><option value="">ללא מוצר</option>' + prods.map((p) => '<option value="' + p.id + '" ' + (post.productId === p.id ? 'selected' : '') + '>' + esc(p.name) + '</option>').join('') + '</select></div>' +
+      '<div class="field"><label for="po_date">תאריך פרסום</label><input class="input" type="date" id="po_date" value="' + esc(post.date || todayIso()) + '"></div>' +
+      '<div class="field full"><label for="po_title">כותרת (לשימוש פנימי)</label><input class="input" id="po_title" value="' + esc(post.title || (startProd ? startProd.name : '')) + '"></div></div>' +
+      '<div class="field"><label for="po_body">ההודעה לקבוצה</label><textarea class="input" id="po_body" style="min-height:200px">' + esc(post.body || postSkeleton(type, startProd)) + '</textarea><span class="help">החליפי את הטקסט שבסוגריים המרובעים</span></div>' +
+      '<div class="wa-preview"><div class="wa-bubble" id="po_prev"></div></div>',
+    foot: '<button class="btn" data-save>' + icon('check') + 'שמירה</button><button class="btn wa" data-send>' + icon('wa') + 'שליחה לקבוצה</button><button class="btn secondary" data-copy>' + icon('copy') + 'העתקה</button>' + (!isNew ? '<button class="btn danger" data-del>' + icon('trash') + '</button>' : ''),
+    onMount: (m) => bindSegmented(m.el),
+  });
+  const body = m.$('#po_body');
+  const touched = { v: !!post.body };
+  const prev = () => { m.$('#po_prev').textContent = body.value; };
+  prev();
+  body.addEventListener('input', () => { touched.v = true; prev(); });
+  const regen = () => {
+    if (touched.v && !confirm('להחליף את הטקסט בתבנית חדשה?')) return;
+    const p = productById(m.$('#po_prod').value);
+    body.value = postSkeleton(segValue(m.el, '#po_type'), p);
+    if (p && !m.$('#po_title').value) m.$('#po_title').value = p.name;
+    touched.v = false; prev();
+  };
+  m.$('#po_type').addEventListener('click', (e) => { if (e.target.closest('button')) setTimeout(regen, 0); });
+  m.$('#po_prod').addEventListener('change', regen);
+  const collect = (status) => Object.assign({}, post, {
+    type: segValue(m.el, '#po_type'), productId: m.$('#po_prod').value, date: m.$('#po_date').value, title: m.$('#po_title').value.trim() || POST_TYPES[segValue(m.el, '#po_type')].label,
+    body: body.value, status: status || (post.status && post.status !== 'draft' ? post.status : (m.$('#po_date').value > todayIso() ? 'planned' : 'draft')),
+  });
+  m.$('[data-save]').onclick = async () => {
+    const rec = collect();
+    if (rec.status === 'draft' && rec.date >= todayIso()) rec.status = 'planned';
+    await saveRec('posts', rec); m.close(); toast('נשמר בתוכן המועדון');
+  };
+  m.$('[data-copy]').onclick = async () => { toast((await copyText(body.value)) ? 'הועתק – הדביקי בקבוצת המועדון' : 'ההעתקה נכשלה'); };
+  m.$('[data-send]').onclick = async () => {
+    openExternal(waLink('', body.value));
+    await saveRec('posts', collect('sent'));
+    m.close(); toast('סומן כנשלח 🌿');
+  };
+  const del = m.$('[data-del]');
+  if (del) del.onclick = async () => {
+    if (!(await confirmBox('מחיקת תוכן', 'למחוק את הפוסט?', 'מחיקה', true))) return;
+    await delRec('posts', post.id); m.close();
+  };
+}
+
+function editTemplate(t) {
+  t = t || {};
+  const m = modal({
+    title: t.id ? 'עריכת נוסח' : 'נוסח חדש',
+    body: '<div class="field"><label for="t_title">שם הנוסח</label><input class="input" id="t_title" value="' + esc(t.title) + '" autofocus></div>' +
+      '<div class="field"><label for="t_cat">שימוש</label><select class="input" id="t_cat">' + Object.keys(TEMPLATE_CATS).map((k) => '<option value="' + k + '" ' + ((t.category || 'general') === k ? 'selected' : '') + '>' + TEMPLATE_CATS[k] + '</option>').join('') + '</select>' +
+      '<span class="help">הנוסח הראשון בכל סוג (בדיקה / חידוש / קבלה) משמש אוטומטית בפולואפים ובשליחת קבלות</span></div>' +
+      '<div class="field"><label for="t_text">הנוסח</label><textarea class="input" id="t_text" style="min-height:170px">' + esc(t.text) + '</textarea><span class="help">{שם} · {שם מלא} · {מוצרים} · {קבלה} · {קישור}</span></div>',
+    foot: '<button class="btn" data-save>' + icon('check') + 'שמירה</button>' + (t.id ? '<button class="btn danger" data-del>' + icon('trash') + 'מחיקה</button>' : '') + '<button class="btn secondary" data-close>ביטול</button>',
+  });
+  m.$('[data-save]').onclick = async () => {
+    const title = m.$('#t_title').value.trim(), text = m.$('#t_text').value.trim();
+    if (!title || !text) return toast('נא למלא שם ונוסח', { error: true });
+    await saveRec('templates', Object.assign({}, t, { title: title, text: text, category: m.$('#t_cat').value, order: t.order !== undefined ? t.order : D('templates').length }));
+    m.close(); toast('הנוסח נשמר');
+  };
+  const del = m.$('[data-del]');
+  if (del) del.onclick = async () => { if (await confirmBox('מחיקת נוסח', 'למחוק את הנוסח?', 'מחיקה', true)) { await delRec('templates', t.id); m.close(); } };
+}
+
+/* =========================================================
+   Misc actions
+   ========================================================= */
+function exportCsv() {
+  const y = String(state.year);
+  const q = (v) => '"' + String(v === undefined || v === null ? '' : v).replace(/"/g, '""') + '"';
+  const lines = [['סוג', 'תאריך', 'מספר קבלה', 'שם', 'תיאור', 'אמצעי תשלום', 'סכום', 'סטטוס'].map(q).join(',')];
+  D('sales').filter((s) => s.date.slice(0, 4) === y).sort((a, b) => a.date.localeCompare(b.date)).forEach((s) => {
+    lines.push(['הכנסה', fmtShort(s.date), receiptLabel(s.receiptNo), s.customerName, (s.items || []).map((i) => i.name + ' x' + i.qty).join('; '), s.payment, s.total, s.status === 'cancelled' ? 'בוטלה' : ''].map(q).join(','));
+  });
+  D('expenses').filter((x) => x.date.slice(0, 4) === y).sort((a, b) => a.date.localeCompare(b.date)).forEach((x) => {
+    lines.push(['הוצאה', fmtShort(x.date), '', x.category, x.description, x.payment, x.amount, ''].map(q).join(','));
+  });
+  const blob = new Blob(['﻿' + lines.join('\n')], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = 'אלה בטבע - הכנסות והוצאות ' + y + '.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+  toast('הקובץ ירד למכשיר');
+}
+
+function moreMenu() {
+  const items = NAV.filter((n) => BOTTOM.indexOf(n.id) === -1);
+  const m = modal({
+    title: 'עוד',
+    body: '<div class="card list">' + items.map((n) => '<button class="row" data-go="' + n.id + '"><span class="avatar sm">' + icon(n.icon) + '</span><div class="grow"><div class="title">' + n.label + '</div></div>' + icon('chevL') + '</button>').join('') + '</div>',
+  });
+  m.el.addEventListener('click', (e) => { const b = e.target.closest('[data-go]'); if (b) { m.close(); go(b.dataset.go); } });
+}
+
+/* =========================================================
+   Action dispatcher
+   ========================================================= */
+const A = {
+  go: (el) => go(el.dataset.view),
+  tab: (el) => { state.tab[el.dataset.view] = el.dataset.tab; render(); },
+  tabGo: (el) => { state.tab[el.dataset.view] = el.dataset.tab; go(el.dataset.view); },
+  moreMenu: moreMenu,
+  newSale: (el) => { closeAllModals(); newSale({ customerId: el.dataset.customer }); },
+  newLead: () => editCustomer(null, true),
+  newCustomer: () => editCustomer(null, false),
+  openCustomer: (el) => openCustomer(el.dataset.id),
+  quickMsg: (el, e) => { e.stopPropagation(); quickMessage({ customerId: el.dataset.customer, templateId: el.dataset.template }); },
+  newExpense: () => editExpense(),
+  editExpense: (el) => editExpense(D('expenses').find((x) => x.id === el.dataset.id)),
+  newOtherIncome: newOtherIncome,
+  openSale: (el) => openSale(el.dataset.id),
+  newProduct: () => editProduct(),
+  editProduct: (el) => editProduct(productById(el.dataset.id)),
+  stock: (el) => bumpStock(el.dataset.id, Number(el.dataset.d)),
+  receiveStock: receiveStock,
+  copyMissing: copyMissing,
+  importProducts: importProducts,
+  newReminder: (el) => newReminder(el.dataset.customer),
+  fuWa: (el) => {
+    const f = D('followups').find((x) => x.id === el.dataset.id);
+    const c = customerById(f.customerId);
+    quickMessage({ customerId: f.customerId, text: followupText(f), products: f.products, onSent: () => {
+      toast('ההודעה נשלחה ל' + firstName(c ? c.name : f.customerName) + '?', { action: 'סימון כבוצע', onAction: () => markFollowup(f, 'done').then(() => toast('מעולה 🌿')) });
+    } });
+  },
+  fuDone: (el) => { const f = D('followups').find((x) => x.id === el.dataset.id); markFollowup(f, 'done').then(() => toast('סומן כבוצע 🌿')); },
+  fuSnooze: (el) => {
+    const f = D('followups').find((x) => x.id === el.dataset.id);
+    const base = f.due > todayIso() ? f.due : todayIso();
+    saveRec('followups', Object.assign({}, f, { due: addDays(base, 3) })).then(() => toast('נדחה ב־3 ימים'));
+  },
+  year: (el) => { state.year += Number(el.dataset.d); state.month = 'all'; render(); },
+  exportCsv: exportCsv,
+  openSheet: () => openExternal(state.data.meta.spreadsheetUrl),
+  newPost: (el) => editPost({ type: el.dataset.type }),
+  editPost: (el) => editPost(D('posts').find((p) => p.id === el.dataset.id)),
+  copyPost: async (el) => { const p = D('posts').find((x) => x.id === el.dataset.id); toast((await copyText(p.body)) ? 'הועתק – הדביקי בקבוצה' : 'ההעתקה נכשלה'); },
+  sendPost: async (el) => {
+    const p = D('posts').find((x) => x.id === el.dataset.id);
+    openExternal(waLink('', p.body));
+    if (p.status !== 'sent') toast('נשלח לקבוצה?', { action: 'סימון כנשלח', onAction: () => saveRec('posts', Object.assign({}, p, { status: 'sent', date: todayIso() })) });
+  },
+  inviteClub: (el) => {
+    const c = customerById(el.dataset.id);
+    const t = templatesFor('club')[0];
+    quickMessage({ customerId: c.id, text: fillTemplate(t ? t.text : 'היי {שם}, מוזמנת למועדון הלקוחות שלי 🌿 {קישור}', { name: c.name }), onSent: () => {
+      toast('להוסיף את ' + firstName(c.name) + ' לחברי המועדון?', { action: 'כן', onAction: () => saveRec('customers', Object.assign({}, c, { club: true })) });
+    } });
+  },
+  editTemplate: (el) => editTemplate(D('templates').find((t) => t.id === el.dataset.id)),
+  copyTemplate: async (el) => { const t = D('templates').find((x) => x.id === el.dataset.id); toast((await copyText(t.text)) ? 'הנוסח הועתק' : 'ההעתקה נכשלה'); },
+  saveSettings: async () => {
+    const patch = {};
+    $$('[data-setting]').forEach((i) => { patch[i.dataset.setting] = i.dataset.setting === 'phone' || i.dataset.setting === 'businessId' ? i.value.replace(/[^\d]/g, '') : i.value.trim(); });
+    await mutate('saveSettings', patch);
+    toast('ההגדרות נשמרו 🌿');
+  },
+  logout: () => window.__logout(),
+  changeReceiptNo: () => {
+    const m = modal({
+      title: 'מספר הקבלה הבאה',
+      body: '<div class="field"><label for="rn">מספר</label><input class="input" type="number" id="rn" value="' + esc(S().receiptNext) + '" autofocus><span class="help">אפשר רק להגדיל – למשל להמשיך מהמספר שבפנקס הקבלות הקודם.</span></div>',
+      foot: '<button class="btn" data-save>שמירה</button><button class="btn secondary" data-close>ביטול</button>',
+    });
+    m.$('[data-save]').onclick = async () => { await mutate('setReceiptStart', num(m.$('#rn').value)); m.close(); toast('עודכן'); };
+  },
+};
+function closeAllModals() { $$('#modalRoot .overlay').forEach((o) => o.remove()); }
+
+document.addEventListener('click', (e) => {
+  const el = e.target.closest('[data-action]');
+  if (!el) return;
+  const fn = A[el.dataset.action];
+  if (fn) { e.preventDefault(); fn(el, e); }
+});
+document.addEventListener('input', (e) => {
+  const el = e.target;
+  if (el.dataset && el.dataset.input === 'search') { state.q[el.dataset.view] = el.value; render(); }
+});
+document.addEventListener('change', (e) => {
+  const el = e.target;
+  if (el.dataset && el.dataset.input === 'month') { state.month = el.value; render(); }
+});
+
+/* =========================================================
+   Boot
+   ========================================================= */
+function boot() {
+  $('#splashLogo').src = LOGO_SRC;
+  google.script.run
+    .withSuccessHandler((data) => {
+      state.data = data;
+      $('#app').hidden = false;
+      render();
+      const sp = $('#splash');
+      sp.style.opacity = '0';
+      setTimeout(() => sp.remove(), 350);
+    })
+    .withFailureHandler((e) => {
+      const sp = $('#splash');
+      sp.classList.add('error');
+      sp.innerHTML = '<img class="splash-logo" src="' + LOGO_SRC + '" alt="אלה בטבע"><b>לא הצלחתי לטעון את המערכת</b><div class="muted">' + esc((e && e.message) || e) + '</div><button class="btn" onclick="location.reload()">ניסיון נוסף</button>';
+    })
+    .bootstrap();
+}
+boot();
+})();
+</script>
+
+</body>
+</html>

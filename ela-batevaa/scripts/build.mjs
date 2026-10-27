@@ -20,4 +20,11 @@ mkdirSync(join(root, 'deploy'), { recursive: true });
 const inlined = src('Index.html').replace(/<\?!= include\('(\w+)'\); \?>/g, (_, name) => src(`${name}.html`));
 writeFileSync(join(root, 'deploy', 'Index.html'), inlined);
 writeFileSync(join(root, 'deploy', 'Code.gs'), src('Code.gs'));
-console.log('built src/Logo.html, preview/index.html and deploy/Index.html');
+// Web version for Vercel: same UI, Supabase backend (web/api.js) instead of Apps Script.
+const SUPABASE_JS = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js';
+const web = src('Index.html')
+  .replace('<base target="_top">', '<title>אלה בטבע · ניהול העסק</title>\n  <link rel="manifest" href="/manifest.webmanifest">\n  <link rel="icon" href="/icon.jpg">\n  <link rel="apple-touch-icon" href="/icon.jpg">\n  <meta name="apple-mobile-web-app-capable" content="yes">\n  <meta name="apple-mobile-web-app-title" content="אלה בטבע">')
+  .replace(/<\?!= include\('(\w+)'\); \?>/g, (_, name) =>
+    src(`${name}.html`) + (name === 'Logo' ? `<script src="${SUPABASE_JS}"></script>\n<script src="/config.js"></script>\n<script src="/api.js"></script>\n` : ''));
+writeFileSync(join(root, 'web', 'index.html'), web);
+console.log('built src/Logo.html, preview/index.html, deploy/Index.html and web/index.html');

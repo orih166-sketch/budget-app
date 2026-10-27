@@ -1241,7 +1241,8 @@ VIEWS.settings = function () {
   '</div>' +
   '<div class="btn-row" style="margin-top:16px"><button class="btn" data-action="saveSettings">' + icon('check') + 'שמירת הגדרות</button>' +
     (meta.spreadsheetUrl ? '<button class="btn secondary" data-action="openSheet">' + icon('ext') + 'פתיחת גיליון הנתונים</button>' : '') + '</div>' +
-  '<p class="faint" style="font-size:13px;margin-top:14px">מחוברת כ־' + esc(meta.email || '') + ' · הנתונים נשמרים בגיליון Google בחשבון שלך, והקבלות בתיקייה ״אלה בטבע – קבלות״ ב־Drive.</p>';
+  (window.__logout ? '<div class="btn-row" style="margin-top:10px"><button class="btn ghost" data-action="logout">' + icon('logout') + 'התנתקות</button></div>' : '') +
+  '<p class="faint" style="font-size:13px;margin-top:14px">מחוברת כ־' + esc(meta.email || '') + ' · ' + esc(meta.storageNote || 'הנתונים נשמרים בגיליון Google בחשבון שלך, והקבלות בתיקייה ״אלה בטבע – קבלות״ ב־Drive.') + '</p>';
 };
 
 /* =========================================================
@@ -2092,6 +2093,7 @@ const A = {
     await mutate('saveSettings', patch);
     toast('ההגדרות נשמרו 🌿');
   },
+  logout: () => window.__logout(),
   changeReceiptNo: () => {
     const m = modal({
       title: 'מספר הקבלה הבאה',
