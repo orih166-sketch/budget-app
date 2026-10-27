@@ -11,7 +11,7 @@
 
   const SETTINGS = {
     businessName: 'אלה בטבע', ownerName: 'אלה', businessId: '212040851', address: 'שעלבים', phone: '0556637932',
-    email: 'ela262@gmail.com', receiptNext: '1', receiptDigits: '4', checkDays: '3', renewDays: '30', inactiveDays: '60',
+    email: 'elah262@gmail.com', receiptNext: '1', receiptDigits: '4', checkDays: '3', renewDays: '30', inactiveDays: '60',
     ceiling: '120000', clubLink: '',
   };
   const TEMPLATES = [
@@ -84,7 +84,7 @@
 
   const api = {
     bootstrap() {
-      return Object.assign(clone(db), { meta: { spreadsheetUrl: 'https://docs.google.com/spreadsheets/', email: 'ela262@gmail.com', today: today() } });
+      return Object.assign(clone(db), { meta: { spreadsheetUrl: 'https://docs.google.com/spreadsheets/', email: 'elah262@gmail.com', today: today() } });
     },
     saveRecord(t, rec) { if (!rec.createdAt && ['customers', 'expenses'].includes(t)) rec.createdAt = today() + 'T09:00:00'; return { changes: { [t]: [upsert(t, rec)] } }; },
     deleteRecord(t, id) { db[t] = db[t].filter((x) => x.id !== id); return { removed: { [t]: [id] } }; },

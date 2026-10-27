@@ -5,7 +5,7 @@
  */
 
 // Only these Google accounts may use the system.
-const ALLOWED_EMAILS = ['ela262@gmail.com'];
+const ALLOWED_EMAILS = ['elah262@gmail.com'];
 
 const APP_TITLE = 'אלה בטבע · ניהול העסק';
 const SPREADSHEET_NAME = 'אלה בטבע – מערכת ניהול (לא למחוק)';
@@ -58,7 +58,7 @@ const DEFAULT_SETTINGS = {
   businessId: '212040851',
   address: 'שעלבים',
   phone: '0556637932',
-  email: 'ela262@gmail.com',
+  email: 'elah262@gmail.com',
   receiptNext: '1',
   receiptDigits: '4',
   checkDays: '3',
