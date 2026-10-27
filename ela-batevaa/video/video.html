@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+<meta charset="utf-8">
+<title>אלה בטבע – מדריך</title>
+<style>
+@font-face { font-family: 'Assistant'; font-weight: 400; src: url(assets/fonts/assistant-hebrew-400-normal.woff2); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+@font-face { font-family: 'Assistant'; font-weight: 600; src: url(assets/fonts/assistant-hebrew-600-normal.woff2); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+@font-face { font-family: 'Assistant'; font-weight: 700; src: url(assets/fonts/assistant-hebrew-700-normal.woff2); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+@font-face { font-family: 'Assistant'; font-weight: 800; src: url(assets/fonts/assistant-hebrew-800-normal.woff2); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+@font-face { font-family: 'Assistant'; font-weight: 400; src: url(assets/fonts/assistant-latin-400-normal.woff2); unicode-range: U+0000-00FF, U+2000-206F, U+20AC; }
+@font-face { font-family: 'Assistant'; font-weight: 700; src: url(assets/fonts/assistant-latin-700-normal.woff2); unicode-range: U+0000-00FF, U+2000-206F, U+20AC; }
+@font-face { font-family: 'Assistant'; font-weight: 800; src: url(assets/fonts/assistant-latin-800-normal.woff2); unicode-range: U+0000-00FF, U+2000-206F, U+20AC; }
+@font-face { font-family: 'Frank Ruhl Libre'; font-weight: 500; src: url(assets/fonts/frank-ruhl-libre-hebrew-500-normal.woff2); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+@font-face { font-family: 'Frank Ruhl Libre'; font-weight: 700; src: url(assets/fonts/frank-ruhl-libre-hebrew-700-normal.woff2); unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+@font-face { font-family: 'Frank Ruhl Libre'; font-weight: 700; src: url(assets/fonts/frank-ruhl-libre-latin-700-normal.woff2); unicode-range: U+0000-00FF, U+2000-206F, U+20AC; }
+
+:root {
+  --cream: #FBF3E8; --olive: #55602F; --olive-deep: #3F4822; --olive-2: #707D3F; --sage: #A2AD82; --sage-soft: #E9ECDB;
+  --brown: #8B5E3C; --sand: #E2C9A6; --text: #2D3020;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--cream); }
+body { font-family: 'Assistant', sans-serif; color: var(--text); -webkit-font-smoothing: antialiased; }
+.stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: var(--cream); }
+
+.blob { position: absolute; border-radius: 50%; filter: blur(70px); will-change: transform; }
+.b1 { width: 900px; height: 760px; left: -320px; top: -260px; background: rgba(162, 173, 130, .55); }
+.b2 { width: 760px; height: 760px; right: -360px; bottom: -200px; background: rgba(112, 125, 63, .22); }
+.b3 { width: 520px; height: 520px; right: -140px; top: 520px; background: rgba(226, 201, 166, .45); }
+
+.chip {
+  position: absolute; top: 86px; right: 64px; display: flex; flex-direction: column; align-items: flex-end; gap: 8px;
+}
+.chip span {
+  background: var(--olive); color: var(--cream); font-weight: 800; font-size: 32px; padding: 8px 26px 10px; border-radius: 999px; white-space: nowrap;
+}
+.chip i { display: block; width: 100%; height: 5px; border-radius: 3px; background: var(--brown); opacity: .75; }
+
+.headline {
+  position: absolute; top: 168px; right: 64px; width: 952px; font-weight: 800; font-size: 56px; line-height: 1.24;
+  color: var(--olive-deep); text-align: right; letter-spacing: -.005em;
+}
+
+.phone {
+  position: absolute; left: 202px; top: 386px; width: 676px; height: 1421px; border-radius: 86px; background: #1E2017;
+  padding: 18px; box-shadow: 0 50px 90px -40px rgba(45, 48, 32, .55), 0 0 0 3px #3A3D2E inset;
+}
+.screen { position: relative; width: 640px; height: 1385px; border-radius: 70px; overflow: hidden; background: var(--cream); }
+.screen img.shot { position: absolute; inset: 0; width: 640px; height: 1385px; opacity: 0; }
+.screen .paper { position: absolute; inset: 0; background: #E7E1D5; opacity: 0; }
+.screen .paper img { position: absolute; left: 34px; top: 90px; width: 572px; border-radius: 6px; box-shadow: 0 20px 50px -18px rgba(0, 0, 0, .35); }
+.island { position: absolute; top: 16px; left: 50%; width: 170px; height: 44px; margin-left: -85px; border-radius: 24px; background: #111; z-index: 5; }
+.homebar { position: absolute; bottom: 12px; left: 50%; width: 220px; height: 8px; margin-left: -110px; border-radius: 6px; background: rgba(0, 0, 0, .55); z-index: 5; }
+
+.cursor { position: absolute; left: 0; top: 0; width: 66px; height: 66px; z-index: 20; transform-origin: 6px 4px; }
+.ripple { position: absolute; width: 40px; height: 40px; margin: -20px 0 0 -20px; border-radius: 50%; z-index: 19; border: 6px solid rgba(85, 96, 47, .75); background: rgba(162, 173, 130, .28); opacity: 0; }
+
+.card {
+  position: absolute; inset: 0; background: var(--olive); z-index: 40; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; color: var(--cream); padding: 120px; gap: 26px; clip-path: inset(0 0 0 100%);
+}
+.card .part { font-size: 40px; font-weight: 700; color: var(--sand); }
+.card h2 { font-family: 'Frank Ruhl Libre', serif; font-weight: 700; font-size: 132px; line-height: 1.08; }
+.card p { font-size: 42px; font-weight: 600; color: rgba(251, 243, 232, .82); }
+.card .leaf { width: 120px; height: 120px; opacity: .9; }
+.card .ring { position: absolute; border-radius: 50%; border: 2px solid rgba(251, 243, 232, .12); }
+
+.intro, .outro { position: absolute; inset: 0; z-index: 30; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 100px; }
+.intro .logo-card { width: 640px; border-radius: 56px; background: var(--cream); padding: 30px 36px; box-shadow: 0 40px 80px -36px rgba(63, 72, 34, .45); }
+.intro .logo-card img { width: 100%; display: block; }
+.intro h1 { font-family: 'Frank Ruhl Libre', serif; font-weight: 700; font-size: 120px; color: var(--olive-deep); margin-top: 64px; }
+.intro p { font-size: 42px; font-weight: 600; color: #6F6B5B; margin-top: 10px; }
+.intro .pill { margin-top: 40px; background: var(--olive); color: var(--cream); font-weight: 800; font-size: 34px; border-radius: 999px; padding: 10px 34px; }
+
+.outro { justify-content: flex-start; padding-top: 250px; gap: 0; }
+.outro h1 { font-family: 'Frank Ruhl Libre', serif; font-weight: 700; font-size: 124px; color: var(--olive-deep); margin-bottom: 64px; }
+.outro .rows { width: 900px; display: flex; flex-direction: column; gap: 26px; }
+.outro .r {
+  display: flex; justify-content: space-between; align-items: center; background: #FFFDF8; border: 2px solid #E8DCC8; border-radius: 30px; padding: 30px 40px;
+  box-shadow: 0 16px 36px -22px rgba(63, 72, 34, .4);
+}
+.outro .r .k { font-size: 40px; font-weight: 600; color: #5E5A4A; }
+.outro .r .v { font-size: 46px; font-weight: 800; color: var(--olive); }
+.outro .end-logo { width: 300px; margin-top: 80px; border-radius: 40px; box-shadow: 0 30px 60px -30px rgba(63, 72, 34, .45); }
+.fadeout { position: absolute; inset: 0; background: var(--cream); z-index: 60; opacity: 0; }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="blob b1" id="b1"></div><div class="blob b2" id="b2"></div><div class="blob b3" id="b3"></div>
+
+  <div id="main">
+    <div class="chip" id="chip" dir="rtl"><span id="chipText"></span><i></i></div>
+    <div class="headline" id="headline" dir="rtl"></div>
+    <div class="phone" id="phone">
+      <div class="screen" id="screen"><div class="island"></div><div class="homebar"></div></div>
+    </div>
+    <div class="ripple" id="ripple"></div>
+    <svg class="cursor" id="cursor" viewBox="0 0 66 66" aria-hidden="true">
+      <path d="M6 4 L6 52 L18 41 L27 61 L36 57 L27 37 L44 37 Z" fill="#1A1A1A" stroke="#fff" stroke-width="4" stroke-linejoin="round"/>
+    </svg>
+  </div>
+
+  <div class="intro" id="intro" dir="rtl">
+    <div class="logo-card" id="iLogo"><img src="assets/logo-640.jpg" alt=""></div>
+    <h1 id="iTitle">מדריך למערכת</h1>
+    <p id="iSub">ניהול העסק · מכירות, קבלות, לקוחות ומלאי</p>
+    <div class="pill" id="iPill">4 חלקים · כל הפעולות</div>
+  </div>
+
+  <div class="card" id="card" dir="rtl">
+    <div class="ring" style="width:1300px;height:1300px;left:-610px;top:-420px"></div>
+    <div class="ring" style="width:900px;height:900px;right:-480px;bottom:-260px"></div>
+    <svg class="leaf" viewBox="0 0 100 100" id="cLeaf"><path d="M12 88C12 44 42 12 90 10c0 50-32 78-78 78z" fill="#A2AD82"/><path d="M12 88 58 42" stroke="#55602F" stroke-width="5" stroke-linecap="round"/></svg>
+    <div class="part" id="cPart"></div>
+    <h2 id="cTitle"></h2>
+    <p id="cSub"></p>
+  </div>
+
+  <div class="outro" id="outro" dir="rtl">
+    <h1 id="oTitle">מה לזכור</h1>
+    <div class="rows" id="oRows"></div>
+    <img class="end-logo" id="oLogo" src="assets/logo-640.jpg" alt="">
+  </div>
+  <div class="fadeout" id="fadeout"></div>
+</div>
+
+<script>
+(function () {
+const CHAPTERS = {
+  'מסך הבית': 'כניסה וסקירה יומית',
+  'מכירה וקבלה': 'מכירה, קבלה ושליחה בוואטסאפ',
+  'פולואפים ולקוחות': 'שימור לקוחות ולידים',
+  'כספים, מלאי ומועדון': 'הכנסות, הוצאות, מלאי ותוכן',
+};
+const OUTRO_ROWS = [
+  ['כל מכירה', 'קבלה + 2 פולואפים'],
+  ['בדיקה עם הלקוח', 'אחרי 3 ימים'],
+  ['הצעת חידוש', 'אחרי 30 יום'],
+  ['קבלה שגויה', 'מבטלים, לא מוחקים'],
+];
+const INTRO = 3.6, CARD = 2.5, OUTRO = 6.5, XFADE = 0.38;
+const SX = 640, SY = 1385;
+
+const $ = (id) => document.getElementById(id);
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const prog = (t, a, d) => clamp((t - a) / d, 0, 1);
+const ease = {
+  out: (x) => 1 - Math.pow(1 - x, 3),
+  inOut: (x) => (x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2),
+  back: (x) => { const c = 1.6; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); },
+  expo: (x) => (x === 1 ? 1 : 1 - Math.pow(2, -10 * x)),
+};
+
+const story = window.STORY;
+const shotEls = story.map((s) => {
+  if (s.kind === 'paper') {
+    const d = document.createElement('div'); d.className = 'paper';
+    d.innerHTML = '<img src="shots/' + s.img + '">';
+    $('screen').appendChild(d); return d;
+  }
+  const im = document.createElement('img'); im.className = 'shot'; im.src = 'shots/' + s.img;
+  $('screen').appendChild(im); return im;
+});
+$('oRows').innerHTML = OUTRO_ROWS.map((r) => '<div class="r"><span class="k">' + r[0] + '</span><span class="v">' + r[1] + '</span></div>').join('');
+const rowEls = Array.from(document.querySelectorAll('.outro .r'));
+
+// ---- build timeline segments
+const segs = [];
+const events = [];
+let t = 0;
+segs.push({ type: 'intro', start: t, dur: INTRO }); events.push({ t: 0.25, kind: 'chime' }); t += INTRO;
+const chapterNames = [];
+story.forEach((s) => { if (chapterNames.indexOf(s.chapter) === -1) chapterNames.push(s.chapter); });
+let lastCursor = { x: 0.5, y: 0.82 };
+story.forEach((s, i) => {
+  const isFirstOfChapter = i === 0 || story[i - 1].chapter !== s.chapter;
+  if (isFirstOfChapter) {
+    segs.push({ type: 'card', start: t, dur: CARD, chapter: s.chapter, n: chapterNames.indexOf(s.chapter) + 1, firstStep: i });
+    events.push({ t: t + 0.02, kind: 'whoosh' }, { t: t + CARD - 0.5, kind: 'whoosh' });
+    t += CARD;
+  }
+  const dur = s.kind === 'paper' ? 3.8 : s.target ? 3.1 : 3.0;
+  const seg = { type: 'step', start: t, dur: dur, i: i, from: lastCursor, to: s.target, tap: s.tap };
+  if (s.target) { lastCursor = s.target; if (s.tap) events.push({ t: t + 1.45, kind: 'click' }); }
+  segs.push(seg);
+  t += dur;
+});
+segs.push({ type: 'outro', start: t, dur: OUTRO }); events.push({ t: t + 0.05, kind: 'whoosh' });
+rowEls.forEach((_, k) => events.push({ t: t + 1.0 + k * 0.32, kind: 'tick' }));
+t += OUTRO;
+const TOTAL = t;
+window.TOTAL = TOTAL;
+window.EVENTS = events;
+
+function stepAt(time) {
+  let cur = null;
+  for (const s of segs) if (s.type === 'step' && time >= s.start) cur = s;
+  return cur;
+}
+function setOpacity(el, v) { el.style.opacity = String(v); }
+
+function renderAt(T) {
+  // background drift
+  $('b1').style.transform = 'translate(' + (Math.sin(T * 0.21) * 60) + 'px,' + (Math.cos(T * 0.17) * 40) + 'px)';
+  $('b2').style.transform = 'translate(' + (Math.cos(T * 0.15) * 70) + 'px,' + (Math.sin(T * 0.19) * 50) + 'px)';
+  $('b3').style.transform = 'translate(' + (Math.sin(T * 0.12 + 1) * 50) + 'px,' + (Math.cos(T * 0.23) * 60) + 'px)';
+
+  const seg = segs.find((s) => T >= s.start && T < s.start + s.dur) || segs[segs.length - 1];
+  const lt = T - seg.start;
+
+  // ---- intro
+  const intro = segs[0];
+  const iOn = T < intro.start + intro.dur + 0.5;
+  $('intro').style.display = iOn ? 'flex' : 'none';
+  if (iOn) {
+    const a = T;
+    const logoP = ease.back(prog(a, 0.15, 0.8));
+    $('iLogo').style.transform = 'scale(' + (0.7 + 0.3 * logoP) + ')';
+    setOpacity($('iLogo'), prog(a, 0.15, 0.4));
+    const tp = ease.out(prog(a, 0.55, 0.7));
+    $('iTitle').style.transform = 'translateY(' + (60 * (1 - tp)) + 'px)'; setOpacity($('iTitle'), tp);
+    const sp = ease.expo(prog(a, 0.85, 0.7));
+    $('iSub').style.transform = 'translateX(' + (70 * (1 - sp)) + 'px)'; setOpacity($('iSub'), sp);
+    const pp = ease.back(prog(a, 1.15, 0.6));
+    $('iPill').style.transform = 'scale(' + (0.6 + 0.4 * pp) + ')'; setOpacity($('iPill'), prog(a, 1.15, 0.3));
+  }
+
+  // ---- main (steps)
+  const main = $('main');
+  const st = stepAt(T);
+  const mainVisible = T >= intro.start + intro.dur - 0.01;
+  main.style.visibility = mainVisible ? 'visible' : 'hidden';
+  if (st) {
+    const s = story[st.i];
+    const l = T - st.start;
+    $('chipText').textContent = s.chapter;
+    // caption
+    const prevCap = st.i > 0 ? story[st.i - 1].caption : '';
+    const capP = s.caption === prevCap ? 1 : ease.out(prog(l, 0.05, 0.5));
+    const h = $('headline');
+    if (h.textContent !== s.caption) h.textContent = s.caption;
+    h.style.transform = 'translateY(' + (34 * (1 - capP)) + 'px)'; setOpacity(h, capP);
+    // shots
+    const next = segs.find((x) => x.type === 'step' && x.i === st.i + 1);
+    const sameChapterNext = next && story[next.i].chapter === s.chapter && next.start === st.start + st.dur;
+    const xf = sameChapterNext ? ease.inOut(prog(l, st.dur - XFADE, XFADE)) : 0;
+    shotEls.forEach((el, k) => setOpacity(el, k === st.i ? 1 : (k === st.i + 1 ? xf : 0)));
+    if (s.kind === 'paper') {
+      const pi = shotEls[st.i].querySelector('img');
+      const pp = ease.out(prog(l, 0, 0.7));
+      pi.style.transform = 'translateY(' + (80 * (1 - pp)) + 'px) scale(' + (0.94 + 0.06 * pp) + ')';
+    }
+    // cursor
+    const cur = $('cursor'), rip = $('ripple');
+    const box = $('screen').getBoundingClientRect();
+    const toPx = (p) => ({ x: box.left + p.x * SX, y: box.top + p.y * SY });
+    let pos, curOp = 1, press = 0;
+    if (st.to) {
+      const mp = ease.inOut(prog(l, 0.45, 0.85));
+      const a = toPx(st.from), b = toPx(st.to);
+      const arc = Math.sin(mp * Math.PI) * -40;
+      pos = { x: a.x + (b.x - a.x) * mp, y: a.y + (b.y - a.y) * mp + arc };
+      const prev = segs.find((x) => x.type === 'step' && x.i === st.i - 1);
+      const prevHasTarget = prev && prev.start + prev.dur === st.start && story[prev.i].target;
+      const nextHasTarget = sameChapterNext && story[next.i].target;
+      curOp = (prevHasTarget ? 1 : prog(l, 0, 0.3)) * (nextHasTarget ? 1 : 1 - prog(l, st.dur - 0.25, 0.25));
+      if (st.tap) {
+        press = Math.sin(prog(l, 1.38, 0.24) * Math.PI);
+        const rp = prog(l, 1.45, 0.55);
+        rip.style.left = b.x + 'px'; rip.style.top = b.y + 'px';
+        rip.style.transform = 'scale(' + (0.6 + 2.6 * ease.out(rp)) + ')';
+        setOpacity(rip, rp > 0 && rp < 1 ? 1 - rp : 0);
+      } else {
+        const hp = prog(l, 1.35, 1.4);
+        rip.style.left = b.x + 'px'; rip.style.top = b.y + 'px';
+        const pulse = Math.sin(hp * Math.PI * 2);
+        rip.style.transform = 'scale(' + (1.6 + 0.35 * pulse) + ')';
+        setOpacity(rip, hp > 0 && hp < 1 ? 0.55 * Math.sin(hp * Math.PI) : 0);
+      }
+    } else {
+      pos = toPx(st.from);
+      curOp = 0;
+      setOpacity(rip, 0);
+    }
+    cur.style.transform = 'translate(' + (pos.x - 6) + 'px,' + (pos.y - 4) + 'px) scale(' + (1 - 0.14 * press) + ')';
+    setOpacity(cur, curOp);
+  } else {
+    // before first step: show first shot behind the first card
+    shotEls.forEach((el, k) => setOpacity(el, k === 0 ? 1 : 0));
+    $('chipText').textContent = story[0].chapter;
+    $('headline').textContent = '';
+    setOpacity($('cursor'), 0); setOpacity($('ripple'), 0);
+  }
+
+  // ---- chapter card
+  const card = $('card');
+  const cs = segs.find((x) => x.type === 'card' && T >= x.start - 0.0001 && T < x.start + x.dur);
+  if (cs) {
+    const l = T - cs.start;
+    const inP = ease.inOut(prog(l, 0, 0.5));
+    const outP = ease.inOut(prog(l, cs.dur - 0.5, 0.5));
+    card.style.clipPath = outP > 0 ? 'inset(0 ' + (outP * 100) + '% 0 0)' : 'inset(0 0 0 ' + ((1 - inP) * 100) + '%)';
+    $('cPart').textContent = 'חלק ' + cs.n + ' מתוך ' + chapterNames.length;
+    $('cTitle').textContent = cs.chapter;
+    $('cSub').textContent = CHAPTERS[cs.chapter] || '';
+    const a = ease.out(prog(l, 0.3, 0.6)), b = ease.back(prog(l, 0.45, 0.7)), c = ease.expo(prog(l, 0.65, 0.6)), d = ease.back(prog(l, 0.2, 0.8));
+    $('cPart').style.transform = 'translateY(' + (40 * (1 - a)) + 'px)'; setOpacity($('cPart'), a);
+    $('cTitle').style.transform = 'scale(' + (0.85 + 0.15 * b) + ')'; setOpacity($('cTitle'), prog(l, 0.45, 0.3));
+    $('cSub').style.transform = 'translateX(' + (60 * (1 - c)) + 'px)'; setOpacity($('cSub'), c);
+    $('cLeaf').style.transform = 'rotate(' + (-25 * (1 - d)) + 'deg) scale(' + (0.5 + 0.5 * d) + ')'; setOpacity($('cLeaf'), prog(l, 0.2, 0.3));
+    // cover the intro while the first card enters
+    if (cs === segs[1] && inP >= 1) $('intro').style.display = 'none';
+  } else {
+    card.style.clipPath = 'inset(0 0 0 100%)';
+  }
+
+  // ---- outro
+  const os = segs[segs.length - 1];
+  const oOn = T >= os.start;
+  $('outro').style.display = oOn ? 'flex' : 'none';
+  if (oOn) {
+    const l = T - os.start;
+    const cover = ease.inOut(prog(l, 0, 0.6));
+    $('outro').style.clipPath = 'circle(' + (cover * 140) + '% at 50% 50%)';
+    $('outro').style.background = 'var(--cream)';
+    const tp = ease.back(prog(l, 0.45, 0.7));
+    $('oTitle').style.transform = 'scale(' + (0.8 + 0.2 * tp) + ')'; setOpacity($('oTitle'), prog(l, 0.45, 0.3));
+    rowEls.forEach((el, k) => {
+      const p = ease.out(prog(l, 1.0 + k * 0.32, 0.55));
+      el.style.transform = 'translateX(' + (90 * (1 - p)) + 'px)'; setOpacity(el, p);
+    });
+    const lp = ease.back(prog(l, 2.6, 0.8));
+    $('oLogo').style.transform = 'scale(' + (0.6 + 0.4 * lp) + ')'; setOpacity($('oLogo'), prog(l, 2.6, 0.4));
+    setOpacity($('fadeout'), prog(l, os.dur - 0.7, 0.7));
+  } else setOpacity($('fadeout'), 0);
+}
+
+window.renderAt = renderAt;
+window.ready = Promise.all([document.fonts.ready].concat(Array.from(document.images).map((im) => (im.complete ? 0 : new Promise((r) => { im.onload = im.onerror = r; })))))
+  .then(() => Promise.all(Array.from(document.images).map((im) => im.decode().catch(() => 0))))
+  .then(() => { renderAt(0); return TOTAL; });
+})();
+</script>
+</body>
+</html>

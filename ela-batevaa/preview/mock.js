@@ -68,7 +68,7 @@
     mk(3, 3, [[0, 2]], 'העברה בנקאית');
     mk(1, 0, [[1, 1]], 'פייבוקס');
     db.followups.push({ id: uid(), customerId: C[5].id, customerName: C[5].name, phone: C[5].phone, saleId: '', type: 'lead', due: t, status: 'open', products: '', note: 'התעניינה בג׳ל אלוורה', doneAt: '' });
-    db.expenses.push({ id: uid(), date: addDays(t, -20), category: 'רכישת מוצרים מפוראבר', description: 'הזמנת מלאי חודשית', amount: 1240, payment: 'אשראי', notes: '', createdAt: '' });
+    db.expenses.push({ id: uid(), date: addDays(t, -35), category: 'רכישת מוצרים מפוראבר', description: 'הזמנת מלאי חודשית', amount: 420, payment: 'אשראי', notes: '', createdAt: '' });
     db.expenses.push({ id: uid(), date: addDays(t, -6), category: 'שירותים דיגיטליים', description: 'קנבה פרו', amount: 20, payment: 'אשראי', notes: '', createdAt: '' });
     db.expenses.push({ id: uid(), date: addDays(t, -2), category: 'כנסים והדרכות', description: 'כרטיס ליום הצלחה', amount: 40, payment: 'אשראי', notes: '', createdAt: '' });
     db.posts.push({ id: uid(), date: addDays(t, 2), type: 'tip', title: 'שתייה נכונה של ג׳ל אלוורה', body: '🌿 הטיפ של אלה לשבוע\n\nכדאי לשתות את ג׳ל האלוורה בבוקר על קיבה ריקה, 30–60 מ״ל, ולשמור את הבקבוק במקרר אחרי הפתיחה.\n\nשאלות? אני כאן 💚', productId: PR[0].id, status: 'planned' });
