@@ -1,218 +1,279 @@
 <title>מחכים לבייבי</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Varela+Round&family=Assistant:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Varela+Round&family=Rubik:wght@400;500;700&display=swap">
 <style>
-/* Layout: one-column phone app — soft header with countdown, content cards, fixed bottom tab bar, full-screen "birth mode" overlay */
+/* Layout: phone-first single column — night-sky hero with the week's "size" moon, one focused task, upcoming dates; 5-tab bottom bar; birth mode as a calm full-screen sheet with three huge actions */
 :root {
-  --bg: #f3f7fb;
+  --bg: #eef2fb;
   --surface: #ffffff;
-  --surface2: #e8f0f8;
-  --ink: #1f3550;
-  --ink2: #5a6f88;
-  --ink3: #93a3b6;
-  --line: #d8e3ee;
-  --sky: #6fa8dc;
-  --sky-soft: #dcebf8;
-  --peach: #f4a88c;
-  --peach-soft: #fde9e1;
-  --mint: #5bb59a;
-  --mint-soft: #ddf2ea;
-  --honey: #e9b54a;
-  --honey-soft: #fbf0d6;
-  --alert: #e0605a;
-  --alert-soft: #fbe3e1;
-  --shadow: 0 2px 10px rgba(31, 53, 80, .07);
-  --display: "Varela Round", "Assistant", system-ui, sans-serif;
-  --body: "Assistant", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --r: 18px;
+  --surface2: #e5ebf8;
+  --ink: #1b2440;
+  --ink2: #48557a;
+  --ink3: #7f8bab;
+  --line: #d5dcef;
+  --accent: #5b7fd6;
+  --accent-soft: #dde5fa;
+  --moon: #d99a22;
+  --moon-soft: #fbefd6;
+  --coral: #dd5a52;
+  --coral-soft: #fbe1de;
+  --mint: #2f9a7e;
+  --mint-soft: #d6efe7;
+  --sky1: #c3d1f5;
+  --sky2: #eef2fb;
+  --star: #ffffff;
+  --shadow: 0 1px 2px rgba(27, 36, 64, .05), 0 6px 20px rgba(27, 36, 64, .06);
+  --display: "Varela Round", "Rubik", system-ui, sans-serif;
+  --body: "Rubik", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --r: 20px;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #111a28; --surface: #18243a; --surface2: #1f2d47; --ink: #e8eef7; --ink2: #a8b8cc; --ink3: #6b7f99;
-    --line: #2a3a55; --sky: #8fbde8; --sky-soft: #22385a; --peach: #f6b39b; --peach-soft: #3d2b2a;
-    --mint: #72c8ad; --mint-soft: #1d3b36; --honey: #f0c66a; --honey-soft: #3a3222; --alert: #f07a74; --alert-soft: #45262a;
-    --shadow: 0 2px 12px rgba(0, 0, 0, .3); color-scheme: dark;
+    --bg: #0e1430; --surface: #171f40; --surface2: #202a50; --ink: #eef1fb; --ink2: #b9c2dd; --ink3: #7c88ad; --line: #2a3563;
+    --accent: #95aef2; --accent-soft: #26325f; --moon: #f3c766; --moon-soft: #3a3322; --coral: #f3837b; --coral-soft: #47262d;
+    --mint: #6fd0b2; --mint-soft: #193a3a; --sky1: #1e2a5c; --sky2: #0e1430; --star: #f8e9b8; --shadow: 0 1px 2px rgba(0,0,0,.2), 0 8px 24px rgba(0,0,0,.25); color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #111a28; --surface: #18243a; --surface2: #1f2d47; --ink: #e8eef7; --ink2: #a8b8cc; --ink3: #6b7f99;
-  --line: #2a3a55; --sky: #8fbde8; --sky-soft: #22385a; --peach: #f6b39b; --peach-soft: #3d2b2a;
-  --mint: #72c8ad; --mint-soft: #1d3b36; --honey: #f0c66a; --honey-soft: #3a3222; --alert: #f07a74; --alert-soft: #45262a;
-  --shadow: 0 2px 12px rgba(0, 0, 0, .3); color-scheme: dark;
+  --bg: #0e1430; --surface: #171f40; --surface2: #202a50; --ink: #eef1fb; --ink2: #b9c2dd; --ink3: #7c88ad; --line: #2a3563;
+  --accent: #95aef2; --accent-soft: #26325f; --moon: #f3c766; --moon-soft: #3a3322; --coral: #f3837b; --coral-soft: #47262d;
+  --mint: #6fd0b2; --mint-soft: #193a3a; --sky1: #1e2a5c; --sky2: #0e1430; --star: #f8e9b8; --shadow: 0 1px 2px rgba(0,0,0,.2), 0 8px 24px rgba(0,0,0,.25); color-scheme: dark;
 }
-* { box-sizing: border-box; }
-html, body { background: var(--bg); }
-body { color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.5; }
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { background: var(--bg); overscroll-behavior-y: none; }
+body { color: var(--ink); font-family: var(--body); font-size: 17px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
 body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
-#app { max-width: 720px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 12px calc(96px + env(safe-area-inset-bottom, 0px)); }
-h1, h2, h3 { font-family: var(--display); font-weight: 400; text-wrap: balance; margin: 0; }
-h2 { font-size: 1.45rem; }
-h3 { font-size: 1.1rem; }
+#app { max-width: 680px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 10px calc(100px + env(safe-area-inset-bottom, 0px)); }
+h1, h2, h3 { font-family: var(--display); font-weight: 400; text-wrap: balance; margin: 0; letter-spacing: -.005em; }
+h2 { font-size: 1.6rem; line-height: 1.25; }
+h3 { font-size: 1.15rem; line-height: 1.3; }
 p { margin: 0; }
-a { color: var(--sky); }
-button { font: inherit; color: inherit; cursor: pointer; }
-button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, a:focus-visible { outline: 3px solid var(--sky); outline-offset: 2px; }
-input, select, textarea { font: inherit; color: var(--ink); background: var(--surface); border: 1.5px solid var(--line); border-radius: 12px; padding: 10px 12px; width: 100%; min-width: 0; }
-textarea { resize: vertical; min-height: 70px; }
-label.f { display: grid; gap: 4px; font-size: .85rem; color: var(--ink2); font-weight: 600; }
-.stack { display: grid; gap: 14px; }
+a { color: var(--accent); }
+button { font: inherit; color: inherit; cursor: pointer; -webkit-user-select: none; user-select: none; touch-action: manipulation; }
+button, .press { transition: transform 160ms var(--ease-out), background-color 200ms ease, opacity 200ms ease; }
+button:active, .press:active { transform: scale(.97); }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 10px; }
+input, select, textarea { font: inherit; font-size: 16px; color: var(--ink); background: var(--surface); border: 1.5px solid var(--line); border-radius: 14px; padding: 11px 13px; width: 100%; min-width: 0; transition: border-color 150ms ease; }
+input:focus, select:focus, textarea:focus { border-color: var(--accent); outline: none; }
+textarea { resize: vertical; min-height: 80px; }
+label.f { display: grid; gap: 5px; font-size: .85rem; color: var(--ink2); font-weight: 500; }
+.hint { font-size: .78rem; color: var(--ink3); font-weight: 400; }
+.stack { display: grid; gap: 16px; }
+.stack-s { display: grid; gap: 8px; }
 .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 .grow { flex: 1; min-width: 0; }
 .muted { color: var(--ink2); }
-.small { font-size: .85rem; }
-.tiny { font-size: .75rem; color: var(--ink3); }
+.small { font-size: .88rem; }
+.tiny { font-size: .78rem; color: var(--ink3); }
 .num { font-variant-numeric: tabular-nums; }
+.eyebrow { font-size: .74rem; font-weight: 700; letter-spacing: .04em; color: var(--ink3); }
 
-/* header */
-.top { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-block: 4px 12px; }
-.brand { display: flex; align-items: center; gap: 10px; }
-.brand h1 { font-size: 1.35rem; }
-.sync { font-size: .72rem; padding: 3px 9px; border-radius: 99px; background: var(--surface2); color: var(--ink2); white-space: nowrap; }
-.sync.on { background: var(--mint-soft); color: var(--mint); }
-.iconbtn { border: 0; background: var(--surface2); width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; }
+/* top bar */
+.top { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-block: 2px 12px; }
+.brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.brand h1 { font-size: 1.2rem; }
+.sync { font-size: .7rem; color: var(--ink3); display: flex; align-items: center; gap: 5px; }
+.sync::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--ink3); }
+.sync.on::before { background: var(--mint); }
+.topbtns { display: flex; gap: 8px; align-items: center; }
+.iconbtn { border: 0; background: var(--surface2); width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; color: var(--ink2); }
+.pill-birth { border: 0; background: var(--coral-soft); color: var(--coral); border-radius: 99px; padding: 9px 14px; font-weight: 700; font-size: .85rem; display: flex; gap: 6px; align-items: center; }
 
 /* hero */
-.hero { position: relative; overflow: hidden; border-radius: 26px; padding: 22px 20px 20px; background: linear-gradient(160deg, var(--sky-soft), var(--surface) 75%); border: 1px solid var(--line); }
-.hero .clouds { position: absolute; inset: 0; pointer-events: none; opacity: .9; }
-.hero .inner { position: relative; display: grid; gap: 6px; }
-.hero .big { font-family: var(--display); font-size: 3.2rem; line-height: 1; color: var(--ink); }
-.hero .big small { font-size: 1.1rem; color: var(--ink2); }
-.weekbar { height: 10px; border-radius: 99px; background: var(--surface2); overflow: hidden; margin-top: 10px; }
-.weekbar i { display: block; height: 100%; background: linear-gradient(90deg, var(--sky), var(--mint)); border-radius: 99px; }
-.weeklbl { display: flex; justify-content: space-between; font-size: .75rem; color: var(--ink3); margin-top: 4px; }
+.hero { position: relative; overflow: hidden; border-radius: 28px; background: linear-gradient(175deg, var(--sky1), var(--sky2) 92%); padding: 22px 20px 20px; isolation: isolate; }
+.hero canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; }
+.hero-grid { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 14px; align-items: center; }
+.hero .hello { font-size: .92rem; color: var(--ink2); }
+.hero .wk { font-family: var(--display); font-size: 2.6rem; line-height: 1.05; }
+.hero .wk small { font-size: 1.05rem; color: var(--ink2); }
+.hero .left { font-size: .95rem; color: var(--ink2); margin-top: 4px; }
+.moonball { width: 112px; height: 112px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, var(--surface), var(--moon-soft) 70%); display: grid; place-items: center; box-shadow: 0 0 0 8px color-mix(in srgb, var(--moon) 14%, transparent), 0 10px 30px color-mix(in srgb, var(--moon) 30%, transparent); }
+.moonball span { font-size: 3.4rem; line-height: 1; }
+.size-txt { margin-top: 12px; font-size: .95rem; }
+.size-txt b { font-weight: 700; }
+.track { position: relative; height: 8px; border-radius: 99px; background: color-mix(in srgb, var(--ink) 10%, transparent); margin-top: 16px; }
+.track > i { position: absolute; inset-block: 0; inset-inline-start: 0; border-radius: 99px; background: linear-gradient(to left, var(--moon), var(--accent)); }
+.marks { position: relative; height: 18px; margin-top: 4px; font-size: .7rem; color: var(--ink3); }
+.marks span { position: absolute; transform: translateX(50%); white-space: nowrap; }
 
-.birthbtn { width: 100%; border: 0; border-radius: 22px; padding: 18px; background: var(--alert); color: #fff; font-family: var(--display); font-size: 1.35rem; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 6px 18px rgba(224, 96, 90, .35); }
-.birthbtn:active { transform: scale(.98); }
+.birth-big { width: 100%; border: 0; border-radius: 24px; padding: 20px; background: var(--coral); color: #fff; font-family: var(--display); font-size: 1.4rem; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 8px 22px color-mix(in srgb, var(--coral) 40%, transparent); }
 
-.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; box-shadow: var(--shadow); }
-.card.flat { box-shadow: none; }
-.banner { border-radius: var(--r); padding: 14px 16px; display: grid; gap: 4px; }
-.banner.honey { background: var(--honey-soft); }
-.banner.peach { background: var(--peach-soft); }
-.banner.mint { background: var(--mint-soft); }
-.banner.sky { background: var(--sky-soft); }
-.banner b { font-family: var(--display); font-weight: 400; font-size: 1.05rem; }
+.card { background: var(--surface); border-radius: var(--r); padding: 18px; box-shadow: var(--shadow); }
+.focus { background: var(--surface); border-radius: var(--r); padding: 18px; box-shadow: var(--shadow); display: grid; gap: 12px; }
+.focus .big { font-family: var(--display); font-size: 1.3rem; line-height: 1.35; }
+.focus .bar { display: flex; gap: 10px; flex-wrap: wrap; }
+.btn { border: 0; border-radius: 14px; padding: 11px 18px; font-weight: 700; background: var(--ink); color: var(--bg); white-space: nowrap; }
+.btn.soft { background: var(--surface2); color: var(--ink); }
+.btn.accent { background: var(--accent); color: #fff; }
+.btn.mint { background: var(--mint); color: #fff; }
+.btn.small { padding: 7px 13px; font-size: .85rem; border-radius: 11px; }
+.link { border: 0; background: none; color: var(--accent); font-weight: 700; padding: 0; font-size: .9rem; }
 
-.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
-.stat { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 12px; display: grid; gap: 2px; }
-.stat .v { font-family: var(--display); font-size: 1.35rem; font-variant-numeric: tabular-nums; }
-.stat .l { font-size: .75rem; color: var(--ink2); }
-.ring { height: 6px; border-radius: 99px; background: var(--surface2); overflow: hidden; margin-top: 6px; }
-.ring i { display: block; height: 100%; background: var(--mint); }
+.upcoming { display: grid; gap: 0; }
+.up { display: grid; grid-template-columns: 54px minmax(0, 1fr); gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.up:last-child { border-bottom: 0; }
+.cal { border-radius: 14px; background: var(--accent-soft); text-align: center; padding: 6px 0 5px; line-height: 1.1; }
+.cal b { display: block; font-family: var(--display); font-size: 1.3rem; font-weight: 400; color: var(--ink); }
+.cal span { font-size: .68rem; color: var(--ink2); }
+.up.hot .cal { background: var(--moon-soft); }
+.up .t { font-weight: 500; }
+.up .d { font-size: .8rem; color: var(--ink3); }
 
-/* section tabs inside a view */
-.chips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+.progress3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.pg { border: 0; background: var(--surface); border-radius: 18px; padding: 14px 12px; box-shadow: var(--shadow); text-align: start; display: grid; gap: 6px; }
+.pg .v { font-family: var(--display); font-size: 1.35rem; font-variant-numeric: tabular-nums; line-height: 1; }
+.pg .l { font-size: .76rem; color: var(--ink2); }
+.mini { height: 5px; border-radius: 99px; background: var(--surface2); overflow: hidden; }
+.mini i { display: block; height: 100%; background: var(--mint); border-radius: 99px; }
+
+/* segmented + chips */
+.seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; background: var(--surface2); border-radius: 14px; padding: 4px; gap: 4px; }
+.seg button { border: 0; background: none; border-radius: 11px; padding: 9px 6px; font-weight: 700; font-size: .9rem; color: var(--ink2); }
+.seg button.on { background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
+.chips { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0 6px; scrollbar-width: none; overscroll-behavior-x: contain; }
 .chips::-webkit-scrollbar { display: none; }
-.chip { flex: none; border: 1.5px solid var(--line); background: var(--surface); border-radius: 99px; padding: 6px 14px; font-size: .9rem; font-weight: 600; color: var(--ink2); }
-.chip.on { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+.chip { flex: none; border: 0; background: var(--surface); box-shadow: var(--shadow); border-radius: 99px; padding: 8px 15px; font-size: .88rem; font-weight: 500; color: var(--ink2); }
+.chip.on { background: var(--ink); color: var(--bg); }
+.chip .num { opacity: .7; margin-inline-start: 4px; }
 
 /* checklist */
 .group { display: grid; gap: 8px; }
-.ghead { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; padding-top: 6px; }
+.ghead { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; padding-top: 10px; }
 .ghead .cnt { font-size: .8rem; color: var(--ink3); font-variant-numeric: tabular-nums; }
-.phase-now { font-size: .7rem; font-weight: 800; color: var(--sky); background: var(--sky-soft); border-radius: 99px; padding: 2px 8px; margin-inline-start: 6px; letter-spacing: .02em; }
-.item { display: flex; gap: 12px; align-items: flex-start; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px; }
-.item.done { background: var(--surface2); border-color: transparent; }
-.item.done .t { text-decoration: line-through; color: var(--ink3); }
-.check { flex: none; width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--ink3); background: transparent; display: grid; place-items: center; margin-top: 1px; padding: 0; }
+.now { font-size: .68rem; font-weight: 700; color: var(--moon); background: var(--moon-soft); border-radius: 99px; padding: 2px 9px; margin-inline-start: 8px; vertical-align: middle; }
+.item { display: flex; gap: 12px; align-items: flex-start; background: var(--surface); border-radius: 16px; padding: 13px 14px; box-shadow: var(--shadow); }
+.item.done { background: transparent; box-shadow: none; padding-block: 8px; }
+.item.done .t { text-decoration: line-through; text-decoration-color: var(--ink3); color: var(--ink3); }
+.item.done .d { display: none; }
+.check { flex: none; width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--ink3); background: transparent; display: grid; place-items: center; padding: 0; }
+.check svg { width: 15px; height: 15px; opacity: 0; transform: scale(.6); transition: opacity 150ms ease, transform 220ms var(--ease-out); }
 .done .check { background: var(--mint); border-color: var(--mint); }
-.check svg { width: 14px; height: 14px; opacity: 0; }
-.done .check svg { opacity: 1; }
-.item .t { font-weight: 600; }
+.done .check svg { opacity: 1; transform: scale(1); }
+.item .t { font-weight: 500; }
 .item .d { font-size: .88rem; color: var(--ink2); margin-top: 2px; }
-.xbtn { border: 0; background: none; color: var(--ink3); font-size: 1.1rem; padding: 2px 6px; }
+.xbtn { border: 0; background: none; color: var(--ink3); font-size: 1.2rem; padding: 0 6px; line-height: 1; }
 .addrow { display: flex; gap: 8px; }
 .addrow input { flex: 1; }
-.btn { border: 0; border-radius: 12px; padding: 10px 16px; font-weight: 700; background: var(--ink); color: var(--bg); white-space: nowrap; }
-.btn.soft { background: var(--surface2); color: var(--ink); }
-.btn.sky { background: var(--sky); color: #fff; }
-.btn.small { padding: 6px 12px; font-size: .85rem; }
 
-/* shopping */
-.prod { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
-.prod.done { opacity: .75; }
-.prod-h { display: flex; gap: 12px; align-items: flex-start; padding: 14px; }
-.prod-h .main { flex: 1; min-width: 0; display: grid; gap: 4px; }
-.prod-h .name { font-weight: 700; font-size: 1.02rem; }
+/* products */
+.prod { background: var(--surface); border-radius: var(--r); box-shadow: var(--shadow); overflow: hidden; }
+.prod-h { display: flex; gap: 12px; align-items: flex-start; padding: 15px; }
+.prod-h .main { flex: 1; min-width: 0; display: grid; gap: 6px; }
+.prod .name { font-weight: 700; font-size: 1rem; line-height: 1.35; }
+.prod.done .name { color: var(--ink3); }
+.ours { font-size: .82rem; color: var(--accent); font-weight: 500; }
 .tags { display: flex; gap: 6px; flex-wrap: wrap; }
-.tag { font-size: .72rem; font-weight: 700; border-radius: 99px; padding: 2px 9px; background: var(--surface2); color: var(--ink2); }
-.tag.must { background: var(--peach-soft); color: var(--alert); }
-.tag.rec { background: var(--sky-soft); color: var(--sky); }
-.tag.opt { background: var(--surface2); color: var(--ink2); }
-.tag.used-ok { background: var(--mint-soft); color: var(--mint); }
-.tag.used-no { background: var(--alert-soft); color: var(--alert); }
-.tag.gift { background: var(--honey-soft); color: var(--honey); }
-.price { font-family: var(--display); font-size: 1rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
-.expand { border: 0; background: none; color: var(--sky); font-weight: 700; padding: 0; font-size: .88rem; justify-self: start; }
-.prod-b { border-top: 1px dashed var(--line); padding: 14px; display: grid; gap: 12px; background: var(--bg); }
-.pick { display: grid; gap: 2px; padding: 10px 12px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); }
+.tag { font-size: .7rem; font-weight: 700; border-radius: 99px; padding: 2px 9px; background: var(--surface2); color: var(--ink2); }
+.tag.must { background: var(--coral-soft); color: var(--coral); }
+.tag.rec { background: var(--accent-soft); color: var(--accent); }
+.tag.ok { background: var(--mint-soft); color: var(--mint); }
+.tag.no { background: var(--coral-soft); color: var(--coral); }
+.tag.gift { background: var(--moon-soft); color: var(--moon); }
+.price { font-family: var(--display); font-size: 1.05rem; white-space: nowrap; font-variant-numeric: tabular-nums; text-align: end; }
+.prod-b { padding: 4px 15px 16px; display: grid; gap: 14px; }
+.picks { display: grid; gap: 8px; }
+.pick { border: 1.5px solid var(--line); background: var(--surface); border-radius: 14px; padding: 11px 13px; display: grid; gap: 3px; text-align: start; width: 100%; }
+.pick.on { border-color: var(--accent); background: var(--accent-soft); }
 .pick .pn { font-weight: 700; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-.pick .pt { font-size: .7rem; font-weight: 800; padding: 1px 8px; border-radius: 99px; background: var(--sky-soft); color: var(--sky); }
-.pick .pt.prem { background: var(--honey-soft); color: var(--honey); }
-.pick .pt.val { background: var(--mint-soft); color: var(--mint); }
-.tip { font-size: .88rem; background: var(--honey-soft); border-radius: 12px; padding: 10px 12px; }
+.pick .pt { font-size: .66rem; font-weight: 700; padding: 1px 8px; border-radius: 99px; background: var(--mint-soft); color: var(--mint); }
+.pick .pt.prem { background: var(--moon-soft); color: var(--moon); }
+.pick .ourmark { font-size: .7rem; font-weight: 700; color: var(--accent); margin-inline-start: auto; }
+.tip { font-size: .88rem; background: var(--moon-soft); border-radius: 14px; padding: 11px 13px; line-height: 1.5; }
 .quotes { display: grid; gap: 6px; }
-.quote { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 10px; background: var(--surface); border: 1px solid var(--line); font-size: .9rem; }
-.quote.best { border-color: var(--mint); background: var(--mint-soft); }
+.quote { display: flex; align-items: center; gap: 8px; padding: 9px 11px; border-radius: 12px; background: var(--surface2); font-size: .9rem; }
+.quote.best { background: var(--mint-soft); }
 .qform { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) auto; gap: 6px; }
+.sub { font-size: .8rem; font-weight: 700; color: var(--ink2); }
 
 /* rights */
-.right { display: grid; gap: 8px; }
-.right .amt { font-family: var(--display); font-size: 1.6rem; color: var(--ink); font-variant-numeric: tabular-nums; }
-.right .who { font-size: .72rem; font-weight: 800; color: var(--sky); letter-spacing: .02em; }
-.todo { display: flex; gap: 8px; align-items: flex-start; font-size: .9rem; background: var(--sky-soft); border-radius: 12px; padding: 10px 12px; }
-.src { font-size: .78rem; color: var(--ink3); }
+.right { display: grid; gap: 10px; }
+.right .head { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+.amt { font-family: var(--display); font-size: 1.05rem; background: var(--accent-soft); color: var(--ink); border-radius: 12px; padding: 4px 11px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.who { font-size: .72rem; font-weight: 700; color: var(--accent); letter-spacing: .02em; }
+.todo { display: flex; gap: 10px; align-items: flex-start; font-size: .9rem; background: var(--surface2); border-radius: 14px; padding: 11px 13px; }
+.src { font-size: .76rem; color: var(--ink3); }
 .src a { color: var(--ink2); }
-.calc { display: grid; gap: 10px; }
-.calc .res { font-family: var(--display); font-size: 1.5rem; font-variant-numeric: tabular-nums; }
+.right.done { opacity: .6; }
+details.auto { background: var(--surface); border-radius: var(--r); box-shadow: var(--shadow); }
+details.auto summary { list-style: none; padding: 16px 18px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+details.auto summary::-webkit-details-marker { display: none; }
+details.auto summary::after { content: "+"; font-size: 1.4rem; color: var(--ink3); }
+details.auto[open] summary::after { content: "−"; }
+details.auto .in { padding: 0 18px 18px; display: grid; gap: 14px; }
+.autoitem { display: grid; gap: 2px; border-top: 1px solid var(--line); padding-top: 12px; }
+.calcbox { display: grid; gap: 10px; background: var(--surface2); border-radius: 14px; padding: 13px; }
+.calcbox .res { font-family: var(--display); font-size: 1.5rem; font-variant-numeric: tabular-nums; }
 
-/* expenses */
-.bars { display: grid; gap: 10px; }
-.bar { display: grid; gap: 4px; }
-.bar .lbl { display: flex; justify-content: space-between; font-size: .88rem; }
-.bar .track { height: 10px; background: var(--surface2); border-radius: 99px; overflow: hidden; }
-.bar .track i { display: block; height: 100%; border-radius: 99px; background: var(--sky); }
-.exp { display: flex; gap: 10px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
+/* money */
+.kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.kpi { background: var(--surface); border-radius: 18px; padding: 14px 12px; box-shadow: var(--shadow); display: grid; gap: 2px; }
+.kpi .v { font-family: var(--display); font-size: 1.25rem; font-variant-numeric: tabular-nums; }
+.kpi .l { font-size: .74rem; color: var(--ink2); }
+.meter { height: 12px; border-radius: 99px; background: var(--surface2); overflow: hidden; display: flex; }
+.meter i { display: block; height: 100%; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: .78rem; color: var(--ink2); }
+.legend span { display: inline-flex; align-items: center; gap: 5px; }
+.legend i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+.exp { display: flex; gap: 10px; align-items: center; padding: 11px 0; border-bottom: 1px solid var(--line); }
 .exp:last-child { border-bottom: 0; }
 .exp .dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
-.eform { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.eform { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .eform .full { grid-column: 1 / -1; }
-.budget-meter { height: 14px; border-radius: 99px; background: var(--surface2); overflow: hidden; display: flex; }
-.budget-meter i { display: block; height: 100%; }
+.empty { text-align: center; padding: 22px 10px; color: var(--ink2); display: grid; gap: 4px; justify-items: center; }
 
 /* bottom nav */
-nav.tabs { position: fixed; inset: auto 0 0 0; z-index: 20; background: var(--surface); border-top: 1px solid var(--line); padding-left: max(6px, env(safe-area-inset-left, 0px)); padding-right: max(6px, env(safe-area-inset-right, 0px)); padding-bottom: env(safe-area-inset-bottom, 0px); }
-nav.tabs .in { max-width: 720px; margin: 0 auto; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); }
-nav.tabs button { border: 0; background: none; padding: 8px 2px 9px; display: grid; justify-items: center; gap: 2px; font-size: .7rem; font-weight: 700; color: var(--ink3); }
-nav.tabs button svg { width: 24px; height: 24px; }
-nav.tabs button.on { color: var(--sky); }
+nav.tabs { position: fixed; inset: auto 0 0 0; z-index: 20; background: color-mix(in srgb, var(--surface) 88%, transparent); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); border-top: 1px solid var(--line); padding-left: max(8px, env(safe-area-inset-left, 0px)); padding-right: max(8px, env(safe-area-inset-right, 0px)); padding-bottom: env(safe-area-inset-bottom, 0px); }
+nav.tabs .in { max-width: 680px; margin: 0 auto; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+nav.tabs button { border: 0; background: none; padding: 9px 2px 10px; display: grid; justify-items: center; gap: 3px; font-size: .74rem; font-weight: 500; color: var(--ink3); }
+nav.tabs button svg { width: 25px; height: 25px; }
+nav.tabs button.on { color: var(--accent); font-weight: 700; }
 
-/* birth mode overlay */
-.birth { position: fixed; inset: 0; z-index: 50; background: var(--bg); overflow-y: auto; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
-.birth .wrap { max-width: 640px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 16px 40px; display: grid; gap: 14px; }
-.birth-h { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-.timer { display: grid; justify-items: center; gap: 10px; padding: 22px 16px; border-radius: 26px; background: var(--surface); border: 1px solid var(--line); }
-.timer .clock { font-family: var(--display); font-size: 3.6rem; line-height: 1; font-variant-numeric: tabular-nums; }
-.cbtn { width: 170px; height: 170px; border-radius: 50%; border: 0; font-family: var(--display); font-size: 1.35rem; background: var(--sky); color: #fff; box-shadow: 0 8px 24px rgba(111, 168, 220, .4); }
-.cbtn.live { background: var(--alert); box-shadow: 0 8px 24px rgba(224, 96, 90, .4); animation: pulse 1.6s ease-in-out infinite; }
-@keyframes pulse { 50% { transform: scale(1.04); } }
-@media (prefers-reduced-motion: reduce) { .cbtn.live { animation: none; } }
-.clog { width: 100%; display: grid; gap: 4px; font-size: .9rem; }
-.clog .r { display: grid; grid-template-columns: 1fr 1fr 1fr; padding: 6px 4px; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
-.clog .r.h { font-size: .75rem; color: var(--ink3); font-weight: 700; }
-.actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-.act { border: 1px solid var(--line); background: var(--surface); border-radius: 18px; padding: 14px; display: grid; gap: 4px; text-decoration: none; color: var(--ink); text-align: start; }
-.act b { font-family: var(--display); font-weight: 400; font-size: 1.05rem; }
-.act span { font-size: .8rem; color: var(--ink2); }
+/* birth mode */
+.birth { position: fixed; inset: 0; z-index: 50; background: var(--bg); overflow-y: auto; overscroll-behavior: contain; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); transition: transform 380ms var(--ease-drawer), opacity 240ms ease; }
+.birth[hidden] { display: block !important; transform: translateY(100%); opacity: 0; pointer-events: none; visibility: hidden; transition: transform 240ms var(--ease-out), opacity 200ms ease, visibility 0s 240ms; }
+.birth .wrap { max-width: 600px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 14px 40px; display: grid; gap: 16px; }
+.bhead { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.calm { font-family: var(--display); font-size: 1.15rem; color: var(--ink2); text-align: center; }
+.timer { display: grid; justify-items: center; gap: 14px; padding: 22px 16px; border-radius: 28px; background: var(--surface); box-shadow: var(--shadow); }
+.clock { font-family: var(--display); font-size: 4.2rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.cbtn { width: 190px; height: 190px; border-radius: 50%; border: 0; font-family: var(--display); font-size: 1.5rem; background: var(--accent); color: #fff; box-shadow: 0 10px 28px color-mix(in srgb, var(--accent) 45%, transparent); }
+.cbtn.live { background: var(--coral); box-shadow: 0 10px 28px color-mix(in srgb, var(--coral) 45%, transparent); }
+.verdict { width: 100%; border-radius: 16px; padding: 12px 14px; display: grid; gap: 2px; background: var(--accent-soft); font-size: .9rem; }
+.verdict.go { background: var(--coral-soft); }
+.verdict b { font-family: var(--display); font-weight: 400; font-size: 1.1rem; }
+.clog { width: 100%; font-size: .9rem; }
+.clog .r { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 6px 2px; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+.clog .r.h { font-size: .74rem; color: var(--ink3); font-weight: 700; }
+.bigacts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.bigact { border: 0; border-radius: 22px; padding: 18px 14px; display: grid; gap: 4px; text-decoration: none; color: var(--ink); background: var(--surface); box-shadow: var(--shadow); text-align: center; justify-items: center; }
+.bigact svg { width: 30px; height: 30px; color: var(--accent); }
+.bigact b { font-family: var(--display); font-weight: 400; font-size: 1.15rem; }
+.bigact span { font-size: .8rem; color: var(--ink2); direction: ltr; }
+.warn { background: var(--coral-soft); border-radius: 18px; padding: 14px 16px; font-size: .9rem; }
+.warn b { display: block; margin-bottom: 2px; }
 
-.toast { position: fixed; z-index: 60; left: 50%; transform: translateX(-50%); bottom: calc(90px + env(safe-area-inset-bottom, 0px)); background: var(--ink); color: var(--bg); padding: 10px 18px; border-radius: 99px; font-weight: 700; font-size: .9rem; max-width: calc(100% - 32px); }
-.empty { text-align: center; padding: 24px 12px; color: var(--ink2); display: grid; gap: 6px; justify-items: center; }
-details.more summary { cursor: pointer; font-weight: 700; color: var(--sky); }
-@media (max-width: 420px) {
-  .hero .big { font-size: 2.7rem; }
-  .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
-  .stat .v { font-size: 1.1rem; }
+.toast { position: fixed; z-index: 60; left: 50%; bottom: calc(92px + env(safe-area-inset-bottom, 0px)); background: var(--ink); color: var(--bg); padding: 11px 18px; border-radius: 99px; font-weight: 500; font-size: .9rem; max-width: calc(100% - 32px); transform: translateX(-50%); transition: transform 300ms var(--ease-out), opacity 200ms ease; }
+.toast[hidden] { display: block !important; opacity: 0; transform: translate(-50%, 12px); pointer-events: none; }
+
+.view { animation: viewIn 220ms var(--ease-out); }
+@keyframes viewIn { from { opacity: 0; transform: translateY(6px); } }
+@media (prefers-reduced-motion: reduce) {
+  .view { animation: none; }
+  .birth, .birth[hidden], .toast, .toast[hidden] { transition: opacity 150ms ease; transform: none; }
+  button:active, .press:active { transform: none; }
+}
+@media (hover: hover) and (pointer: fine) {
+  .chip:hover, .pick:hover { background: var(--surface2); }
+  .chip.on:hover { background: var(--ink); }
+}
+@media (max-width: 400px) {
+  .hero .wk { font-size: 2.2rem; }
+  .moonball { width: 92px; height: 92px; }
+  .moonball span { font-size: 2.8rem; }
+  .kpi .v, .pg .v { font-size: 1.05rem; }
   .qform { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   .qform .btn { grid-column: 1 / -1; }
 }
@@ -220,7 +281,7 @@ details.more summary { cursor: pointer; font-weight: 700; color: var(--sky); }
 
 <div id="app" dir="rtl" lang="he"></div>
 <nav class="tabs" dir="rtl" lang="he" aria-label="ניווט"><div class="in" id="tabs"></div></nav>
-<div id="birth" class="birth" dir="rtl" lang="he" hidden></div>
+<div id="birth" class="birth" dir="rtl" lang="he" hidden role="dialog" aria-label="מצב לידה"></div>
 <div id="toast" class="toast" role="status" hidden></div>
 
 <script>
@@ -252,6 +313,7 @@ const TASK_PHASES = [
     { id: "t-uni", t: "לפנות לרכז ההתאמות באוניברסיטה", d: "לשאול מה מגיע לך כבן זוג של יולדת: היעדרות, מועד מבחן נוסף והגשות מאוחרות. כדאי לתכנן את סמסטר ב׳ מראש." },
     { id: "t-gift", t: "לשתף את המשפחה ברשימת המתנות", d: "בלשונית ׳קניות׳ אפשר לסמן מי קונה מה." },
     { id: "t-pump", t: "לבדוק בקופת החולים ובביטוח המשלים", d: "הטבות היריון ולידה: משאבת חלב, יועצת הנקה, קורסים וערכות." },
+    { id: "t-biz", t: "לתכנן את פתיחת העסק סביב הלידה", d: "לסגור רישום, ציוד ושיווק לפני הלידה. בשבועות הראשונים אחריה כמעט אין זמן לעבוד, אז כדאי לקבוע תאריך התחלה ריאלי." },
   ]},
   { id: "p2", title: "שבועות 31–34 · קניות והכנת הבית", from: 31, to: 34, items: [
     { id: "t-bf", t: "לקנות את הדברים הגדולים בבלאק פריידיי / סייבר מאנדיי", d: "27–30 בנובמבר. כדאי להשוות מחירים בזאפ ולשמור קבלות בשביל האחריות." },
@@ -269,7 +331,7 @@ const TASK_PHASES = [
     { id: "t-route", t: "לתכנן את הנסיעה לשמיר", d: "מסלול, חניה, ואיזה כניסה מובילה לחדר הלידה. לשמור כתובת בוויז." },
     { id: "t-docs", t: "להכין תיקייה עם המסמכים", d: "תעודות זהות, כרטיסי קופה, סוג דם, סקירות, תוצאות בדיקות ותוכנית הלידה." },
     { id: "t-freezer", t: "לבשל ולהקפיא אוכל לשבועיים", d: "מנות שאפשר לחמם ביד אחת." },
-    { id: "t-stroller", t: "להתאמן על פתיחה וקיפול של העגלה", d: "כולל הכנסה לתא המטען וחיבור הסלקל לעגלה." },
+    { id: "t-stroller", t: "להתאמן על פתיחה וקיפול של העגלה", d: "כולל הכנסה לתא המטען של הסיוויק וחיבור הסלקל לעגלה." },
     { id: "t-phones", t: "לשמור בטלפון את המספרים החשובים", d: "חדר לידה, רופאה, מוהל, דולה (אם יש) ומי שמשגיח על הבית." },
   ]},
   { id: "p4", title: "שבועות 38–40 · בכוננות", from: 38, to: 45, items: [
@@ -306,14 +368,14 @@ const SHOP = [
         { n: "Maxi-Cosi Pebble 360 Pro + בסיס FamilyFix 360", tag: "prem", why: "מסתובב על הבסיס, ולכן הרבה יותר קל להכניס ולהוציא את התינוק. מתאים במיוחד אם יש רכב אחד." },
         { n: "Britax Römer Baby-Safe Pro", tag: "", why: "מותג ותיק עם איכות ייצור גבוהה. נוח וחזק." },
       ],
-      tip: "חובה תקן i-Size (R129) ונסיעה עם הפנים לאחור. לא קונים יד שנייה: אי אפשר לדעת אם הסלקל היה בתאונה. בחורף לא מושיבים את התינוק במעיל עבה, אלא מהדקים את הרצועות ופורשים שמיכה מעליהן." },
+      tip: "חובה תקן i-Size (R129) ונסיעה עם הפנים לאחור. לא קונים יד שנייה: אי אפשר לדעת אם הסלקל היה בתאונה. בחורף לא מושיבים את התינוק במעיל עבה, אלא מהדקים את הרצועות ופורשים שמיכה מעליהן. בסיוויק יש עיגוני ISOFIX במושב האחורי. סלקל עם הפנים לאחור תופס מקום, ולכן כדאי להתקין אותו מאחורי מושב הנוסע." },
     { id: "s-stroller", name: "עגלה עם אמבטיה (שלדה + אמבטיה + מושב)", prio: "must", est: [2500, 6500], used: "ok", q: "עגלת תינוק אמבטיה",
       picks: [
         { n: "Cybex Balios S Lux", tag: "val", why: "אמבטיה ומושב במחיר נוח, גלגלים טובים, ומתחברת ישירות לסלקל של Cybex." },
         { n: "Joolz Day+ / Day 5", tag: "", why: "נוחה מאוד לדחיפה, עם סל קניות גדול ושלדה יציבה. נחשבת אחת המאוזנות בשוק." },
         { n: "Bugaboo Fox 5", tag: "prem", why: "בולמים מעולים, נדחפת ביד אחת ומתקפלת בתנועה אחת." },
       ],
-      tip: "בדירת קרקע עם 3–4 מדרגות כדאי לבחור עגלה במשקל סביר (פחות מ-12 ק״ג שלדה) עם גלגלים גדולים. לנסות בחנות קיפול והרמה, ולמדוד מראש את תא המטען. עגלה טובה יד שנייה זו דרך מצוינת לחסוך." },
+      tip: "בדירת קרקע עם 3–4 מדרגות כדאי לבחור עגלה במשקל סביר (פחות מ-12 ק״ג שלדה) עם גלגלים גדולים. לנסות בחנות קיפול והרמה, ולמדוד מראש את תא המטען. עגלה טובה יד שנייה זו דרך מצוינת לחסוך. בסיוויק תא המטען עמוק אבל הפתח נמוך, אז עגלה שמתקפלת שטוח נכנסת הכי בקלות. כדאי להביא סרט מדידה לחנות." },
     { id: "s-bedside", name: "עריסה צמודה למיטה שלכם", prio: "must", est: [800, 1800], used: "ok", q: "עריסה צמודה למיטה",
       picks: [
         { n: "Chicco Next2Me Air / Magic", tag: "val", why: "הכי נפוצה. דופן נפתחת, גובה מתכוונן ורשת לאוורור." },
@@ -448,39 +510,51 @@ const RIGHTS = [
   { id: "r-grant", who: "אוטומטי · ביטוח לאומי", title: "מענק לידה", amt: "₪2,103",
     body: "מענק חד-פעמי לילד ראשון (סכום 2026, מתעדכן כל ינואר). מועבר תוך כחודש מהלידה.",
     todo: "לוודא שבבית החולים נמסרו פרטי חשבון הבנק. אין צורך להגיש תביעה.", src: ["btlGrant"] },
-  { id: "r-hosp", who: "אוטומטי · ביטוח לאומי", title: "מענק אשפוז (עלות הלידה)", amt: "₪0 מכם",
+  { id: "r-hosp", who: "אוטומטי · ביטוח לאומי", title: "מענק אשפוז (עלות הלידה)", amt: "חינם",
     body: "ביטוח לאומי משלם ישירות לבית החולים על הלידה והאשפוז.", todo: "אין מה לעשות.", src: ["kzPreg"] },
-  { id: "r-mat", who: "אשתך · שכירה", title: "דמי לידה — 15 שבועות בתשלום", amt: "עד ₪1,752 ליום",
+  { id: "r-mat", act: true, who: "אשתך · שכירה", title: "דמי לידה — 15 שבועות בתשלום", amt: "עד ₪1,752 ליום",
     body: "105 ימים. החישוב לפי ממוצע השכר ב-3 החודשים שלפני היציאה לחופשה (או 6 חודשים, אם זה יותר טוב לכם), עד התקרה. בשנה השלישית במשרה היא זכאית לתקופה המלאה.",
     todo: "להגיש תביעה לדמי לידה באתר ביטוח לאומי אחרי הלידה, ולבדוק שמשרד החינוך העביר את נתוני השכר.", src: ["kzMat", "forty", "btlMat"], calc: true },
-  { id: "r-leave", who: "אשתך", title: "חופשת לידה עד 26 שבועות", amt: "26 שבועות",
+  { id: "r-leave", act: true, who: "אשתך", title: "חופשת לידה עד 26 שבועות", amt: "26 שבועות",
     body: "15 שבועות בתשלום ועוד 11 שבועות בלי תשלום. אסור לפטר עובדת בזמן חופשת הלידה וב-60 הימים שאחריה.",
     todo: "לסמן בלוח שנה את סוף 15 השבועות ואת סוף 26 השבועות. בלידה בסוף ינואר זה יוצא בערך אמצע מאי וסוף יולי.", src: ["kzPreg"] },
-  { id: "r-checks", who: "אשתך · עכשיו", title: "40 שעות לבדיקות היריון בתשלום", amt: "40 שעות",
+  { id: "r-early", who: "אשתך", act: true, title: "אפשר לצאת לחופשה לפני הלידה", amt: "עד 7 שבועות",
+    body: "אפשר להתחיל את חופשת הלידה עד 7 שבועות לפני התאריך המשוער. הימים האלה יורדים מ-15 השבועות בתשלום.",
+    todo: "להחליט יחד מתי היא מפסיקה לעבוד, ולתאם עם בית הספר.", src: ["kzPreg"] },
+  { id: "r-pension", who: "אשתך", act: true, title: "פנסיה בזמן חופשת הלידה", amt: "לא לפספס",
+    body: "בתקופת דמי הלידה המעסיק ממשיך להפריש לפנסיה, בתנאי שהעובדת משלמת את החלק שלה. בלי זה נוצר חור בפנסיה ובכיסוי הביטוחי.",
+    todo: "לשאול את משרד החינוך איך משלמים את החלק שלה בתקופת החופשה.", src: ["kzPreg"] },
+  { id: "r-ext", who: "אם יקרה", title: "הארכה בגלל אשפוז / שמירת היריון", amt: "לפי מצב",
+    body: "אשפוז ארוך של האם או התינוק אחרי הלידה יכול להאריך את החופשה ואת דמי הלידה. אם הרופא/ה קובע/ת שהעבודה מסכנת את ההיריון, יש גמלת שמירת היריון מביטוח לאומי.",
+    todo: "רק אם זה קורה. לשמור את כל האישורים הרפואיים.", src: ["kzPreg"] },
+  { id: "r-checks", act: true, who: "אשתך · עכשיו", title: "40 שעות לבדיקות היריון בתשלום", amt: "40 שעות",
     body: "עובדת במשרה מלאה רשאית להיעדר עד 40 שעות במהלך ההיריון בשביל בדיקות, בלי הורדה מהשכר.", todo: "להשתמש בהן לבדיקות שנשארו.", src: ["kzPreg"] },
-  { id: "r-teach-mom", who: "אשתך · מורה", title: "משרת אם", amt: "שעה פחות ביום / +10%",
+  { id: "r-teach-mom", act: true, who: "אשתך · מורה", title: "משרת אם", amt: "שעה פחות ביום / +10%",
     body: "מורה שהיא אם לילד עד גיל 14 ועובדת לפחות ב-79% משרה זכאית לקצר את יום העבודה בשעה בלי פגיעה בשכר. במקום זה היא יכולה לבחור לעבוד מלא ולקבל תוספת של 10%.",
     todo: "להגיש בקשה דרך בית הספר או משרד החינוך כשהיא חוזרת לעבודה, ולוודא שהזכות נכנסת לתלוש.", src: ["wrMom", "kzTeach"] },
   { id: "r-teach-daycare", who: "אשתך · מורה", title: "תוספת מעונות", amt: "תוספת לשכר",
     body: "תוספת לעובדת הוראה שהיא אם לילד מתחת לגיל 5.", todo: "לבדוק בתלוש אחרי החזרה ולשאול את המזכירות אם התוספת לא מופיעה.", src: ["wrMom"] },
-  { id: "r-teach-vac", who: "אשתך · מורה · לבדוק!", title: "תשלום על חופשות (פסח / חופש גדול)", amt: "לבדוק",
+  { id: "r-teach-vac", act: true, who: "אשתך · מורה · לבדוק!", title: "תשלום על חופשות (פסח / חופש גדול)", amt: "לבדוק",
     body: "יש כללים מיוחדים במערכת החינוך לגבי תשלום על חופשות כשחופשת הלידה מסתיימת לפניהן. בפורומים מדווחים על דרישה לחזור כ-21 יום לפני חופשה כדי לקבל עליה תשלום. זה לא אומת במקור רשמי.",
     todo: "לברר עם הסתדרות המורים / ארגון המורים לפני שבוחרים תאריך חזרה. זה יכול להיות שווה אלפי שקלים.", src: ["kzTeach"] },
   { id: "r-kids", who: "אוטומטי · ביטוח לאומי", title: "קצבת ילדים", amt: "₪173 לחודש",
     body: "לילד ראשון (סכום 2026), עד גיל 18. בלי תלות בהכנסה.", todo: "אוטומטי.", src: ["iceKids"] },
-  { id: "r-save", who: "אתם · חשוב!", title: "חיסכון לכל ילד", amt: "₪58 + ₪58",
+  { id: "r-save", act: true, who: "אתם · חשוב!", title: "חיסכון לכל ילד", amt: "₪58 + ₪58",
     body: "ביטוח לאומי מפקיד ₪58 בחודש בחיסכון על שם הילד. אתם יכולים להוסיף עוד ₪58 מתוך קצבת הילדים, וזה מכפיל את החיסכון. אם לא בוחרים קופה, הכסף הולך למסלול ברירת מחדל.",
     todo: "לבחור בית השקעות ומסלול באתר ביטוח לאומי (לאופק של 18 שנה מסלול מנייתי מקובל) ולסמן הפקדה כפולה.", src: ["btlKids"] },
-  { id: "r-tax", who: "שניכם", title: "נקודות זיכוי במס", amt: "חיסכון במס",
+  { id: "r-tax", act: true, who: "שניכם", title: "נקודות זיכוי במס", amt: "חיסכון במס",
     body: "הורים לילדים קטנים מקבלים נקודות זיכוי, והמשמעות היא פחות מס הכנסה בכל חודש.",
     todo: "לעדכן טופס 101 אצל המעסיק אחרי הלידה. אם אתה עובד בעבודה צדדית, גם אצלך.", src: ["kzPreg"] },
-  { id: "r-dad", who: "אתה · סטודנט", title: "זכויות לבן הזוג", amt: "לפי המצב",
-    body: "דמי לידה לאב (שיתוף בחופשה אחרי 6 שבועות) מגיעים רק לאב שעובד ומבוטח כשכיר או כעצמאי. אם אתה עובד במשרה חלקית, נבדוק את זה. באוניברסיטה יש התאמות להורים, ובחלק מהמוסדות גם לאב: היעדרות נוספת, מועד מבחן מיוחד והגשות מאוחרות.",
+  { id: "r-dad", who: "אתה · סטודנט", act: true, title: "זכויות לבן הזוג", amt: "לפי המוסד",
+    body: "דמי לידה לאב (שיתוף בחופשה אחרי 6 שבועות) מגיעים רק לאב שמבוטח בביטוח לאומי כשכיר או כעצמאי, ותקופה מספיק ארוכה לפני הלידה. העסק נפתח בתחילת 2027, ולכן כנראה לא תהיה זכאי הפעם. באוניברסיטה יש התאמות להורים, ובחלק מהמוסדות גם לאב: היעדרות נוספת, מועד מבחן מיוחד והגשות מאוחרות.",
     todo: "לפנות לרכז ההתאמות / דיקנט הסטודנטים עם אישור לידה, ולשאול על נוהל ׳הורות׳ של המוסד.", src: ["kzPartner", "kzStudent"] },
-  { id: "r-daycare", who: "בהמשך", title: "סבסוד מעון יום", amt: "לפי הכנסה",
+  { id: "r-biz", who: "אתה · עסק חדש", act: true, title: "פתיחת העסק לניקוי ספות", amt: "רישום",
+    body: "לפני החשבונית הראשונה צריך לפתוח תיק במע״מ (עוסק פטור או מורשה), במס הכנסה ובביטוח לאומי כעצמאי. הרישום בביטוח לאומי חשוב גם לזכויות בעתיד, כולל דמי לידה לאב בלידה הבאה. ההכנסה מהעסק עשויה להשפיע על סבסוד מעון ועל נקודות זיכוי.",
+    todo: "לסגור עם רואה חשבון (בהרבה מקרים הייעוץ הראשון חינם) לפני ההכנסה הראשונה, ולשמור קבלות על ציוד העסק.", src: ["kzPreg"] },
+  { id: "r-daycare", act: true, who: "בהמשך", title: "סבסוד מעון יום", amt: "לפי הכנסה",
     body: "בגלל שאתה סטודנט ואשתך עובדת, ייתכן שאתם זכאים לסבסוד במעון מוכר. הכללים משתנים, ולכן כדאי לבדוק קרוב למועד.",
     todo: "לבדוק זכאות באתר משרד העבודה כשבוחרים מעון.", src: ["kzPreg"] },
-  { id: "r-kupa", who: "קופת חולים", title: "הטבות היריון ולידה בקופה ובביטוח המשלים", amt: "לבדוק",
+  { id: "r-kupa", act: true, who: "קופת חולים", title: "הטבות היריון ולידה בקופה ובביטוח המשלים", amt: "לבדוק",
     body: "בהרבה מקרים יש הנחות על קורסי הכנה ללידה, יועצות הנקה, משאבות, ערכות ליולדת ושיעורי החייאה.",
     todo: "להיכנס לאפליקציה של הקופה, לחפש ׳היריון ולידה׳, ולעבור על כל מה שמגיע לכם.", src: ["kzPreg"] },
 ];
@@ -500,12 +574,19 @@ const EXP_CATS = [
   { id: "brit", n: "ברית מילה", c: "#7fb3b0" }, { id: "other", n: "אחר", c: "var(--ink3)" },
 ];
 
+
+const SIZES = { 12: ["🍋", "לימון"], 16: ["🥑", "אבוקדו"], 19: ["🥭", "מנגו"], 20: ["🍌", "בננה"], 21: ["🥕", "גזר"], 22: ["🌶️", "פלפל גדול"], 23: ["🍊", "אשכולית"],
+  24: ["🌽", "קלח תירס"], 25: ["🥦", "ברוקולי ענק"], 26: ["🥬", "חסה"], 27: ["🥬", "כרוב"], 28: ["🍆", "חציל"], 29: ["🎃", "דלעת ערמונים"], 30: ["🥬", "כרוב גדול"],
+  31: ["🥥", "קוקוס"], 32: ["🍍", "אננס"], 33: ["🍈", "מלון קטן"], 34: ["🍈", "מלון"], 35: ["🎃", "דלעת קטנה"], 36: ["🥬", "חסה רומית"], 37: ["🥬", "כרוב ענק"],
+  38: ["🎃", "דלעת"], 39: ["🍉", "אבטיח קטן"], 40: ["🍉", "אבטיח"] };
+const WEIGHT = { 24: 600, 25: 660, 26: 760, 27: 875, 28: 1000, 29: 1150, 30: 1300, 31: 1500, 32: 1700, 33: 1900, 34: 2100, 35: 2400, 36: 2600, 37: 2900, 38: 3100, 39: 3300, 40: 3400 };
+
 /* ============================================================
    אחסון — משותף בין המכשירים (db) או מקומי כגיבוי
    ============================================================ */
-const COLS = ["checks", "expenses", "quotes", "custom", "settings"];
+const COLS = ["checks", "expenses", "quotes", "custom", "settings", "live"];
 const LS_KEY = "baby-app-v1";
-const S = { mode: "local", db: null, data: { checks: {}, expenses: {}, quotes: {}, custom: {}, settings: {} }, readOnly: false };
+const S = { mode: "local", db: null, data: { checks: {}, expenses: {}, quotes: {}, custom: {}, settings: {}, live: {} }, readOnly: false };
 function lsGet(k, f) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : f; } catch (e) { return f; } }
 function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
 (function loadLocal() { const d = lsGet(LS_KEY, null); if (d) COLS.forEach(c => { S.data[c] = d[c] || {}; }); })();
@@ -513,17 +594,15 @@ function saveLocal() { if (S.mode === "local") lsSet(LS_KEY, S.data); }
 
 async function put(col, id, obj) {
   if (S.readOnly) { toast("אין לך הרשאת עריכה בעמוד הזה"); return; }
-  if (S.mode === "db") {
-    S.data[col] = { ...S.data[col], [id]: obj }; render();
-    try { await S.db.collection(col).doc(id).set(obj); }
-    catch (e) { handleWriteError(e); }
-  } else { S.data[col] = { ...S.data[col], [id]: obj }; saveLocal(); render(); }
+  S.data[col] = { ...S.data[col], [id]: obj }; render();
+  if (S.mode === "db") { try { await S.db.collection(col).doc(id).set(obj); } catch (e) { handleWriteError(e); } }
+  else saveLocal();
 }
 async function del(col, id) {
   if (S.readOnly) { toast("אין לך הרשאת עריכה בעמוד הזה"); return; }
-  const next = { ...S.data[col] }; delete next[id]; S.data[col] = next;
-  if (S.mode === "db") { render(); try { await S.db.collection(col).doc(id).delete(); } catch (e) { handleWriteError(e); } }
-  else { saveLocal(); render(); }
+  const next = { ...S.data[col] }; delete next[id]; S.data[col] = next; render();
+  if (S.mode === "db") { try { await S.db.collection(col).doc(id).delete(); } catch (e) { handleWriteError(e); } }
+  else saveLocal();
 }
 function handleWriteError(e) {
   if (e && e.code === "invalid_argument") { S.readOnly = true; toast("אין לך הרשאת עריכה. מוצג במצב קריאה בלבד"); }
@@ -549,205 +628,250 @@ async function initDb() {
 }
 
 /* ============================================================
-   עזרים
+   תאריכים ועזרים
    ============================================================ */
 const $ = s => document.querySelector(s);
 const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
-const ils = n => "₪" + Math.round(n).toLocaleString("he-IL");
+const ils = n => "₪" + Math.round(+n || 0).toLocaleString("he-IL");
 const DAY = 864e5;
-function settings() { return Object.assign({ due: defaultDue(), budget: 15000, phone: "", notify: "אמא\nאבא\nחמותי\nחמי", mohel: "" }, S.data.settings.main || {}); }
-function defaultDue() { const d = new Date(2026, 9, 26); d.setMonth(d.getMonth() + 3); return d.toISOString().slice(0, 10); }
+const iso = d => { const z = new Date(d); z.setMinutes(z.getMinutes() - z.getTimezoneOffset()); return z.toISOString().slice(0, 10); };
+const parse = s => new Date(s + "T00:00:00");
+const addDays = (d, n) => new Date(d.getTime() + n * DAY);
+function settings() { return Object.assign({ lmp: "", usDue: "", budget: 15000, phone: "", notify: "אמא\nאבא\nההורים של אשתי", mohel: "", baby: "", mom: "", dad: "" }, S.data.settings.main || {}); }
+function dueInfo() {
+  const st = settings();
+  if (st.usDue) return { due: parse(st.usDue), how: "לפי אולטרסאונד" };
+  if (st.lmp) return { due: addDays(parse(st.lmp), 280), how: "לפי הווסת האחרונה" };
+  return { due: parse("2027-01-26"), how: "הערכה זמנית: להזין תאריך וסת בהגדרות" };
+}
 function preg() {
-  const due = new Date(settings().due + "T00:00:00"); const now = new Date(); now.setHours(0, 0, 0, 0);
-  const days = Math.round((due - now) / DAY); const week = Math.max(0, Math.min(42, Math.floor((280 - days) / 7)));
-  return { days, week, due };
+  const { due, how } = dueInfo(); const now = new Date(); now.setHours(0, 0, 0, 0);
+  const days = Math.round((due - now) / DAY); const ga = Math.max(0, 280 - days);
+  return { days, ga, week: Math.min(42, Math.floor(ga / 7)), day: ga % 7, due, how };
 }
 function isDone(id) { return !!(S.data.checks[id] && S.data.checks[id].done); }
 function toggle(id) { if (isDone(id)) del("checks", id); else put("checks", id, { done: true, at: Date.now() }); }
-let toastT; function toast(m) { const t = $("#toast"); t.textContent = m; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => { t.hidden = true; }, 2600); }
+let toastT; function toast(m) { const t = $("#toast"); t.textContent = m; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => { t.hidden = true; }, 2400); }
 const zap = q => "https://www.zap.co.il/search.aspx?keyword=" + encodeURIComponent(q);
 const fmtDate = d => new Date(d).toLocaleDateString("he-IL", { day: "numeric", month: "short" });
+const plural = (n, one, many) => n === 1 ? one : n + " " + many;
 
 const IC = {
-  home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>',
-  tasks: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2"/></svg>',
-  shop: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="19" r="1.6"/><circle cx="17" cy="19" r="1.6"/><path d="M3 4h2l2.4 11h10.2L20 8H6.2"/></svg>',
-  bag: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="3"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18"/></svg>',
-  rights: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg>',
-  money: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="12" rx="3"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v5M18 9.5v5"/></svg>',
-  gear: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>',
-  check: '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
-  heart: '<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 21s-7.5-4.6-9.5-9.3C1 8 3.4 4.5 7 4.5c2 0 3.4 1.1 5 3 1.6-1.9 3-3 5-3 3.6 0 6 3.5 4.5 7.2C19.5 16.4 12 21 12 21z"/></svg>',
+  home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 4l8.5 6.5V19a1.5 1.5 0 0 1-1.5 1.5h-4v-6h-6v6H5A1.5 1.5 0 0 1 3.5 19z"/></svg>',
+  tasks: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3.5" width="16" height="17" rx="3"/><path d="M8 9l1.5 1.5L12 8M8 15l1.5 1.5L12 14M14.5 9.5H17M14.5 15.5H17"/></svg>',
+  shop: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.2 11.2a1.5 1.5 0 0 1-1.5 1.3H7.7a1.5 1.5 0 0 1-1.5-1.3z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg>',
+  rights: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l7.5 2.8v5.6c0 4.3-3.2 7.6-7.5 8.6-4.3-1-7.5-4.3-7.5-8.6V6.3z"/><path d="M9 12l2 2 4-4"/></svg>',
+  money: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="3"/><path d="M3 10h18M7 15h3"/></svg>',
+  gear: '<svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>',
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  heart: '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 21s-7.5-4.6-9.5-9.3C1 8 3.4 4.5 7 4.5c2 0 3.4 1.1 5 3 1.6-1.9 3-3 5-3 3.6 0 6 3.5 4.5 7.2C19.5 16.4 12 21 12 21z"/></svg>',
+  phone: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>',
+  nav: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/></svg>',
 };
-const LOGO = '<svg width="38" height="38" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="var(--sky-soft)"/><path d="M11 23a9 9 0 0 0 18 0z" fill="var(--sky)"/><circle cx="20" cy="15" r="6" fill="var(--peach)"/><circle cx="18" cy="14.5" r=".9" fill="var(--ink)"/><circle cx="22" cy="14.5" r=".9" fill="var(--ink)"/><path d="M18.3 17q1.7 1.3 3.4 0" stroke="var(--ink)" stroke-width=".9" fill="none" stroke-linecap="round"/></svg>';
-const CLOUDS = '<svg class="clouds" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><g fill="var(--surface)" opacity=".75"><ellipse cx="60" cy="40" rx="38" ry="14"/><ellipse cx="82" cy="32" rx="22" ry="14"/><ellipse cx="330" cy="150" rx="44" ry="15"/><ellipse cx="352" cy="140" rx="24" ry="15"/></g><g fill="var(--honey)" opacity=".7"><path d="M340 34l3 7 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z"/><circle cx="300" cy="60" r="2.5"/><circle cx="370" cy="80" r="2"/><circle cx="40" cy="120" r="2"/></g><path d="M372 22a14 14 0 1 0 14 18 11 11 0 0 1-14-18z" fill="var(--honey)" opacity=".55"/></svg>';
+const LOGO = '<svg width="36" height="36" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="var(--sky1)"/><path d="M26 9a11 11 0 1 0 5 17A9 9 0 0 1 26 9z" fill="var(--moon)"/><circle cx="12" cy="12" r="1.3" fill="var(--star)"/><circle cx="9" cy="20" r=".9" fill="var(--star)"/></svg>';
 
 /* ============================================================
-   מצב תצוגה
+   מצב תצוגה ורינדור
    ============================================================ */
-const UI = lsGet("baby-ui", { tab: "home", shopCat: "big", bagTab: "mom", open: {} });
-function saveUI() { lsSet("baby-ui", UI); }
-const TABS = [["home", "בית", IC.home], ["tasks", "משימות", IC.tasks], ["shop", "קניות", IC.shop], ["bag", "תיק לידה", IC.bag], ["rights", "זכויות", IC.rights], ["money", "הוצאות", IC.money]];
-function go(tab) { UI.tab = tab; saveUI(); render(); window.scrollTo(0, 0); }
+const UI = lsGet("baby-ui2", { tab: "home", taskSeg: "time", shopCat: "big", bagTab: "mom", open: {} });
+function saveUI() { lsSet("baby-ui2", UI); }
+const TABS = [["home", "בית", IC.home], ["tasks", "משימות", IC.tasks], ["shop", "קניות", IC.shop], ["rights", "זכויות", IC.rights], ["money", "הוצאות", IC.money]];
+function go(tab) { UI.tab = tab; saveUI(); render(true); window.scrollTo(0, 0); }
 
 let renderQueued = false, deferred = false;
 function scheduleRender() { if (renderQueued) return; renderQueued = true; requestAnimationFrame(() => { renderQueued = false; render(); }); }
-function render() {
+function render(fresh) {
   const a = document.activeElement;
-  if (a && (a.tagName === "INPUT" || a.tagName === "TEXTAREA" || a.tagName === "SELECT") && $("#app").contains(a)) { deferred = true; return; }
+  if (a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) && $("#app").contains(a)) { deferred = true; return; }
   deferred = false;
   $("#tabs").innerHTML = TABS.map(([id, n, ic]) => `<button class="${UI.tab === id ? "on" : ""}" data-go="${id}" aria-current="${UI.tab === id ? "page" : "false"}">${ic}<span>${n}</span></button>`).join("");
-  const v = { home: vHome, tasks: vTasks, shop: vShop, bag: vBag, rights: vRights, money: vMoney, settings: vSettings }[UI.tab] || vHome;
-  $("#app").innerHTML = header() + v();
+  const v = { home: vHome, tasks: vTasks, shop: vShop, rights: vRights, money: vMoney, settings: vSettings }[UI.tab] || vHome;
+  $("#app").innerHTML = header() + `<main class="${fresh ? "view " : ""}stack">${v()}</main>`;
+  if (UI.tab === "home") drawSky();
   if (!$("#birth").hidden) renderBirth();
 }
-document.addEventListener("focusout", () => setTimeout(() => { if (deferred) render(); }, 50));
+document.addEventListener("focusout", () => setTimeout(() => { if (deferred) render(); }, 60));
 
 function header() {
-  return `<div class="top"><div class="brand">${LOGO}<div><h1>מחכים לבייבי</h1><span class="sync ${S.mode === "db" ? "on" : ""}">${S.mode === "db" ? "● משותף בין המכשירים" : "נשמר במכשיר הזה"}</span></div></div>
-  <button class="iconbtn" data-go="settings" aria-label="הגדרות">${IC.gear}</button></div>`;
+  const p = preg();
+  return `<div class="top"><div class="brand">${LOGO}<div><h1>מחכים ${settings().baby ? "ל" + esc(settings().baby) : "לבייבי"}</h1><span class="sync ${S.mode === "db" ? "on" : ""}">${S.mode === "db" ? "משותף בין המכשירים" : "נשמר במכשיר הזה"}</span></div></div>
+  <div class="topbtns">${p.week < 36 ? `<button class="pill-birth" data-birth="1">${IC.heart}מצב לידה</button>` : ""}<button class="iconbtn" data-go="settings" aria-label="הגדרות">${IC.gear}</button></div></div>`;
 }
 
+/* ---------- שמיים עם כוכבים ---------- */
+function drawSky() {
+  const c = $("#sky"); if (!c) return;
+  const r = c.getBoundingClientRect(); const dpr = Math.min(2, window.devicePixelRatio || 1);
+  c.width = r.width * dpr; c.height = r.height * dpr;
+  const g = c.getContext("2d"); g.scale(dpr, dpr);
+  const col = getComputedStyle(document.documentElement).getPropertyValue("--star").trim() || "#fff";
+  let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  g.fillStyle = col;
+  for (let k = 0; k < 46; k++) {
+    const x = rnd() * r.width, y = rnd() * r.height * .75, s = rnd() * 1.4 + .3;
+    g.globalAlpha = .35 + rnd() * .55; g.beginPath(); g.arc(x, y, s, 0, Math.PI * 2); g.fill();
+  }
+  g.globalAlpha = .85;
+  [[.12, .2, 4], [.5, .1, 3], [.08, .7, 3.2]].forEach(([fx, fy, s]) => {
+    const x = fx * r.width, y = fy * r.height; g.beginPath();
+    for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4, rr = i % 2 ? s * .35 : s; g.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); }
+    g.closePath(); g.fill();
+  });
+}
+window.addEventListener("resize", () => { if (UI.tab === "home") drawSky(); });
+try { matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => render()); } catch (e) {}
+new MutationObserver(() => render()).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
 /* ---------- בית ---------- */
+function customOf(list) { return Object.entries(S.data.custom).filter(([, c]) => c.list === list).map(([id, c]) => ({ id, ...c })).sort((a, b) => (a.at || 0) - (b.at || 0)); }
 function allTaskItems() { return TASK_PHASES.flatMap(p => p.items.map(i => i.id)).concat(customOf("tasks").map(c => c.id)); }
 function allShopItems() { return SHOP.flatMap(c => c.items); }
-function allBagIds() { return BAG.flatMap(b => b.items.map(i => i[0])).concat(customOf("bag").map(c => c.id)); }
-function pct(ids) { if (!ids.length) return 0; return Math.round(ids.filter(isDone).length / ids.length * 100); }
+function allBagIds() { return BAG.flatMap(b => b.items.map(i => i[0]).concat(customOf("bag-" + b.id).map(c => c.id))); }
+function pct(ids) { return ids.length ? Math.round(ids.filter(isDone).length / ids.length * 100) : 0; }
 function currentPhase() { const w = preg().week; return TASK_PHASES.find(p => !p.post && w >= p.from && w <= p.to) || TASK_PHASES[0]; }
-
+function sizeFor(w) { let best = null; Object.keys(SIZES).map(Number).sort((a, b) => a - b).forEach(k => { if (k <= w) best = k; }); return best ? { e: SIZES[best][0], n: SIZES[best][1], g: WEIGHT[best] } : { e: "🌱", n: "זרע קטן", g: 0 }; }
+function upcoming() {
+  const { due } = preg(); const now = new Date(); now.setHours(0, 0, 0, 0);
+  return [
+    { d: parse("2026-11-27"), t: "בלאק פריידיי", s: "לקנות את הדברים הגדולים", hot: true },
+    { d: parse("2026-11-30"), t: "סייבר מאנדיי", s: "עוד יום של מבצעים באונליין" },
+    { d: addDays(due, -35), t: "שבוע 35: לארוז תיק לידה", s: "ולהתקין את הסלקל בסיוויק" },
+    { d: addDays(due, -28), t: "שבוע 36: מצב לידה בבית", s: "הכפתור הגדול עובר למסך הראשי" },
+    { d: due, t: "התאריך המשוער", s: "רוב התינוקות מגיעים בין שבוע 38 ל-42", hot: true },
+    { d: addDays(due, 7), t: "ברית מילה (בערך)", s: "ביום השמיני, אם הכול תקין" },
+  ].filter(x => x.d >= now).sort((a, b) => a.d - b.d).slice(0, 3);
+}
 function vHome() {
-  const p = preg(); const st = settings();
-  const ph = currentPhase(); const next = ph.items.filter(i => !isDone(i.id)).slice(0, 3);
+  const p = preg(); const st = settings(); const sz = sizeFor(p.week);
+  const ph = currentPhase(); const next = ph.items.find(i => !isDone(i.id));
   const shopMust = allShopItems().filter(i => i.prio === "must");
-  const spent = Object.values(S.data.expenses).reduce((s, e) => s + (+e.amount || 0), 0);
-  const bf = Math.round((new Date("2026-11-27T00:00:00") - new Date()) / DAY);
-  const dueTxt = p.due.toLocaleDateString("he-IL", { day: "numeric", month: "long", year: "numeric" });
-  return `<div class="stack">
-  <section class="hero">${CLOUDS}<div class="inner">
-    <span class="muted small">תאריך משוער · ${esc(dueTxt)}</span>
-    <div class="big num">${p.days > 0 ? p.days : "היום!"} ${p.days > 0 ? "<small>ימים לפגישה</small>" : ""}</div>
-    <p class="muted">שבוע ${p.week} מתוך 40 · ${p.week < 37 ? "יש עוד זמן להתארגן" : "בכוננות מלאה"}</p>
-    <div class="weekbar" role="progressbar" aria-valuenow="${p.week}" aria-valuemin="0" aria-valuemax="40"><i style="width:${Math.min(100, p.week / 40 * 100)}%"></i></div>
-    <div class="weeklbl"><span>שבוע 0</span><span>27</span><span>37</span><span>40</span></div>
+  const spent = Object.values(S.data.expenses).filter(e => !e.income).reduce((s, e) => s + (+e.amount || 0), 0);
+  const pos = w => Math.min(100, w / 40 * 100);
+  const hello = st.mom && st.dad ? `${esc(st.dad)} ו${esc(st.mom)}, ` : "";
+  return `
+  <section class="hero" aria-label="מצב ההיריון"><canvas id="sky" aria-hidden="true"></canvas>
+    <div class="hero-grid"><div>
+      <div class="hello">${hello}${p.days > 0 ? "עוד" : ""}</div>
+      <div class="wk num">${p.days > 0 ? `${p.days} <small>ימים</small>` : "הגיע הזמן 💛"}</div>
+      <div class="left num">שבוע ${p.week}+${p.day} · ${p.due.toLocaleDateString("he-IL", { day: "numeric", month: "long" })}</div>
+    </div><div class="moonball" aria-hidden="true"><span>${sz.e}</span></div></div>
+    <p class="size-txt">השבוע הוא בגודל של <b>${sz.n}</b>${sz.g ? `, בערך ${sz.g >= 1000 ? (sz.g / 1000).toLocaleString("he-IL", { maximumFractionDigits: 1 }) + " ק״ג" : sz.g + " גרם"}` : ""}</p>
+    <div class="track" role="progressbar" aria-valuenow="${p.week}" aria-valuemin="0" aria-valuemax="40" aria-label="שבוע ${p.week} מתוך 40"><i style="width:${pos(p.ga / 7)}%"></i></div>
+    <div class="marks">${[[13, "שליש 2"], [27, "שליש 3"], [37, "מלא"], [40, "40"]].map(([w, l]) => `<span style="right:${pos(w)}%">${l}</span>`).join("")}</div>
+    <p class="tiny" style="margin-top:2px">${esc(p.how)}</p>
+  </section>
+
+  ${p.week >= 36 ? `<button class="birth-big" data-birth="1">${IC.heart} מתחילה ללדת</button>` : ""}
+
+  ${next ? `<section class="focus"><span class="eyebrow">הדבר הבא · ${esc(ph.title)}</span><div class="big">${esc(next.t)}</div>${next.d ? `<p class="small muted">${esc(next.d)}</p>` : ""}
+    <div class="bar"><button class="btn mint" data-toggle="${next.id}">סיימנו ✓</button><button class="btn soft" data-go="tasks">כל המשימות</button></div></section>`
+    : `<section class="focus"><span class="eyebrow">${esc(ph.title)}</span><div class="big">סיימתם את כל המשימות בשלב הזה 🌙</div><button class="btn soft" data-go="tasks" style="justify-self:start">לשלב הבא</button></section>`}
+
+  <section class="card"><h3 style="margin-bottom:4px">בקרוב</h3><div class="upcoming">
+    ${upcoming().map(u => { const n = Math.round((u.d - new Date().setHours(0, 0, 0, 0)) / DAY); return `<div class="up ${u.hot ? "hot" : ""}"><div class="cal"><b class="num">${u.d.getDate()}</b><span>${u.d.toLocaleDateString("he-IL", { month: "short" })}</span></div><div><div class="t">${esc(u.t)}</div><div class="d">${n === 0 ? "היום" : n === 1 ? "מחר" : "בעוד " + n + " ימים"} · ${esc(u.s)}</div></div></div>`; }).join("")}
   </div></section>
 
-  <button class="birthbtn" data-birth="1">${IC.heart} מתחילה ללדת</button>
-
-  <div class="stats">
-    <button class="stat" data-go="tasks" style="text-align:start"><span class="v">${pct(allTaskItems())}%</span><span class="l">משימות</span><div class="ring"><i style="width:${pct(allTaskItems())}%"></i></div></button>
-    <button class="stat" data-go="shop" style="text-align:start"><span class="v">${shopMust.filter(i => isDone(i.id)).length}/${shopMust.length}</span><span class="l">פריטי חובה נקנו</span><div class="ring"><i style="width:${pct(shopMust.map(i => i.id))}%"></i></div></button>
-    <button class="stat" data-go="bag" style="text-align:start"><span class="v">${pct(allBagIds())}%</span><span class="l">תיק לידה</span><div class="ring"><i style="width:${pct(allBagIds())}%"></i></div></button>
-  </div>
-
-  ${bf > 0 && bf < 60 ? `<div class="banner honey"><b>בלאק פריידיי בעוד ${bf} ימים</b><span class="small">27.11 · כדאי לסגור עכשיו על דגם לעגלה, לסלקל ולעריסה, ולרשום מחירים כדי לזהות הנחה אמיתית.</span></div>` : ""}
-
-  <section class="card stack">
-    <div class="ghead"><h3>עכשיו על הפרק</h3><button class="expand" data-go="tasks">כל המשימות ←</button></div>
-    <span class="tiny">${esc(ph.title)}</span>
-    ${next.length ? next.map(taskRow).join("") : `<div class="banner mint"><b>סיימתם את השלב הזה!</b><span class="small">אפשר להתקדם לשלב הבא בלשונית המשימות.</span></div>`}
-  </section>
-
-  <section class="card stack">
-    <div class="ghead"><h3>תקציב</h3><button class="expand" data-go="money">פירוט ←</button></div>
-    <div class="row"><span class="price">${ils(spent)}</span><span class="muted small">הוצאו מתוך ${ils(st.budget)}</span></div>
-    <div class="budget-meter"><i style="width:${Math.min(100, spent / Math.max(1, st.budget) * 100)}%;background:${spent > st.budget ? "var(--alert)" : "var(--mint)"}"></i></div>
-  </section>
+  <div class="progress3">
+    <button class="pg" data-go="tasks"><span class="v">${pct(allTaskItems())}%</span><span class="l">משימות</span><div class="mini"><i style="width:${pct(allTaskItems())}%"></i></div></button>
+    <button class="pg" data-go="shop"><span class="v">${shopMust.filter(i => isDone(i.id)).length}/${shopMust.length}</span><span class="l">חובה נקנו</span><div class="mini"><i style="width:${pct(shopMust.map(i => i.id))}%"></i></div></button>
+    <button class="pg" data-go="money"><span class="v">${ils(spent)}</span><span class="l">מתוך ${ils(st.budget)}</span><div class="mini"><i style="width:${Math.min(100, spent / Math.max(1, st.budget) * 100)}%;${spent > st.budget ? "background:var(--coral)" : ""}"></i></div></button>
   </div>`;
 }
 
-/* ---------- משימות ---------- */
-function customOf(list) { return Object.entries(S.data.custom).filter(([, c]) => c.list === list).map(([id, c]) => ({ id, ...c })).sort((a, b) => (a.at || 0) - (b.at || 0)); }
+/* ---------- משימות + תיק לידה ---------- */
 function taskRow(i) {
   const done = isDone(i.id);
-  return `<div class="item ${done ? "done" : ""}"><button class="check" data-toggle="${i.id}" aria-label="${done ? "בטל סימון" : "סמן כבוצע"}" aria-pressed="${done}">${IC.check}</button>
+  return `<div class="item ${done ? "done" : ""}"><button class="check" data-toggle="${i.id}" aria-label="${done ? "בטל סימון" : "סמן כבוצע"}: ${esc(i.t)}" aria-pressed="${done}">${IC.check}</button>
   <div class="grow"><div class="t">${esc(i.t)}</div>${i.d ? `<div class="d">${esc(i.d)}</div>` : ""}</div>
   ${i.custom ? `<button class="xbtn" data-delcustom="${i.id}" aria-label="מחק">×</button>` : ""}</div>`;
 }
+function sortDoneLast(items) { return items.slice().sort((a, b) => isDone(a.id) - isDone(b.id)); }
 function vTasks() {
+  const seg = `<div class="seg" role="tablist"><button class="${UI.taskSeg === "time" ? "on" : ""}" data-taskseg="time" role="tab">ציר זמן</button><button class="${UI.taskSeg === "bag" ? "on" : ""}" data-taskseg="bag" role="tab">תיק לידה · ${pct(allBagIds())}%</button></div>`;
+  if (UI.taskSeg === "bag") return `<h2>תיק לידה</h2>${seg}${vBag()}`;
   const cur = currentPhase().id;
   const mine = customOf("tasks").map(c => ({ id: c.id, t: c.text, custom: true }));
-  return `<div class="stack"><h2>ציר זמן ומשימות</h2>
-  <p class="muted small">מסודר לפי שבועות ההיריון ואחרי הלידה. מה שמסמנים כאן מתעדכן אצל שניכם.</p>
-  ${TASK_PHASES.map(p => `<div class="group"><div class="ghead"><h3>${esc(p.title)}${p.id === cur ? '<span class="phase-now">עכשיו</span>' : ""}</h3><span class="cnt">${p.items.filter(i => isDone(i.id)).length}/${p.items.length}</span></div>${p.items.map(taskRow).join("")}</div>`).join("")}
+  return `<h2>משימות</h2>${seg}
+  ${TASK_PHASES.map(p => `<div class="group"><div class="ghead"><h3>${esc(p.title)}${p.id === cur ? '<span class="now">עכשיו</span>' : ""}</h3><span class="cnt">${p.items.filter(i => isDone(i.id)).length}/${p.items.length}</span></div>${sortDoneLast(p.items).map(taskRow).join("")}</div>`).join("")}
   <div class="group"><div class="ghead"><h3>המשימות שלנו</h3></div>${mine.map(taskRow).join("")}
-    <form class="addrow" data-addcustom="tasks"><input id="add-task" name="text" placeholder="להוסיף משימה…" autocomplete="off"><button class="btn" type="submit">הוספה</button></form></div>
-  </div>`;
+    <form class="addrow" data-addcustom="tasks"><input id="add-task" name="text" placeholder="להוסיף משימה…" autocomplete="off"><button class="btn" type="submit">הוספה</button></form></div>`;
+}
+function vBag() {
+  const b = BAG.find(x => x.id === UI.bagTab) || BAG[0];
+  const items = b.items.map(([id, t]) => ({ id, t })).concat(customOf("bag-" + b.id).map(c => ({ id: c.id, t: c.text, custom: true })));
+  return `<p class="muted small">לארוז עד שבוע 35 ולהשאיר ליד הדלת. הלידה צפויה בחורף, אז כדאי שכבות ובגדים חמים.</p>
+  <div class="chips">${BAG.map(x => { const ids = x.items.map(i => i[0]).concat(customOf("bag-" + x.id).map(c => c.id)); return `<button class="chip ${x.id === b.id ? "on" : ""}" data-bagtab="${x.id}">${esc(x.title)}<span class="num">${ids.filter(isDone).length}/${ids.length}</span></button>`; }).join("")}</div>
+  <div class="group">${sortDoneLast(items).map(taskRow).join("")}</div>
+  <form class="addrow" data-addcustom="bag-${b.id}"><input id="add-bag" name="text" placeholder="להוסיף פריט…" autocomplete="off"><button class="btn" type="submit">הוספה</button></form>`;
 }
 
 /* ---------- קניות ---------- */
 function quotesOf(itemId) { return Object.entries(S.data.quotes).filter(([, q]) => q.item === itemId).map(([id, q]) => ({ id, ...q })).sort((a, b) => a.price - b.price); }
+function planned(i) { const q = quotesOf(i.id)[0]; return q ? q.price : (i.est[0] + i.est[1]) / 2; }
 function prodCard(i) {
-  const done = isDone(i.id); const open = UI.open[i.id]; const qs = quotesOf(i.id); const gift = S.data.checks["gift-" + i.id];
+  const done = isDone(i.id); const open = UI.open[i.id]; const qs = quotesOf(i.id);
+  const gift = S.data.checks["gift-" + i.id]; const ours = S.data.checks["pick-" + i.id];
   const prioTxt = { must: "חובה", rec: "מומלץ", opt: "אפשר לוותר" }[i.prio];
-  const best = qs[0];
   return `<article class="prod ${done ? "done" : ""}">
   <div class="prod-h ${done ? "done" : ""}"><button class="check" data-toggle="${i.id}" aria-label="${done ? "בטל: נקנה" : "סמן: נקנה"}" aria-pressed="${done}">${IC.check}</button>
     <div class="main"><div class="name">${esc(i.name)}</div>
-      <div class="tags"><span class="tag ${i.prio}">${prioTxt}</span>${i.used === "ok" ? '<span class="tag used-ok">יד שנייה בסדר</span>' : i.used === "no" ? '<span class="tag used-no">רק חדש</span>' : ""}${gift && gift.by ? `<span class="tag gift">🎁 ${esc(gift.by)}</span>` : ""}</div>
-      <button class="expand" data-open="${i.id}" aria-expanded="${!!open}">${open ? "סגירה" : "המלצות, טיפים והשוואת מחירים"}</button>
+      ${ours ? `<div class="ours">הבחירה שלנו: ${esc(ours.n)}</div>` : ""}
+      <div class="tags"><span class="tag ${i.prio}">${prioTxt}</span>${i.used === "ok" ? '<span class="tag ok">יד שנייה בסדר</span>' : i.used === "no" ? '<span class="tag no">רק חדש</span>' : ""}${gift && gift.by ? `<span class="tag gift">מתנה מ${esc(gift.by)}</span>` : ""}</div>
+      <button class="link" data-open="${i.id}" aria-expanded="${!!open}" style="justify-self:start">${open ? "סגירה" : "פרטים והשוואת מחירים"}</button>
     </div>
-    <div style="text-align:end"><div class="price">${best ? ils(best.price) : `<span dir="ltr">${ils(i.est[0])}–${i.est[1].toLocaleString("he-IL")}</span>`}</div><div class="tiny">${best ? "המחיר הכי טוב שמצאתם" : "טווח משוער"}</div></div>
+    <div><div class="price">${qs[0] ? ils(qs[0].price) : `<span dir="ltr">${ils(i.est[0])}–${i.est[1].toLocaleString("he-IL")}</span>`}</div><div class="tiny" style="text-align:end">${qs[0] ? "הכי זול שמצאנו" : "משוער"}</div></div>
   </div>
   ${open ? `<div class="prod-b">
-    ${i.picks.length ? `<div class="stack" style="gap:8px">${i.picks.map(pk => `<div class="pick"><div class="pn">${esc(pk.n)}${pk.tag ? `<span class="pt ${pk.tag}">${pk.tag === "val" ? "תמורה מעולה" : "פרימיום"}</span>` : ""}</div><div class="small muted">${esc(pk.why)}</div></div>`).join("")}</div>` : ""}
+    ${i.picks.length ? `<div class="picks"><span class="sub">מומלצים · לחיצה מסמנת את הבחירה שלכם</span>${i.picks.map(pk => { const on = ours && ours.n === pk.n; return `<button class="pick ${on ? "on" : ""}" data-pick="${i.id}" data-name="${esc(pk.n)}" aria-pressed="${on}"><span class="pn">${esc(pk.n)}${pk.tag ? `<span class="pt ${pk.tag}">${pk.tag === "val" ? "תמורה מעולה" : "פרימיום"}</span>` : ""}${on ? '<span class="ourmark">✓ שלנו</span>' : ""}</span><span class="small muted">${esc(pk.why)}</span></button>`; }).join("")}</div>` : ""}
     ${i.tip ? `<div class="tip">${esc(i.tip)}</div>` : ""}
-    ${i.q ? `<a class="btn soft small" style="justify-self:start;text-decoration:none" href="${zap(i.picks[0] ? i.picks[0].n : i.q)}" target="_blank" rel="noopener">בדיקת מחיר בזאפ ↗</a>` : ""}
-    <div class="stack" style="gap:8px"><b class="small">השוואת מחירים שמצאנו</b>
-      ${qs.length ? `<div class="quotes">${qs.map((q, k) => `<div class="quote ${k === 0 && qs.length > 1 ? "best" : ""}"><span class="grow">${esc(q.store)}${q.note ? ` · <span class="muted">${esc(q.note)}</span>` : ""}</span><b class="num">${ils(q.price)}</b><button class="btn small sky" data-buyquote="${q.id}" title="רשום כהוצאה">קנינו</button><button class="xbtn" data-delquote="${q.id}" aria-label="מחק">×</button></div>`).join("")}</div>` : `<span class="tiny">עוד לא נרשמו מחירים. הוסיפו חנות ומחיר כדי להשוות.</span>`}
-      <form class="qform" data-addquote="${i.id}"><input id="qs-${i.id}" name="store" placeholder="חנות / אתר / דגם" required autocomplete="off"><input id="qp-${i.id}" name="price" type="number" inputmode="decimal" min="0" placeholder="מחיר ₪" required><button class="btn small" type="submit">הוספה</button></form>
+    ${i.q ? `<a class="btn soft small press" style="justify-self:start;text-decoration:none" href="${zap(ours ? ours.n : (i.picks[0] ? i.picks[0].n : i.q))}" target="_blank" rel="noopener">בדיקת מחיר בזאפ ↗</a>` : ""}
+    <div class="stack-s"><span class="sub">מחירים שמצאנו</span>
+      ${qs.length ? `<div class="quotes">${qs.map((q, k) => `<div class="quote ${k === 0 && qs.length > 1 ? "best" : ""}"><span class="grow">${esc(q.store)}</span><b class="num">${ils(q.price)}</b><button class="btn small accent" data-buyquote="${q.id}">קנינו</button><button class="xbtn" data-delquote="${q.id}" aria-label="מחק">×</button></div>`).join("")}</div>` : `<span class="tiny">רושמים חנות ומחיר, והזול ביותר מסומן בירוק.</span>`}
+      <form class="qform" data-addquote="${i.id}"><input id="qs-${i.id}" name="store" placeholder="חנות / אתר" required autocomplete="off"><input id="qp-${i.id}" name="price" type="number" inputmode="decimal" min="0" placeholder="₪" required><button class="btn small" type="submit">הוספה</button></form>
     </div>
-    <form class="addrow" data-gift="${i.id}"><input id="g-${i.id}" name="by" placeholder="מתנה מ… (סבתא, החברים מהעבודה)" value="${gift ? esc(gift.by) : ""}" autocomplete="off"><button class="btn soft small" type="submit">שמירה</button></form>
+    <form class="addrow" data-gift="${i.id}"><input id="g-${i.id}" name="by" placeholder="מתנה מ… (סבתא, חברים מהעבודה)" value="${gift ? esc(gift.by) : ""}" autocomplete="off"><button class="btn soft small" type="submit">שמירה</button></form>
   </div>` : ""}
   </article>`;
 }
 function vShop() {
-  const cat = SHOP.find(c => c.id === UI.shopCat) || SHOP[0];
-  const est = allShopItems().filter(i => i.prio !== "opt").reduce((s, i) => [s[0] + i.est[0], s[1] + i.est[1]], [0, 0]);
-  return `<div class="stack"><h2>רשימת קניות</h2>
-  <p class="muted small">מותגים מוכרים עם ביקורות טובות, בכמה רמות מחיר. המחירים הם טווח משוער. לפני קנייה בודקים בזאפ ורושמים כאן מה מצאתם, כדי להשוות.</p>
-  <div class="banner sky"><b>הערכה כוללת (חובה + מומלץ): <span dir="ltr">${ils(est[0])}–${est[1].toLocaleString("he-IL")}</span></b><span class="small">הטווח תלוי בעיקר בעגלה ובסלקל. חלק מהדברים יגיעו כמתנות.</span></div>
-  <div class="chips" role="tablist">${SHOP.map(c => { const d = c.items.filter(i => isDone(i.id)).length; return `<button class="chip ${c.id === cat.id ? "on" : ""}" data-shopcat="${c.id}" role="tab" aria-selected="${c.id === cat.id}">${esc(c.cat)} <span class="num">${d}/${c.items.length}</span></button>`; }).join("")}<button class="chip ${UI.shopCat === "deals" ? "on" : ""}" data-shopcat="deals">איפה חוסכים</button></div>
-  ${UI.shopCat === "deals" ? DEALS.map(d => `<div class="card flat"><h3>${esc(d.t)}</h3><p class="small muted" style="margin-top:4px">${esc(d.d)}</p></div>`).join("") : cat.items.map(prodCard).join("")}
-  </div>`;
-}
-
-/* ---------- תיק לידה ---------- */
-function vBag() {
-  const b = BAG.find(x => x.id === UI.bagTab) || BAG[0];
-  const mine = customOf("bag-" + b.id).map(c => ({ id: c.id, t: c.text, custom: true }));
-  const items = b.items.map(([id, t]) => ({ id, t })).concat(mine);
-  return `<div class="stack"><h2>תיק לידה</h2>
-  <p class="muted small">לארוז עד שבוע 36 ולהשאיר ליד הדלת. הלידה צפויה בחורף, אז כדאי שכבות ובגדים חמים.</p>
-  <div class="chips">${BAG.map(x => { const ids = x.items.map(i => i[0]).concat(customOf("bag-" + x.id).map(c => c.id)); return `<button class="chip ${x.id === b.id ? "on" : ""}" data-bagtab="${x.id}">${esc(x.title)} <span class="num">${ids.filter(isDone).length}/${ids.length}</span></button>`; }).join("")}</div>
-  <div class="group">${items.map(taskRow).join("")}</div>
-  <form class="addrow" data-addcustom="bag-${b.id}"><input id="add-bag" name="text" placeholder="להוסיף פריט…" autocomplete="off"><button class="btn" type="submit">הוספה</button></form>
-  </div>`;
+  const deals = UI.shopCat === "deals"; const cat = SHOP.find(c => c.id === UI.shopCat) || SHOP[0];
+  const core = allShopItems().filter(i => i.prio !== "opt" && !S.data.checks["gift-" + i.id]);
+  const plan = core.reduce((s, i) => s + planned(i), 0);
+  return `<h2>קניות</h2>
+  <section class="card stack-s"><span class="eyebrow">תכנון לפי הבחירות שלכם</span><div class="row"><span class="price" style="font-size:1.6rem">${ils(plan)}</span><span class="small muted">חובה + מומלץ, בלי מתנות</span></div>
+  <span class="tiny">כשרושמים מחיר שמצאתם, הוא מחליף את ההערכה. ככה התכנון מתקרב למציאות.</span></section>
+  <div class="chips" role="tablist">${SHOP.map(c => { const d = c.items.filter(i => isDone(i.id)).length; return `<button class="chip ${c.id === UI.shopCat ? "on" : ""}" data-shopcat="${c.id}" role="tab" aria-selected="${c.id === UI.shopCat}">${esc(c.cat)}<span class="num">${d}/${c.items.length}</span></button>`; }).join("")}<button class="chip ${deals ? "on" : ""}" data-shopcat="deals" role="tab">איפה חוסכים</button></div>
+  ${deals ? DEALS.map(d => `<section class="card"><h3>${esc(d.t)}</h3><p class="small muted" style="margin-top:4px">${esc(d.d)}</p></section>`).join("") : sortDoneLast(cat.items).map(prodCard).join("")}`;
 }
 
 /* ---------- זכויות ---------- */
 function vRights() {
-  return `<div class="stack"><h2>הזכויות שלכם</h2>
-  <p class="muted small">זכויות בישראל לפי המצב שלכם: אשתך שכירה במשרד החינוך, ואתה סטודנט. הסכומים הם של 2026 ומתעדכנים בכל ינואר, ולכן לפני הגשה כדאי לבדוק באתר ביטוח לאומי. אפשר לסמן כל זכות אחרי שטיפלתם בה.</p>
-  ${RIGHTS.map(r => { const done = isDone(r.id); return `<article class="card right" style="${done ? "opacity:.7" : ""}">
-    <div class="row" style="justify-content:space-between;align-items:flex-start"><div class="grow"><div class="who">${esc(r.who)}</div><h3>${esc(r.title)}</h3></div><div class="amt">${esc(r.amt)}</div></div>
-    <p class="small">${esc(r.body)}</p>
-    <div class="todo ${done ? "done" : ""}"><button class="check" data-toggle="${r.id}" aria-label="סמן שטופל" aria-pressed="${done}">${IC.check}</button><span><b>מה עושים:</b> ${esc(r.todo)}</span></div>
-    ${r.calc ? matCalc() : ""}
-    <div class="src">מקור: ${r.src.map(k => `<a href="${SRC[k].u}" target="_blank" rel="noopener">${esc(SRC[k].t)}</a>`).join(" · ")}</div>
+  const act = RIGHTS.filter(r => r.act); const auto = RIGHTS.filter(r => !r.act);
+  const open = act.filter(r => !isDone(r.id)).length;
+  return `<h2>הזכויות שלכם</h2>
+  <p class="muted small">לפי המצב שלכם: אשתך מורה שכירה, אתה סטודנט שפותח עסק. הסכומים הם של 2026 ומתעדכנים בכל ינואר.</p>
+  <div class="ghead"><h3>דורש פעולה מכם</h3><span class="cnt">${open ? "נשארו " + open : "הכול טופל ✓"}</span></div>
+  ${act.sort((a, b) => isDone(a.id) - isDone(b.id)).map(r => { const done = isDone(r.id); return `<article class="card right ${done ? "done" : ""}">
+    <div class="head"><div class="grow"><div class="who">${esc(r.who)}</div><h3>${esc(r.title)}</h3></div><span class="amt">${esc(r.amt)}</span></div>
+    ${done ? "" : `<p class="small muted">${esc(r.body)}</p>`}
+    <div class="todo ${done ? "done" : ""}"><button class="check" data-toggle="${r.id}" aria-label="סמן שטופל" aria-pressed="${done}">${IC.check}</button><span>${esc(r.todo)}</span></div>
+    ${r.calc && !done ? matCalc() : ""}
+    ${done ? "" : `<div class="src">מקור: ${r.src.map(k => `<a href="${SRC[k].u}" target="_blank" rel="noopener">${esc(SRC[k].t)}</a>`).join(" · ")}</div>`}
   </article>`; }).join("")}
-  <div class="banner peach"><b>טיפ</b><span class="small">כל זכות אוטומטית שמגיעה לחשבון אפשר לרשום גם בלשונית ההוצאות כהכנסה, כדי לראות את התמונה המלאה.</span></div>
-  </div>`;
+  <details class="auto"><summary><span><h3>קורה לבד</h3><span class="tiny">${auto.length} זכויות שלא צריך לעשות בשבילן כלום</span></span></summary><div class="in">
+    ${auto.map(r => `<div class="autoitem"><div class="head row" style="justify-content:space-between"><b>${esc(r.title)}</b><span class="amt">${esc(r.amt)}</span></div><p class="small muted">${esc(r.body)}</p><div class="src">מקור: ${r.src.map(k => `<a href="${SRC[k].u}" target="_blank" rel="noopener">${esc(SRC[k].t)}</a>`).join(" · ")}</div></div>`).join("")}
+  </div></details>`;
 }
 function matCalc() {
   const sal = +(lsGet("baby-sal", 0)) || "";
-  return `<div class="calc card flat" style="background:var(--surface2);border:0"><b class="small">מחשבון דמי לידה (ברוטו, הערכה)</b>
+  return `<div class="calcbox"><b class="small">מחשבון דמי לידה (ברוטו, הערכה)</b>
   <label class="f">השכר הברוטו הממוצע בחודש<input id="sal" type="number" inputmode="decimal" min="0" placeholder="למשל 11000" value="${sal}" data-sal="1"></label>
   <div id="calcres">${calcText(sal)}</div></div>`;
 }
 function calcText(sal) {
-  if (!sal) return '<span class="tiny">הכניסו שכר כדי לראות הערכה.</span>';
-  const daily = Math.min(1752.33, (sal * 3) / 90); const total = daily * 105;
-  return `<div class="res">${ils(total)}</div><span class="tiny">${ils(daily)} ליום × 105 ימים. ההערכה לפני ניכוי מס, ביטוח לאומי ומס בריאות.</span>`;
+  if (!sal) return '<span class="tiny">מכניסים שכר ומקבלים הערכה.</span>';
+  const daily = Math.min(1752.33, (sal * 3) / 90);
+  return `<div class="res">${ils(daily * 105)}</div><span class="tiny">${ils(daily)} ליום × 105 ימים. לפני מס, ביטוח לאומי ומס בריאות.</span>`;
 }
 
 /* ---------- הוצאות ---------- */
@@ -755,99 +879,109 @@ function vMoney() {
   const st = settings(); const ex = Object.entries(S.data.expenses).map(([id, e]) => ({ id, ...e })).sort((a, b) => (b.date || "").localeCompare(a.date || "") || (b.at || 0) - (a.at || 0));
   const spent = ex.filter(e => !e.income).reduce((s, e) => s + (+e.amount || 0), 0);
   const income = ex.filter(e => e.income).reduce((s, e) => s + (+e.amount || 0), 0);
-  const byCat = EXP_CATS.map(c => ({ ...c, sum: ex.filter(e => !e.income && e.cat === c.id).reduce((s, e) => s + (+e.amount || 0), 0) })).filter(c => c.sum > 0);
-  const max = Math.max(1, ...byCat.map(c => c.sum));
-  const today = new Date().toISOString().slice(0, 10);
-  return `<div class="stack"><h2>הוצאות ותקציב</h2>
-  <div class="stats">
-    <div class="stat"><span class="v">${ils(spent)}</span><span class="l">הוצאנו</span></div>
-    <div class="stat"><span class="v" style="color:${st.budget - spent < 0 ? "var(--alert)" : "var(--mint)"}">${ils(st.budget - spent)}</span><span class="l">נשאר מהתקציב</span></div>
-    <div class="stat"><span class="v">${ils(income)}</span><span class="l">התקבל (מענקים, מתנות)</span></div>
+  const byCat = EXP_CATS.map(c => ({ ...c, sum: ex.filter(e => !e.income && e.cat === c.id).reduce((s, e) => s + (+e.amount || 0), 0) })).filter(c => c.sum > 0).sort((a, b) => b.sum - a.sum);
+  const left = st.budget - spent;
+  return `<h2>הוצאות</h2>
+  <div class="kpis">
+    <div class="kpi"><span class="v">${ils(spent)}</span><span class="l">הוצאנו</span></div>
+    <div class="kpi"><span class="v" style="color:${left < 0 ? "var(--coral)" : "var(--mint)"}">${ils(left)}</span><span class="l">נשאר בתקציב</span></div>
+    <div class="kpi"><span class="v">${ils(income)}</span><span class="l">נכנס</span></div>
   </div>
-  <div class="budget-meter" aria-label="ניצול תקציב">${byCat.map(c => `<i style="width:${c.sum / Math.max(st.budget, spent) * 100}%;background:${c.c}"></i>`).join("")}</div>
-  <p class="tiny">תקציב: ${ils(st.budget)} · אפשר לשנות בהגדרות</p>
+  <section class="card stack-s"><div class="meter" aria-label="ניצול התקציב">${byCat.map(c => `<i style="width:${c.sum / Math.max(st.budget, spent) * 100}%;background:${c.c}"></i>`).join("")}</div>
+    ${byCat.length ? `<div class="legend">${byCat.map(c => `<span><i style="background:${c.c}"></i>${c.n} ${ils(c.sum)}</span>`).join("")}</div>` : ""}
+    <span class="tiny">תקציב ${ils(st.budget)} · משנים בהגדרות</span></section>
 
   <form class="card eform" data-addexp="1">
-    <h3 class="full">רישום הוצאה</h3>
-    <label class="f full">מה קנינו<input id="e-name" name="name" required placeholder="עגלת Joolz Day+" autocomplete="off"></label>
+    <h3 class="full">רישום</h3>
+    <label class="f full">מה<input id="e-name" name="name" required placeholder="עגלה, סלקל, מענק לידה…" autocomplete="off"></label>
     <label class="f">סכום ₪<input id="e-amount" name="amount" type="number" inputmode="decimal" min="0" required></label>
-    <label class="f">תאריך<input id="e-date" name="date" type="date" value="${today}"></label>
+    <label class="f">תאריך<input id="e-date" name="date" type="date" value="${iso(new Date())}"></label>
     <label class="f">קטגוריה<select id="e-cat" name="cat">${EXP_CATS.map(c => `<option value="${c.id}">${c.n}</option>`).join("")}</select></label>
     <label class="f">איפה<input id="e-store" name="store" placeholder="חנות / אתר" autocomplete="off"></label>
-    <label class="f full" style="display:flex;gap:8px;align-items:center;flex-direction:row"><input id="e-income" name="income" type="checkbox" style="width:auto"> זו הכנסה (מענק, מתנה כספית)</label>
+    <label class="full row" style="gap:8px;font-size:.9rem"><input id="e-income" name="income" type="checkbox" style="width:22px;height:22px"> זו הכנסה (מענק או מתנה בכסף)</label>
     <button class="btn full" type="submit">שמירה</button>
   </form>
 
-  ${byCat.length ? `<section class="card stack"><h3>לפי קטגוריה</h3><div class="bars">${byCat.sort((a, b) => b.sum - a.sum).map(c => `<div class="bar"><div class="lbl"><span>${c.n}</span><b class="num">${ils(c.sum)}</b></div><div class="track"><i style="width:${c.sum / max * 100}%;background:${c.c}"></i></div></div>`).join("")}</div></section>` : ""}
-
-  <section class="card"><h3 style="margin-bottom:6px">כל הרשומות</h3>
-  ${ex.length ? ex.map(e => { const c = EXP_CATS.find(x => x.id === e.cat) || EXP_CATS[7]; return `<div class="exp"><span class="dot" style="background:${e.income ? "var(--mint)" : c.c}"></span><div class="grow"><div style="font-weight:600">${esc(e.name)}</div><div class="tiny">${e.date ? fmtDate(e.date) : ""}${e.store ? " · " + esc(e.store) : ""} · ${e.income ? "הכנסה" : c.n}</div></div><b class="num" style="color:${e.income ? "var(--mint)" : "var(--ink)"}">${e.income ? "+" : ""}${ils(e.amount)}</b><button class="xbtn" data-delexp="${e.id}" aria-label="מחק">×</button></div>`; }).join("") : `<div class="empty"><b>עוד לא נרשמו הוצאות</b><span class="small">רשמו כאן את הקנייה הראשונה, או לחצו ׳קנינו׳ על מחיר ששמרתם ברשימת הקניות.</span></div>`}
-  </section></div>`;
+  <section class="card"><h3 style="margin-bottom:4px">כל הרשומות</h3>
+  ${ex.length ? ex.map(e => { const c = EXP_CATS.find(x => x.id === e.cat) || EXP_CATS[EXP_CATS.length - 1]; return `<div class="exp"><span class="dot" style="background:${e.income ? "var(--mint)" : c.c}"></span><div class="grow"><div style="font-weight:500">${esc(e.name)}</div><div class="tiny">${e.date ? fmtDate(e.date) : ""}${e.store ? " · " + esc(e.store) : ""} · ${e.income ? "הכנסה" : c.n}</div></div><b class="num" style="color:${e.income ? "var(--mint)" : "var(--ink)"}">${e.income ? "+" : ""}${ils(e.amount)}</b><button class="xbtn" data-delexp="${e.id}" aria-label="מחק">×</button></div>`; }).join("") : `<div class="empty"><b>עוד אין רשומות</b><span class="small">אפשר לרשום כאן, או ללחוץ ׳קנינו׳ על מחיר ששמרתם בקניות.</span></div>`}
+  </section>`;
 }
 
 /* ---------- הגדרות ---------- */
 function vSettings() {
-  const st = settings();
-  return `<div class="stack"><div class="row"><button class="btn soft small" data-go="home">→ חזרה</button><h2>הגדרות</h2></div>
+  const st = settings(); const lmpDue = st.lmp ? addDays(parse(st.lmp), 280) : null;
+  return `<div class="row"><button class="btn soft small" data-go="home">→ חזרה</button><h2>הגדרות</h2></div>
   <form class="card stack" data-settings="1">
-    <label class="f">תאריך לידה משוער<input id="st-due" name="due" type="date" value="${esc(st.due)}"></label>
+    <h3>תאריך הלידה</h3>
+    <label class="f">היום הראשון של הווסת האחרונה<input id="st-lmp" name="lmp" type="date" value="${esc(st.lmp)}"><span class="hint">${lmpDue ? "תאריך משוער: " + lmpDue.toLocaleDateString("he-IL", { day: "numeric", month: "long", year: "numeric" }) + " (280 יום)" : "מחשבים ממנו את התאריך המשוער (280 יום)."}</span></label>
+    <label class="f">תאריך משוער לפי אולטרסאונד (אם הרופא/ה תיקן/ה)<input id="st-us" name="usDue" type="date" value="${esc(st.usDue)}"><span class="hint">אם ממלאים, הוא גובר על החישוב לפי הווסת. הרבה פעמים מתקנים את התאריך לפי האולטרסאונד של השליש הראשון.</span></label>
+    <h3>אתם</h3>
+    <div class="eform" style="gap:10px"><label class="f">השם שלך<input id="st-dad" name="dad" value="${esc(st.dad)}" autocomplete="off"></label><label class="f">השם של אשתך<input id="st-mom" name="mom" value="${esc(st.mom)}" autocomplete="off"></label>
+    <label class="f full">שם או כינוי לתינוק<input id="st-baby" name="baby" value="${esc(st.baby)}" placeholder="למשל: בייבי, השוקו…" autocomplete="off"></label></div>
+    <h3>כסף וטלפונים</h3>
     <label class="f">תקציב לציוד (₪)<input id="st-budget" name="budget" type="number" min="0" value="${esc(st.budget)}"></label>
-    <label class="f">טלפון חדר לידה / מיון יולדות בשמיר<input id="st-phone" name="phone" type="tel" value="${esc(st.phone)}" placeholder="לבדוק באתר בית החולים ולשמור כאן"></label>
+    <label class="f">טלפון חדר לידה / מיון יולדות בשמיר<input id="st-phone" name="phone" type="tel" value="${esc(st.phone)}" placeholder="לבדוק באתר בית החולים"></label>
     <label class="f">טלפון המוהל<input id="st-mohel" name="mohel" type="tel" value="${esc(st.mohel)}"></label>
     <label class="f">את מי לעדכן כשמתחילים (שורה לכל אחד)<textarea id="st-notify" name="notify">${esc(st.notify)}</textarea></label>
     <button class="btn" type="submit">שמירה</button>
   </form>
-  <div class="card flat small muted stack"><b style="color:var(--ink)">שיתוף עם אשתך</b><span>${S.mode === "db" ? "השינויים נשמרים בענן ומתעדכנים אצל כל מי שקיבל הרשאת עריכה. כדי לשתף, לחצו על Share בעמוד ותנו לאשתך הרשאת עריכה (Editor) לפי המייל שלה." : "כרגע הנתונים נשמרים רק במכשיר הזה. כשפותחים את האפליקציה דרך claude.ai, הנתונים מסונכרנים בין המכשירים."}</span>
-  <a href="${SRC.shamir.u}" target="_blank" rel="noopener">אתר המרכז הרפואי שמיר ↗</a></div>
-  </div>`;
+  <section class="card stack-s small muted"><b style="color:var(--ink)">שיתוף עם אשתך</b><span>${S.mode === "db" ? "הכול נשמר בענן ומתעדכן אצל מי שקיבל הרשאת עריכה. כדי לשתף: Share בראש העמוד, ואז הרשאת Editor למייל של אשתך." : "כרגע הנתונים נשמרים רק במכשיר הזה."}</span>
+  <a href="${SRC.shamir.u}" target="_blank" rel="noopener">אתר המרכז הרפואי שמיר ↗</a></section>`;
 }
 
 /* ============================================================
-   מצב לידה — טיימר צירים
+   מצב לידה — טיימר צירים משותף
    ============================================================ */
-const BIRTH = lsGet("baby-contractions", { list: [], cur: null });
-function saveBirth() { lsSet("baby-contractions", BIRTH); }
-let tick;
-function openBirth() { $("#birth").hidden = false; document.body.style.overflow = "hidden"; renderBirth(); clearInterval(tick); tick = setInterval(updClock, 500); }
-function closeBirth() { $("#birth").hidden = true; document.body.style.overflow = ""; clearInterval(tick); }
+function contractions() {
+  if (S.mode === "db") return Object.assign({ list: [], cur: null }, S.data.live.contractions || {});
+  return lsGet("baby-contractions", { list: [], cur: null });
+}
+function saveContractions(c) { if (S.mode === "db") put("live", "contractions", c); else { lsSet("baby-contractions", c); renderBirth(); } }
+let tick, wake = null;
+async function openBirth() {
+  $("#birth").hidden = false; document.body.style.overflow = "hidden"; renderBirth(); clearInterval(tick); tick = setInterval(updClock, 500);
+  try { if (navigator.wakeLock) wake = await navigator.wakeLock.request("screen"); } catch (e) { wake = null; }
+}
+function closeBirth() { $("#birth").hidden = true; document.body.style.overflow = ""; clearInterval(tick); try { wake && wake.release(); } catch (e) {} wake = null; }
 const mmss = ms => { const s = Math.max(0, Math.round(ms / 1000)); return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); };
 function updClock() {
-  const el = $("#clock"); if (!el) return;
-  if (BIRTH.cur) el.textContent = mmss(Date.now() - BIRTH.cur);
-  else { const last = BIRTH.list[BIRTH.list.length - 1]; el.textContent = last ? mmss(Date.now() - last.e) : "0:00"; }
+  const el = $("#clock"); if (!el) return; const C = contractions();
+  if (C.cur) el.textContent = mmss(Date.now() - C.cur);
+  else { const last = C.list[C.list.length - 1]; el.textContent = last ? mmss(Date.now() - last.e) : "0:00"; }
 }
-function analysis() {
-  const L = BIRTH.list.slice(-8); if (L.length < 3) return null;
+function analysis(L) {
+  L = L.slice(-8); if (L.length < 3) return null;
   const ints = []; for (let k = 1; k < L.length; k++) ints.push(L[k].s - L[k - 1].s);
   const avgI = ints.reduce((a, b) => a + b, 0) / ints.length; const avgD = L.reduce((a, c) => a + (c.e - c.s), 0) / L.length;
-  return { avgI, avgD, ready: avgI <= 5.5 * 60e3 && avgD >= 45e3 };
-}
-function renderBirth() {
-  const st = settings(); const L = BIRTH.list; const an = analysis();
-  const rows = L.slice(-10).reverse().map((c, k, arr) => { const prev = arr[k + 1]; return `<div class="r"><span>${new Date(c.s).toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit" })}</span><span>${mmss(c.e - c.s)}</span><span>${prev ? mmss(c.s - prev.s) : "—"}</span></div>`; }).join("");
-  const waze = "https://waze.com/ul?q=" + encodeURIComponent("המרכז הרפואי שמיר אסף הרופא") + "&navigate=yes";
-  $("#birth").innerHTML = `<div class="wrap">
-  <div class="birth-h"><h2>מצב לידה 💛</h2><button class="btn soft" data-closebirth="1">סגירה</button></div>
-  <div class="banner peach"><b>נושמים. אתם מוכנים לזה.</b><span class="small">לנסוע מיד לבית החולים אם: ירדו מים, יש דימום, יש ירידה בתנועות התינוק, או כאב חזק ומתמשך. בכל מקרה של ספק, להתקשר לחדר הלידה.</span></div>
-  <section class="timer"><span class="muted small">${BIRTH.cur ? "ציר עכשיו" : "מאז הציר האחרון"}</span><div class="clock" id="clock">0:00</div>
-    <button class="cbtn ${BIRTH.cur ? "live" : ""}" data-contraction="1">${BIRTH.cur ? "הציר נגמר" : "התחיל ציר"}</button>
-    ${an ? `<div class="banner ${an.ready ? "peach" : "sky"}" style="width:100%"><b>${an.ready ? "הצירים סדירים וצפופים. זה הזמן להתקשר לחדר הלידה" : "ממשיכים לעקוב"}</b><span class="small">ממוצע: ציר כל ${mmss(an.avgI)} דק׳, באורך ${mmss(an.avgD)}. בלידה ראשונה הכלל המקובל לנסיעה הוא ציר כל 5 דקות, באורך דקה, במשך שעה (5-1-1), אלא אם הצוות אמר אחרת.</span></div>` : `<span class="tiny">לוחצים כשציר מתחיל ושוב כשהוא נגמר. אחרי 3 צירים יופיע ניתוח.</span>`}
-    ${L.length ? `<div class="clog"><div class="r h"><span>שעה</span><span>אורך</span><span>מרווח</span></div>${rows}</div><button class="btn soft small" data-resetc="1">${resetArm ? "ללחוץ שוב כדי לאשר מחיקה" : "איפוס הרשימה"}</button>` : ""}
-  </section>
-  <div class="actions">
-    <a class="act" href="${waze}" target="_blank" rel="noopener"><b>ניווט לשמיר ↗</b><span>Waze · צריפין, באר יעקב</span></a>
-    <div class="act"><b>חדר לידה</b><span class="num" style="user-select:all">${st.phone ? `<a href="tel:${esc(st.phone)}">${esc(st.phone)}</a>` : 'להוסיף מספר <button class="expand" data-go-settings="1">בהגדרות</button>'}</span></div>
-  </div>
-  <section class="card stack"><h3>לפני שיוצאים מהבית</h3>
-    ${["x-bag|תיק לידה", "x-docs|תיקיית מסמכים ותעודות זהות", "x-charge|מטענים וטלפונים", "x-seat|הסלקל מותקן ברכב", "x-home|לנעול, לכבות גז ולהשאיר אוכל לחיות"].map(s => { const [id, t] = s.split("|"); return taskRow({ id, t }); }).join("")}
-  </section>
-  <section class="card stack"><h3>את מי לעדכן</h3>
-    ${st.notify.split("\n").map(n => n.trim()).filter(Boolean).map((n, k) => taskRow({ id: "n-" + k, t: n })).join("") || '<span class="tiny">אפשר להוסיף אנשים בהגדרות.</span>'}
-  </section>
-  </div>`;
-  updClock();
+  return { avgI, avgD, go: avgI <= 5.5 * 60e3 && avgD >= 45e3 };
 }
 let resetArm = false;
+function renderBirth() {
+  const st = settings(); const C = contractions(); const L = C.list; const an = analysis(L);
+  const rows = L.slice(-8).reverse().map((c, k, arr) => { const prev = arr[k + 1]; return `<div class="r"><span>${new Date(c.s).toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit" })}</span><span>${mmss(c.e - c.s)}</span><span>${prev ? mmss(c.s - prev.s) : "—"}</span></div>`; }).join("");
+  const waze = "https://waze.com/ul?q=" + encodeURIComponent("המרכז הרפואי שמיר אסף הרופא") + "&navigate=yes";
+  $("#birth").innerHTML = `<div class="wrap">
+  <div class="bhead"><h2>מצב לידה</h2><button class="btn soft" data-closebirth="1">סגירה</button></div>
+  <p class="calm">נושמים. יש זמן. אתם מוכנים לזה.</p>
+  <section class="timer"><span class="muted small">${C.cur ? "ציר עכשיו" : "מאז הציר האחרון"}</span><div class="clock" id="clock">0:00</div>
+    <button class="cbtn ${C.cur ? "live" : ""}" data-contraction="1">${C.cur ? "הציר נגמר" : "התחיל ציר"}</button>
+    ${an ? `<div class="verdict ${an.go ? "go" : ""}"><b>${an.go ? "הצירים סדירים. זה הזמן להתקשר לחדר הלידה" : "ממשיכים לעקוב"}</b><span>ציר כל ${mmss(an.avgI)} דק׳, באורך ${mmss(an.avgD)}. בלידה ראשונה הכלל המקובל לנסיעה הוא 5-1-1, אלא אם הצוות אמר אחרת.</span></div>` : `<span class="tiny">לוחצים כשציר מתחיל ושוב כשהוא נגמר. ${S.mode === "db" ? "הטיימר משותף לשני הטלפונים." : ""}</span>`}
+    ${L.length ? `<div class="clog"><div class="r h"><span>שעה</span><span>אורך</span><span>מרווח</span></div>${rows}</div><button class="btn soft small" data-resetc="1">${resetArm ? "ללחוץ שוב לאישור" : "איפוס"}</button>` : ""}
+  </section>
+  <div class="bigacts">
+    <a class="bigact press" href="${waze}" target="_blank" rel="noopener">${IC.nav}<b>ניווט לשמיר</b><span>Waze</span></a>
+    ${st.phone ? `<a class="bigact press" href="tel:${esc(st.phone.replace(/[^\d+]/g, ""))}">${IC.phone}<b>חדר לידה</b><span style="user-select:all">${esc(st.phone)}</span></a>` : `<button class="bigact" data-go-settings="1">${IC.phone}<b>חדר לידה</b><span>להוסיף מספר</span></button>`}
+  </div>
+  <div class="warn"><b>נוסעים מיד, בלי לחכות לצירים, אם:</b>ירדו מים, יש דימום, התינוק זז פחות, או יש כאב חזק שלא עובר. בכל ספק, להתקשר לחדר הלידה.</div>
+  <section class="card stack-s"><h3>לפני שיוצאים</h3>
+    ${["x-bag|תיק לידה", "x-docs|תיקיית מסמכים ותעודות זהות", "x-charge|מטענים וטלפונים", "x-seat|הסלקל מותקן בסיוויק", "x-home|לנעול ולכבות גז"].map(s => { const [id, t] = s.split("|"); return taskRow({ id, t }); }).join("")}
+  </section>
+  <section class="card stack-s"><h3>את מי לעדכן</h3>
+    ${st.notify.split("\n").map(n => n.trim()).filter(Boolean).map((n, k) => taskRow({ id: "n-" + k, t: n })).join("") || '<span class="tiny">מוסיפים אנשים בהגדרות.</span>'}
+  </section></div>`;
+  updClock();
+}
+document.addEventListener("visibilitychange", async () => { if (document.visibilityState === "visible" && !$("#birth").hidden && !wake) { try { if (navigator.wakeLock) wake = await navigator.wakeLock.request("screen"); } catch (e) {} } });
 
 /* ============================================================
    אירועים
@@ -855,49 +989,59 @@ let resetArm = false;
 document.addEventListener("click", e => {
   const t = e.target.closest("button, a"); if (!t) return;
   const d = t.dataset;
-  if (d.go) { go(d.go); return; }
+  if (d.go) { if (!$("#birth").hidden) closeBirth(); go(d.go); return; }
   if (d.goSettings) { closeBirth(); go("settings"); return; }
-  if (d.toggle) { toggle(d.toggle); return; }
+  if (d.toggle) { const was = isDone(d.toggle); toggle(d.toggle); if (!was && UI.tab === "home") toast("כל הכבוד ✓"); return; }
   if (d.open) { UI.open[d.open] = !UI.open[d.open]; saveUI(); render(); return; }
   if (d.shopcat) { UI.shopCat = d.shopcat; saveUI(); render(); return; }
   if (d.bagtab) { UI.bagTab = d.bagtab; saveUI(); render(); return; }
+  if (d.taskseg) { UI.taskSeg = d.taskseg; saveUI(); render(); return; }
+  if (d.pick) { const cur = S.data.checks["pick-" + d.pick]; if (cur && cur.n === d.name) del("checks", "pick-" + d.pick); else put("checks", "pick-" + d.pick, { n: d.name, at: Date.now() }); return; }
   if (d.delcustom) { del("custom", d.delcustom); return; }
   if (d.delquote) { del("quotes", d.delquote); return; }
   if (d.delexp) { del("expenses", d.delexp); return; }
   if (d.buyquote) {
     const q = S.data.quotes[d.buyquote]; if (!q) return;
-    const it = allShopItems().find(i => i.id === q.item); const cat = SHOP.find(c => c.items.includes(it));
-    put("expenses", newId(), { name: it ? it.name : q.store, amount: q.price, store: q.store, cat: cat ? cat.id : "other", date: new Date().toISOString().slice(0, 10), at: Date.now() });
+    const it = allShopItems().find(i => i.id === q.item); const cat = SHOP.find(c => it && c.items.includes(it));
+    put("expenses", newId(), { name: it ? it.name : q.store, amount: q.price, store: q.store, cat: cat ? cat.id : "other", date: iso(new Date()), at: Date.now() });
     if (it && !isDone(it.id)) put("checks", it.id, { done: true, at: Date.now() });
-    toast("נרשם בהוצאות וסומן כנקנה ✓"); return;
+    toast("נרשם בהוצאות וסומן כנקנה"); return;
   }
   if (d.birth) { openBirth(); return; }
   if (d.closebirth) { closeBirth(); render(); return; }
   if (d.contraction) {
-    if (BIRTH.cur) { BIRTH.list.push({ s: BIRTH.cur, e: Date.now() }); BIRTH.cur = null; } else BIRTH.cur = Date.now();
-    saveBirth(); renderBirth(); return;
+    const C = contractions(); const n = { list: C.list.slice(-60), cur: C.cur };
+    if (n.cur) { n.list.push({ s: n.cur, e: Date.now() }); n.cur = null; } else n.cur = Date.now();
+    saveContractions(n); return;
   }
-  if (d.resetc) { if (resetArm) { BIRTH.list = []; BIRTH.cur = null; saveBirth(); resetArm = false; } else { resetArm = true; setTimeout(() => { resetArm = false; if (!$("#birth").hidden) renderBirth(); }, 4000); } renderBirth(); return; }
+  if (d.resetc) {
+    if (resetArm) { resetArm = false; saveContractions({ list: [], cur: null }); }
+    else { resetArm = true; renderBirth(); setTimeout(() => { resetArm = false; if (!$("#birth").hidden) renderBirth(); }, 4000); }
+    return;
+  }
 });
 document.addEventListener("submit", e => {
   const f = e.target; e.preventDefault(); const d = f.dataset; const fd = new FormData(f);
-  if (d.addcustom) { const text = (fd.get("text") || "").trim(); if (!text) return; f.reset(); document.activeElement && document.activeElement.blur(); put("custom", newId(), { list: d.addcustom, text, at: Date.now() }); return; }
-  if (d.addquote) { const store = (fd.get("store") || "").trim(); const price = +fd.get("price"); if (!store || !(price >= 0)) return; f.reset(); document.activeElement.blur(); put("quotes", newId(), { item: d.addquote, store, price, at: Date.now() }); toast("המחיר נשמר"); return; }
-  if (d.gift) { const by = (fd.get("by") || "").trim(); document.activeElement.blur(); if (by) put("checks", "gift-" + d.gift, { by, at: Date.now() }); else del("checks", "gift-" + d.gift); toast(by ? "נרשם כמתנה 🎁" : "הוסר"); return; }
+  const blur = () => { if (document.activeElement) document.activeElement.blur(); };
+  if (d.addcustom) { const text = (fd.get("text") || "").trim(); if (!text) return; f.reset(); blur(); put("custom", newId(), { list: d.addcustom, text, at: Date.now() }); return; }
+  if (d.addquote) { const store = (fd.get("store") || "").trim(); const price = +fd.get("price"); if (!store || !(price >= 0)) return; f.reset(); blur(); put("quotes", newId(), { item: d.addquote, store, price, at: Date.now() }); toast("המחיר נשמר"); return; }
+  if (d.gift) { const by = (fd.get("by") || "").trim(); blur(); if (by) put("checks", "gift-" + d.gift, { by, at: Date.now() }); else del("checks", "gift-" + d.gift); toast(by ? "נרשם כמתנה" : "הוסר"); return; }
   if (d.addexp) {
     const name = (fd.get("name") || "").trim(); const amount = +fd.get("amount"); if (!name || !(amount >= 0)) return;
     const obj = { name, amount, date: fd.get("date") || "", cat: fd.get("cat"), store: (fd.get("store") || "").trim(), income: !!fd.get("income"), at: Date.now() };
-    f.reset(); document.activeElement.blur(); put("expenses", newId(), obj); toast("נשמר ✓"); return;
+    f.reset(); blur(); put("expenses", newId(), obj); toast("נשמר"); return;
   }
   if (d.settings) {
-    const obj = { due: fd.get("due") || defaultDue(), budget: +fd.get("budget") || 0, phone: (fd.get("phone") || "").trim(), mohel: (fd.get("mohel") || "").trim(), notify: fd.get("notify") || "" };
-    document.activeElement.blur(); put("settings", "main", obj); toast("ההגדרות נשמרו"); return;
+    const g = k => (fd.get(k) || "").toString().trim();
+    blur(); put("settings", "main", { lmp: g("lmp"), usDue: g("usDue"), budget: +g("budget") || 0, phone: g("phone"), mohel: g("mohel"), notify: fd.get("notify") || "", baby: g("baby"), mom: g("mom"), dad: g("dad") });
+    toast("ההגדרות נשמרו"); return;
   }
 });
 document.addEventListener("input", e => {
   if (e.target.dataset && e.target.dataset.sal) { const v = +e.target.value || 0; lsSet("baby-sal", v); const r = $("#calcres"); if (r) r.innerHTML = calcText(v); }
 });
 
-render();
+render(true);
 initDb();
+
 </script>
