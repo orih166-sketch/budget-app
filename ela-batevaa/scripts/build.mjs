@@ -1,6 +1,6 @@
 // Builds src/Logo.html (embedded logo) and preview/index.html (standalone demo with a mock backend).
 // Usage: node scripts/build.mjs
-import { readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -14,4 +14,9 @@ const mock = readFileSync(join(root, 'preview', 'mock.js'), 'utf8');
 const html = src('Index.html').replace(/<\?!= include\('(\w+)'\); \?>/g, (_, name) =>
   (name === 'Logo' ? `<script>\n${mock}\n</script>\n` : '') + src(`${name}.html`));
 writeFileSync(join(root, 'preview', 'index.html'), html);
-console.log('built src/Logo.html and preview/index.html');
+
+// Single-file page for copy-paste deployment: deploy/Index.html + src/Code.gs are all Apps Script needs.
+mkdirSync(join(root, 'deploy'), { recursive: true });
+const inlined = src('Index.html').replace(/<\?!= include\('(\w+)'\); \?>/g, (_, name) => src(`${name}.html`));
+writeFileSync(join(root, 'deploy', 'Index.html'), inlined);
+console.log('built src/Logo.html, preview/index.html and deploy/Index.html');
