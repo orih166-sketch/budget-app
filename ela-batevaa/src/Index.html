@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#FBF3E8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700;800&family=Frank+Ruhl+Libre:wght@500;700&display=swap" rel="stylesheet">
+  <?!= include('Styles'); ?>
+</head>
+<body>
+  <div id="splash" class="splash">
+    <img class="splash-logo" alt="אלה בטבע" id="splashLogo">
+    <div class="splash-dots"><span></span><span></span><span></span></div>
+  </div>
+
+  <div id="app" class="app" hidden>
+    <aside class="sidebar" id="sidebar"></aside>
+    <main class="main">
+      <header class="topbar" id="topbar"></header>
+      <section id="view" class="view"></section>
+    </main>
+    <nav class="bottomnav" id="bottomnav"></nav>
+    <button class="fab" data-action="newSale" aria-label="מכירה חדשה">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+      <span>מכירה</span>
+    </button>
+  </div>
+
+  <div id="modalRoot"></div>
+  <div id="toastRoot" class="toast-root" aria-live="polite"></div>
+  <div id="receiptStage" class="receipt-stage" aria-hidden="true"></div>
+
+  <?!= include('Logo'); ?>
+  <?!= include('App'); ?>
+</body>
+</html>

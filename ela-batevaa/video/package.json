@@ -1,0 +1,13 @@
+{
+  "name": "ela-batevaa-video",
+  "private": true,
+  "description": "User guide video for the Ela Batevaa system",
+  "scripts": {
+    "capture": "node capture.js",
+    "render": "node render.js"
+  },
+  "devDependencies": {
+    "html2canvas": "1.4.1",
+    "jspdf": "2.5.1"
+  }
+}
