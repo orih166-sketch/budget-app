@@ -15,11 +15,20 @@ async function authHeader() {
 }
 
 export async function callSheet(action, params = {}) {
-  const r = await fetch('/api/sheet', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...(await authHeader()) },
-    body: JSON.stringify({ action, params }),
-  })
+  // לא מחכים לנצח: אחרי 25 שניות מציגים שגיאה עם אפשרות לנסות שוב
+  const ctrl = new AbortController()
+  const timer = setTimeout(() => ctrl.abort(), 25000)
+  let r
+  try {
+    r = await fetch('/api/sheet', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...(await authHeader()) },
+      body: JSON.stringify({ action, params }),
+      signal: ctrl.signal,
+    })
+  } catch (e) {
+    throw new Error(e.name === 'AbortError' ? 'הגיליון לא ענה בזמן. נסה שוב' : 'אין חיבור לאינטרנט')
+  } finally { clearTimeout(timer) }
   const j = await r.json().catch(() => ({ ok: false, error: 'אין חיבור לשרת' }))
   if (!j.ok) throw new Error(j.error || 'משהו השתבש')
   return j.data

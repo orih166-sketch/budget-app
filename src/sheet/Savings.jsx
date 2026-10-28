@@ -18,7 +18,7 @@ export default function Savings() {
       {!d ? <><Skeleton h={130} /><Skeleton h={300} /></>
         : (setup || !d.balancesFrom) ? <Setup d={d} done={() => setSetup(false)} canCancel={!!d.balancesFrom} />
         : <Body d={d} />}
-      <Status loading={sv.loading} error={sv.error} hasData={!!d} />
+      <Status loading={sv.loading} error={sv.error} hasData={!!d} retry={sv.reload} />
     </div>
   )
 }

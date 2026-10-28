@@ -113,7 +113,7 @@ export default function Budget({ initialMonth, back }) {
           </div>
         </>
       )}
-      <Status loading={plan.loading} error={plan.error} hasData={!!rows} />
+      <Status loading={plan.loading} error={plan.error} hasData={!!rows} retry={plan.reload} />
     </div>
   )
 }

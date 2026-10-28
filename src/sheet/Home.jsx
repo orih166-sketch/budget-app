@@ -84,7 +84,7 @@ export default function Home({ month, setMonth, thisMonth, go, userName }) {
       {isCurrent && cf.data?.cardNext && data && (
         <p className={s.small}>חיוב {cf.data.cardNext.card} הבא: {money(cf.data.cardNext.amount)} ב-{ddmm(cf.data.cardNext.date)}</p>
       )}
-      <Status loading={m.loading} error={m.error} hasData={!!data} />
+      <Status loading={m.loading} error={m.error} hasData={!!data} retry={m.reload} />
     </div>
   )
 }

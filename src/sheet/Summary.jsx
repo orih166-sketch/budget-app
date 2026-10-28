@@ -30,7 +30,7 @@ export default function Summary({ initialMonth, back, go }) {
         <button type="button" className={s.iconBtn} aria-label="חודש הבא" disabled={month >= thisMonth} onClick={() => setMonth(shiftMonth(month, 1))}><ChevronLeft size={18} aria-hidden="true" /></button>
       </div>
       {!d ? <><Skeleton h={160} /><Skeleton h={240} /></> : <Body d={d} prev={prev} name={name} month={month} go={go} partial={month === thisMonth} />}
-      <Status loading={m.loading} error={m.error} hasData={!!d} />
+      <Status loading={m.loading} error={m.error} hasData={!!d} retry={m.reload} />
     </div>
   )
 }

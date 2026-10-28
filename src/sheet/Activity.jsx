@@ -135,7 +135,7 @@ export default function Activity({ focusInput, go }) {
       ))}
       {tx.data && !days.length && <div className={`${s.card} ${s.empty}`}>{searching ? 'לא נמצאו תנועות' : 'אין תנועות להצגה'}</div>}
       {searching && !tx.data && tx.loading && <p className={s.status}>מחפש בכל התנועות…</p>}
-      <Status loading={tx.loading} error={tx.error} hasData={!!tx.data} />
+      <Status loading={tx.loading} error={tx.error} hasData={!!tx.data} retry={tx.reload} />
       {editing && <TxEditor tx={editing} close={() => setEditing(null)} />}
     </div>
   )

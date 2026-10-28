@@ -9,6 +9,7 @@ const ACTIONS = new Set([
   'updateTx', 'deleteTx', 'cashflow', 'setBalance', 'savings',
   'pasteAnalyze', 'bankImport',
   'savingsSetup', 'savingsPending', 'savingsAllocate',
+  'budgetPlan', 'budgetSave', 'setCushion',
   'pushGet', 'pushSubscribe', 'pushUnsubscribe', 'pushPrefs', 'pushTest',
 ])
 // פעולות שהגיליון צריך לדעת עבור מי הן — המייל נלקח מההתחברות, לא ממה שהדפדפן שלח

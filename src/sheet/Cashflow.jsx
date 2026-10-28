@@ -15,7 +15,7 @@ export default function Cashflow() {
         {d && <StatusPill d={d} />}
       </div>
       {!d ? <><Skeleton h={150} /><Skeleton h={230} /><Skeleton h={280} /></> : <Body d={d} />}
-      <Status loading={cf.loading} error={cf.error} hasData={!!d} />
+      <Status loading={cf.loading} error={cf.error} hasData={!!d} retry={cf.reload} />
     </div>
   )
 }

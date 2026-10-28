@@ -24,7 +24,14 @@ export function Skeleton({ h = 80 }) {
 }
 
 /** שורת מצב: "מתעדכן…" בזמן טעינה מעל נתונים ישנים, או שגיאה. */
-export function Status({ loading, error, hasData }) {
-  if (error) return <p className={s.errMsg} role="alert">{hasData ? 'לא הצלחתי לרענן: ' : ''}{error}</p>
+export function Status({ loading, error, hasData, retry }) {
+  if (error && !hasData) return (
+    <div className={s.banner} role="alert" style={{ flexDirection: 'column', alignItems: 'stretch', gap: 10, position: 'fixed', zIndex: 30, left: 16, right: 16, bottom: 'calc(104px + env(safe-area-inset-bottom))', maxWidth: 528, margin: '0 auto' }}>
+      <span className={s.name} style={{ color: 'var(--warn)' }}>לא הצלחתי לטעון</span>
+      <span className={s.small}>{error}</span>
+      <button type="button" className={s.secondary} onClick={retry || (() => window.location.reload())}>לנסות שוב</button>
+    </div>
+  )
+  if (error) return <p className={s.errMsg} role="alert">לא הצלחתי לרענן: {error}</p>
   return <p className={s.status} aria-live="polite">{loading && hasData ? 'מתעדכן מהגיליון…' : ''}</p>
 }
