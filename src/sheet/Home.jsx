@@ -30,8 +30,7 @@ export default function Home({ month, setMonth, thisMonth, go, userName }) {
     <div className={s.screen}>
       <div className={s.topbar}>
         <div className={s.titleBlock}>
-          <span className={s.hello}>{greeting}{userName ? `, ${userName}` : ''}</span>
-          <h1 className={s.h1}>{isCurrent ? 'החודש' : 'חודש קודם'}</h1>
+          <h1 className={s.h1}>{greeting}{userName ? `, ${userName}` : ''}</h1>
         </div>
         <div className={s.tools}>
           <button type="button" className={s.iconBtn} aria-label="התראות" onClick={() => go('alerts')}>
@@ -43,6 +42,19 @@ export default function Home({ month, setMonth, thisMonth, go, userName }) {
         </div>
       </div>
 
+      {isCurrent && <SafeCard cf={cf.data} />}
+      {isCurrent && <BalanceNudge cf={cf.data} />}
+
+      {isCurrent && new Date().getDate() <= 7 && (
+        <button type="button" className={`${s.banner} ${s.rowBtn}`} onClick={() => go('summary')}>
+          <div className={s.nameCol}>
+            <span className={s.name}>הסיכום של {monthLabel(shiftMonth(month, -1)).split(' ')[0]} מוכן</span>
+            <span className={s.small}>כמה נכנס, כמה יצא, איפה חרגתם — ובניית תקציב לחודש החדש</span>
+          </div>
+          <ChevronLeft size={18} aria-hidden="true" />
+        </button>
+      )}
+      <h2 className={s.h2} style={{ marginTop: 8 }}>החודש בפירוט</h2>
       <div className={s.monthBar}>
         <button type="button" className={s.iconBtn} aria-label="חודש קודם" disabled={month <= options[options.length - 1]} onClick={() => setMonth(shiftMonth(month, -1))}>
           <ChevronRight size={18} aria-hidden="true" />
@@ -54,29 +66,13 @@ export default function Home({ month, setMonth, thisMonth, go, userName }) {
           <ChevronLeft size={18} aria-hidden="true" />
         </button>
       </div>
-      <div className={s.spread}>
-        <span className={s.small}>{isCurrent ? 'בתחילת כל חודש עוברים לבד לחודש החדש' : <button type="button" className={s.link} style={{ padding: 0, fontSize: 12 }} onClick={() => setMonth(thisMonth)}>חזרה לחודש הנוכחי</button>}</span>
+      <div className={s.chips}>
+        {!isCurrent && <button type="button" className={s.chipBtn} onClick={() => setMonth(thisMonth)}>חזרה לחודש הנוכחי</button>}
         <button type="button" aria-pressed={compare} className={`${s.chipBtn} ${compare ? s.chipOn : ''}`} onClick={() => setCompare(c => !c)}>
           השוואה ל{monthLabel(shiftMonth(month, -1)).split(' ')[0]}
         </button>
-      </div>
-
-      {isCurrent && new Date().getDate() <= 7 && (
-        <button type="button" className={`${s.banner} ${s.rowBtn}`} onClick={() => go('summary')}>
-          <div className={s.nameCol}>
-            <span className={s.name}>הסיכום של {monthLabel(shiftMonth(month, -1)).split(' ')[0]} מוכן</span>
-            <span className={s.small}>כמה נכנס, כמה יצא, איפה חרגתם — ובניית תקציב לחודש החדש</span>
-          </div>
-          <ChevronLeft size={18} aria-hidden="true" />
-        </button>
-      )}
-      {isCurrent && <SafeCard cf={cf.data} />}
-      {isCurrent && <BalanceNudge cf={cf.data} />}
-
-      <div className={s.chips}>
         <button type="button" className={s.chipBtn} onClick={() => go('budget', month)}>בניית תקציב</button>
         <button type="button" className={s.chipBtn} onClick={() => go('summary', isCurrent ? shiftMonth(month, -1) : month)}>סיכום חודש</button>
-        <button type="button" className={s.chipBtn} onClick={() => go('cashflow')}>תזרים</button>
       </div>
 
       {!data ? <><Skeleton h={170} /><Skeleton h={84} /><Skeleton h={300} /></> : <MonthBody data={data} prev={prevData} isCurrent={isCurrent} go={go} />}
