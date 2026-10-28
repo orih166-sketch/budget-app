@@ -23,7 +23,12 @@ import { useAuth } from './hooks/useAuth.js'
 import { useCategoryBudgets } from './hooks/useCategoryBudgets.js'
 import { checkBudgetAlert } from './utils/budgetNotify.js'
 import { CURRENT_MONTH, CURRENT_YEAR } from './data.js'
+import SheetApp from './sheet/SheetApp.jsx'
+import { SHEET_DEV } from './sheet/api.js'
 import styles from './App.module.css'
+
+// האפליקציה החדשה עובדת מול הגיליון. AppShell הישן נשאר בקוד ומוסתר בינתיים.
+const USE_SHEET_APP = true
 
 function AppShell({ user, isPasswordRecovery, logout, updatePassword }) {
   const { acceptInvitation } = useHousehold()
@@ -228,6 +233,8 @@ export default function App() {
     sendResetCode, updatePassword, loginWithGoogle, sendPhoneOtp, verifyPhoneOtp,
   } = useAuth()
 
+  if (SHEET_DEV) return <SheetApp user={{ email: 'orih166@gmail.com' }} />
+
   if (user === undefined) {
     return (
       <div className={styles.loading}>
@@ -248,6 +255,8 @@ export default function App() {
       />
     )
   }
+
+  if (USE_SHEET_APP && !isPasswordRecovery) return <SheetApp user={user} logout={logout} />
 
   return (
     <HouseholdProvider user={user}>
