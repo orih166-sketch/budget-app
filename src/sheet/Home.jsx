@@ -3,6 +3,7 @@ import { ChevronRight, ChevronLeft, Settings, Bell } from 'lucide-react'
 import { useSheet } from './api.js'
 import { money, monthLabel, shiftMonth, ddmm, initial } from './format.js'
 import { Bar, Skeleton, Status } from './ui.jsx'
+import { SafeCard, BalanceNudge } from './Safe.jsx'
 import s from './sheet.module.css'
 
 // החודשים ברשימה: מינואר בשנה שעברה ועד החודש הנוכחי (החדש למעלה)
@@ -23,7 +24,7 @@ export default function Home({ month, setMonth, thisMonth, go, userName }) {
   const isCurrent = month === thisMonth
   const options = monthOptions(thisMonth)
   const hour = new Date().getHours()
-  const greeting = hour < 12 ? 'בוקר טוב' : hour < 18 ? 'צהריים טובים' : 'ערב טוב'
+  const greeting = hour < 5 ? 'לילה טוב' : hour < 12 ? 'בוקר טוב' : hour < 18 ? 'צהריים טובים' : 'ערב טוב'
 
   return (
     <div className={s.screen}>
@@ -58,6 +59,24 @@ export default function Home({ month, setMonth, thisMonth, go, userName }) {
         <button type="button" aria-pressed={compare} className={`${s.chipBtn} ${compare ? s.chipOn : ''}`} onClick={() => setCompare(c => !c)}>
           השוואה ל{monthLabel(shiftMonth(month, -1)).split(' ')[0]}
         </button>
+      </div>
+
+      {isCurrent && new Date().getDate() <= 7 && (
+        <button type="button" className={`${s.banner} ${s.rowBtn}`} onClick={() => go('summary')}>
+          <div className={s.nameCol}>
+            <span className={s.name}>הסיכום של {monthLabel(shiftMonth(month, -1)).split(' ')[0]} מוכן</span>
+            <span className={s.small}>כמה נכנס, כמה יצא, איפה חרגתם — ובניית תקציב לחודש החדש</span>
+          </div>
+          <ChevronLeft size={18} aria-hidden="true" />
+        </button>
+      )}
+      {isCurrent && <SafeCard cf={cf.data} />}
+      {isCurrent && <BalanceNudge cf={cf.data} />}
+
+      <div className={s.chips}>
+        <button type="button" className={s.chipBtn} onClick={() => go('budget', month)}>בניית תקציב</button>
+        <button type="button" className={s.chipBtn} onClick={() => go('summary', isCurrent ? shiftMonth(month, -1) : month)}>סיכום חודש</button>
+        <button type="button" className={s.chipBtn} onClick={() => go('cashflow')}>תזרים</button>
       </div>
 
       {!data ? <><Skeleton h={170} /><Skeleton h={84} /><Skeleton h={300} /></> : <MonthBody data={data} prev={prevData} isCurrent={isCurrent} go={go} />}
@@ -115,32 +134,39 @@ function MonthBody({ data, prev, isCurrent, go }) {
       <section className={s.hero} aria-label="מאזן החודש">
         <span className={s.heroLabel}>{balance >= 0 ? (isCurrent ? 'עודף עד עכשיו' : 'עודף בחודש') : (isCurrent ? 'גירעון עד עכשיו' : 'גירעון בחודש')}</span>
         <span className={`${s.heroNum} ${balance < 0 ? s.warnText : ''}`}>{money(Math.abs(balance))}</span>
-        <span className={s.heroSub}>
-          הכנסות פחות הוצאות וחיסכון · בתכנון: {planned >= 0 ? 'עודף' : 'גירעון'} של {money(Math.abs(planned))}
-        </span>
+        <span className={s.heroSub}>הכנסות פחות הוצאות וחיסכון</span>
         {pt && (() => {
           const pb = pt.income.actual - pt.expenses.actual - pt.savings.actual
           return <span className={s.heroSub}>בחודש הקודם: {pb >= 0 ? 'עודף' : 'גירעון'} של {money(Math.abs(pb))}</span>
         })()}
       </section>
 
-      <div className={s.kpis}>
-        <div className={s.kpi}>
-          <span className={s.kpiLabel}>הכנסות</span>
-          <span className={`${s.kpiNum} ${s.pos}`}>{money(t.income.actual)}</span>
-          {pt && <Was now={t.income.actual} before={pt.income.actual} goodWhenLower={false} />}
+      <section className={s.rows} aria-label="תכנון מול בפועל">
+        <div className={s.rowItem} style={{ paddingBlock: 10 }}>
+          <span className={s.nameCol}><span className={s.small} style={{ fontWeight: 700 }}>תכנון מול בפועל</span></span>
+          <span className={s.small} style={{ width: 82, textAlign: 'left' }}>תכנון</span>
+          <span className={s.small} style={{ width: 82, textAlign: 'left' }}>בפועל</span>
         </div>
-        <div className={s.kpi}>
-          <span className={s.kpiLabel}>הוצאות</span>
-          <span className={s.kpiNum}>{money(t.expenses.actual)}</span>
-          {pt && <Was now={t.expenses.actual} before={pt.expenses.actual} />}
+        {[
+          ['הכנסות', t.income.budget, t.income.actual, pt?.income.actual, false],
+          ['הוצאות', t.expenses.budget, t.expenses.actual, pt?.expenses.actual, true],
+          ['חיסכון', t.savings.budget, t.savings.actual, pt?.savings.actual, false],
+        ].map(([label, plan, act, before, lowerGood]) => (
+          <div key={label} className={s.rowItem}>
+            <div className={s.nameCol}>
+              <span className={s.name}>{label}</span>
+              {pt && <Was now={act} before={before} goodWhenLower={lowerGood} />}
+            </div>
+            <span className={s.muted} style={{ width: 82, textAlign: 'left' }}>{money(plan)}</span>
+            <span className={s.amount} style={{ width: 82, textAlign: 'left' }}>{money(act)}</span>
+          </div>
+        ))}
+        <div className={s.rowItem} style={{ background: 'var(--soft)', borderRadius: '0 0 18px 18px' }}>
+          <span className={s.nameCol}><span className={s.name} style={{ fontWeight: 700 }}>מאזן</span></span>
+          <span className={`${s.amount} ${planned < 0 ? s.warnText : s.pos}`} style={{ width: 82, textAlign: 'left' }}>{money(planned)}</span>
+          <span className={`${s.amount} ${balance < 0 ? s.warnText : s.pos}`} style={{ width: 82, textAlign: 'left' }}>{money(balance)}</span>
         </div>
-        <div className={s.kpi}>
-          <span className={s.kpiLabel}>חיסכון</span>
-          <span className={s.kpiNum}>{money(t.savings.actual)}</span>
-          {pt && <Was now={t.savings.actual} before={pt.savings.actual} goodWhenLower={false} />}
-        </div>
-      </div>
+      </section>
 
       <section className={s.catCard} aria-label="הוצאות משתנות">
         <div className={s.spread}>

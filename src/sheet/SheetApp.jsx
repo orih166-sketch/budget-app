@@ -8,6 +8,8 @@ import SettingsScreen from './SettingsScreen.jsx'
 import Alerts from './Alerts.jsx'
 import Import from './Import.jsx'
 import ApplePay from './ApplePay.jsx'
+import Budget from './Budget.jsx'
+import Summary from './Summary.jsx'
 import { ymd } from './format.js'
 import s from './sheet.module.css'
 
@@ -29,18 +31,24 @@ export default function SheetApp({ user, logout }) {
 
   // index.css של האפליקציה הישנה צובע את הדף בכחול כהה; הוא נראה בקצוות המסך באייפון
   useEffect(() => {
-    const prev = [document.documentElement.style.background, document.body.style.background]
-    document.documentElement.style.background = '#F7F5EC'
-    document.body.style.background = '#F7F5EC'
-    return () => { [document.documentElement.style.background, document.body.style.background] = prev }
+    const mq = window.matchMedia('(prefers-color-scheme: dark)')
+    const paint = () => {
+      const c = mq.matches ? '#15160F' : '#F7F5EC'
+      document.documentElement.style.background = c
+      document.body.style.background = c
+    }
+    paint()
+    mq.addEventListener('change', paint)
+    return () => mq.removeEventListener('change', paint)
   }, [])
 
   const scroller = useRef(null)
-  const go = id => { setScreen(id); scroller.current?.scrollTo(0, 0) }
+  const [arg, setArg] = useState(null)
+  const go = (id, a = null) => { setScreen(id); setArg(a); scroller.current?.scrollTo(0, 0) }
   const userName = NAMES[user?.email?.toLowerCase()] || ''
 
   return (
-    <div className={s.app} ref={scroller}>
+    <div className={s.app} ref={scroller} key={screen + (arg || '')}>
       {screen === 'home' && <Home month={month} setMonth={setMonth} thisMonth={thisMonth} go={go} userName={userName} />}
       {screen === 'activity' && <Activity focusInput={focusAdd} go={go} />}
       {screen === 'cashflow' && <Cashflow />}
@@ -49,6 +57,8 @@ export default function SheetApp({ user, logout }) {
       {screen === 'alerts' && <Alerts back={() => go('home')} />}
       {screen === 'import' && <Import back={() => go('activity')} />}
       {screen === 'applepay' && <ApplePay back={() => go('settings')} />}
+      {screen === 'budget' && <Budget initialMonth={arg} back={() => go('home')} />}
+      {screen === 'summary' && <Summary initialMonth={arg} back={() => go('home')} go={go} />}
 
       <nav className={s.nav} aria-label="ניווט ראשי">
         <div className={s.navInner}>

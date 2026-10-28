@@ -130,7 +130,7 @@ export default function Import({ back }) {
             <div className={s.stats}>
               <div className={s.stat}><span className={s.statNum} style={{ color: 'var(--accentDark)' }}>{known.length}</span><span className={s.small}>מוינו לבד</span></div>
               <div className={s.stat} style={{ background: 'var(--warnBg)' }}><span className={s.statNum} style={{ color: 'var(--warn)' }}>{unknown.length}</span><span className={s.small}>לבחירתך</span></div>
-              <div className={s.stat} style={{ background: '#F0EEE6' }}><span className={s.statNum}>{skipped.length}</span><span className={s.small}>כבר נרשמו או דולגו</span></div>
+              <div className={s.stat} style={{ background: 'var(--soft)' }}><span className={s.statNum}>{skipped.length}</span><span className={s.small}>כבר נרשמו או דולגו</span></div>
             </div>
           </section>
 

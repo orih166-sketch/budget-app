@@ -24,6 +24,7 @@ import { useCategoryBudgets } from './hooks/useCategoryBudgets.js'
 import { checkBudgetAlert } from './utils/budgetNotify.js'
 import { CURRENT_MONTH, CURRENT_YEAR } from './data.js'
 import SheetApp from './sheet/SheetApp.jsx'
+import SheetLogin from './sheet/SheetLogin.jsx'
 import { SHEET_DEV } from './sheet/api.js'
 import styles from './App.module.css'
 
@@ -236,6 +237,7 @@ export default function App() {
   if (SHEET_DEV) return <SheetApp user={{ email: 'orih166@gmail.com' }} />
 
   if (user === undefined) {
+    if (USE_SHEET_APP) return <div style={{ minHeight: '100dvh' }} aria-busy="true" />
     return (
       <div className={styles.loading}>
         <div className={styles.loadingSpinner} />
@@ -244,6 +246,7 @@ export default function App() {
   }
 
   if (!user) {
+    if (USE_SHEET_APP) return <SheetLogin onLogin={login} onRegister={register} onSendResetCode={sendResetCode} onLoginWithGoogle={loginWithGoogle} />
     return (
       <Login
         onLogin={login}

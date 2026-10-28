@@ -1,6 +1,7 @@
 import { useSheet } from './api.js'
 import { money, ddmm, parseYmd, MONTHS } from './format.js'
 import { Skeleton, Status } from './ui.jsx'
+import { SafeCard, BalanceNudge } from './Safe.jsx'
 import s from './sheet.module.css'
 
 export default function Cashflow() {
@@ -13,16 +14,16 @@ export default function Cashflow() {
         <h1 className={s.h1}>תזרים</h1>
         {d && <StatusPill d={d} />}
       </div>
-      {!d ? <><Skeleton h={230} /><Skeleton h={84} /><Skeleton h={280} /></> : <Body d={d} />}
+      {!d ? <><Skeleton h={150} /><Skeleton h={230} /><Skeleton h={280} /></> : <Body d={d} />}
       <Status loading={cf.loading} error={cf.error} hasData={!!d} />
     </div>
   )
 }
 
 function StatusPill({ d }) {
-  if (d.minValue < -d.overdraft) return <span className={`${s.pill} ${s.pillWarn}`}>צפוי מינוס ב-{ddmm(d.minDate)}</span>
-  if (d.minValue < 0) return <span className={`${s.pill} ${s.pillWarn}`}>מינוס בתוך המסגרת</span>
-  return <span className={s.pill}>אין צפי למינוס ב-60 יום</span>
+  if (d.minValue < 0) return <span className={`${s.pill} ${s.pillWarn}`}>צפוי מינוס ב-{ddmm(d.minDate)}</span>
+  if (d.cushion && d.minValue < d.cushion) return <span className={`${s.pill} ${s.pillWarn}`}>מתחת לכרית ב-{ddmm(d.minDate)}</span>
+  return <span className={s.pill}>מעל הכרית ב-60 יום</span>
 }
 
 function Body({ d }) {
@@ -38,13 +39,16 @@ function Body({ d }) {
 
   return (
     <>
+      <SafeCard cf={d} />
+      <BalanceNudge cf={d} />
+
       <section className={s.hero} aria-label="יתרה">
         <span className={s.heroLabel}>יתרה משוערת בעו"ש היום</span>
         <span className={s.heroNum}>{money(d.start)}</span>
         <Chart d={d} />
         <div className={s.spread}>
           <span className={s.small}>היום</span>
-          <span className={s.small}>הנקודה הנמוכה {money(d.minValue)} ב-{ddmm(d.minDate)}</span>
+          <span className={s.small}>קו מקווקו: הכרית {money(d.cushion)}</span>
           <span className={s.small}>{d.days.length ? ddmm(d.days[d.days.length - 1].date) : ''}</span>
         </div>
       </section>
@@ -78,8 +82,8 @@ function Body({ d }) {
         {!events.length && <div className={s.empty}>אין חיובים קבועים ב-60 הימים הקרובים</div>}
       </div>
       <p className={s.small}>
-        יתרת הפתיחה נכונה ל-{ddmm(d.balanceDate)}. אפשר לעדכן אותה בהגדרות.
-        הערכת הוצאות שוטפות בביט והעברות: {money(d.estDaily)} ליום.
+        יתרת הפתיחה נכונה ל-{ddmm(d.balanceDate)}. התחזית מניחה שתמשיכו להוציא בקצב של 30 הימים האחרונים
+        (בכרטיסים, ועוד {money(d.estDaily)} ליום בביט והעברות).
       </p>
     </>
   )
@@ -89,7 +93,7 @@ function Chart({ d }) {
   const pts = [d.start, ...d.days.map(x => x.balance)]
   if (pts.length < 2) return null
   const W = 340, H = 100, top = 8
-  const max = Math.max(...pts), min = Math.min(0, ...pts)
+  const max = Math.max(...pts, d.cushion || 0), min = Math.min(0, ...pts)
   const span = max - min || 1
   // ימין לשמאל: היום בצד ימין
   const x = i => W - (i / (pts.length - 1)) * W
@@ -99,11 +103,12 @@ function Chart({ d }) {
   const mi = pts.indexOf(Math.min(...pts))
   return (
     <svg className={s.chart} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" role="img"
-      aria-label={`תחזית יתרה ל-60 יום. הנקודה הנמוכה ${money(d.minValue)} ב-${ddmm(d.minDate)}`}>
-      {min < 0 && <line x1="0" x2={W} y1={y(0)} y2={y(0)} stroke="#B45309" strokeDasharray="4 4" strokeWidth="1" />}
-      <path d={area} fill="rgba(91,107,46,.12)" />
-      <path d={line} fill="none" stroke="#5B6B2E" strokeWidth="2.5" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
-      <circle cx={x(mi)} cy={y(pts[mi])} r="4" fill="#FFFDF7" stroke="#B45309" strokeWidth="2.5" vectorEffect="non-scaling-stroke" />
+      aria-label={`תחזית יתרה ל-60 יום. הנקודה הנמוכה ${money(d.minValue)} ב-${ddmm(d.minDate)}, הכרית ${money(d.cushion)}`}>
+      {d.cushion > 0 && <line x1="0" x2={W} y1={y(d.cushion)} y2={y(d.cushion)} style={{ stroke: 'var(--muted)' }} strokeDasharray="4 4" strokeWidth="1" vectorEffect="non-scaling-stroke" />}
+      {min < 0 && <line x1="0" x2={W} y1={y(0)} y2={y(0)} style={{ stroke: 'var(--warn)' }} strokeWidth="1" vectorEffect="non-scaling-stroke" />}
+      <path d={area} style={{ fill: 'var(--accentFill)' }} />
+      <path d={line} fill="none" style={{ stroke: 'var(--accent)' }} strokeWidth="2.5" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+      <circle cx={x(mi)} cy={y(pts[mi])} r="4" style={{ fill: 'var(--card)', stroke: 'var(--warn)' }} strokeWidth="2.5" vectorEffect="non-scaling-stroke" />
     </svg>
   )
 }

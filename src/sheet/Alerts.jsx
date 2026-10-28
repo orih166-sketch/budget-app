@@ -116,7 +116,7 @@ export default function Alerts({ back }) {
       <div className={s.rows}>
         {current.map(a => (
           <div key={a.name} className={s.rowItem}>
-            <span className={s.dot} style={{ background: a.over ? 'var(--warn)' : '#8A6D3B' }} aria-hidden="true" />
+            <span className={s.dot} style={{ background: a.over ? 'var(--warn)' : 'var(--near)' }} aria-hidden="true" />
             <div className={s.nameCol}>
               <span className={s.name}>{a.over ? `חריגה ב${a.name}` : `${a.name} ב-${Math.round(a.pct * 100)}%`}</span>
               <span className={s.small}>{money(a.used)} מתוך {money(a.base)}</span>

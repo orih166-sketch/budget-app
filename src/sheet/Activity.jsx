@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
-import { Undo2, Upload } from 'lucide-react'
+import { Undo2, Upload, Search } from 'lucide-react'
+import TxEditor from './TxEditor.jsx'
 import { useSheet, callSheet, notifyChanged } from './api.js'
 import { money, ymd, parseYmd, DAYS, cleanMsg, initial } from './format.js'
 import { Skeleton, Status } from './ui.jsx'
@@ -15,7 +16,13 @@ const FILTERS = [
 export default function Activity({ focusInput, go }) {
   const now = new Date()
   const from = ymd(new Date(now.getFullYear(), now.getMonth() - 1, 1))
-  const tx = useSheet('transactions', { from, to: ymd(now) })
+  const [q, setQ] = useState('')
+  const searching = q.trim().length >= 2
+  const recent = useSheet('transactions', { from, to: ymd(now) })
+  // בחיפוש קוראים את כל התנועות מתחילת השנה שעברה
+  const all = useSheet(searching ? 'transactions' : null, { from: `${now.getFullYear() - 1}-01-01`, to: ymd(now) })
+  const tx = searching ? all : recent
+  const [editing, setEditing] = useState(null)
 
   const [text, setText] = useState('')
   const [busy, setBusy] = useState(false)
@@ -53,7 +60,9 @@ export default function Activity({ focusInput, go }) {
   }
 
   const f = FILTERS.find(x => x.id === filter)
-  const days = groupByDay((tx.data || []).filter(f.test))
+  const needle = q.trim().toLowerCase()
+  const match = t => !searching || [t.desc, t.category, t.method, String(t.amount)].some(v => String(v || '').toLowerCase().includes(needle))
+  const days = groupByDay((tx.data || []).filter(t => f.test(t) && match(t)).slice(0, searching ? 150 : 400))
 
   return (
     <div className={s.screen}>
@@ -85,6 +94,12 @@ export default function Activity({ focusInput, go }) {
         )}
       </form>
 
+      <div className={s.inlineForm}>
+        <Search size={18} aria-hidden="true" style={{ color: 'var(--muted)', flexShrink: 0 }} />
+        <input className={s.input} type="search" aria-label="חיפוש תנועות" placeholder="חיפוש: בית עסק, קטגוריה או סכום"
+          value={q} onChange={e => setQ(e.target.value)} style={{ height: 44 }} />
+      </div>
+
       <div className={s.chips} role="group" aria-label="סינון">
         {FILTERS.map(x => (
           <button key={x.id} type="button" aria-pressed={filter === x.id}
@@ -104,21 +119,24 @@ export default function Activity({ focusInput, go }) {
             {d.items.map(t => {
               const income = t.type === 'הכנסה'
               return (
-                <div key={t.row + t.created} className={s.rowItem}>
+                <button type="button" key={t.row + t.created} className={`${s.rowItem} ${s.rowBtn}`}
+                  aria-label={`עריכה: ${t.desc || t.category} ${money(t.amount, { cents: true })}`} onClick={() => setEditing(t)}>
                   <span className={s.avatar} aria-hidden="true">{initial(t.category)}</span>
                   <div className={s.nameCol}>
                     <span className={s.name}>{t.desc || t.category}</span>
-                    <span className={s.small}>{[t.category, t.method].filter(Boolean).join(' · ')}</span>
+                    <span className={s.small}>{[t.category, t.method, t.source === 'Apple Pay' ? 'Apple Pay' : ''].filter(Boolean).join(' · ')}</span>
                   </div>
                   <span className={`${s.amount} ${income ? s.pos : ''}`}>{income ? '+' : ''}{money(t.amount, { cents: true })}</span>
-                </div>
+                </button>
               )
             })}
           </div>
         </section>
       ))}
-      {tx.data && !days.length && <div className={`${s.card} ${s.empty}`}>אין תנועות להצגה</div>}
+      {tx.data && !days.length && <div className={`${s.card} ${s.empty}`}>{searching ? 'לא נמצאו תנועות' : 'אין תנועות להצגה'}</div>}
+      {searching && !tx.data && tx.loading && <p className={s.status}>מחפש בכל התנועות…</p>}
       <Status loading={tx.loading} error={tx.error} hasData={!!tx.data} />
+      {editing && <TxEditor tx={editing} close={() => setEditing(null)} />}
     </div>
   )
 }
