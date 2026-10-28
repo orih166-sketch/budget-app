@@ -3,7 +3,7 @@ import { ChevronRight, ChevronLeft, Settings, Bell } from 'lucide-react'
 import { useSheet } from './api.js'
 import { money, monthLabel, shiftMonth, ddmm, initial } from './format.js'
 import { Bar, Skeleton, Status } from './ui.jsx'
-import { SafeCard, BalanceNudge } from './Safe.jsx'
+import { BalanceNudge } from './Safe.jsx'
 import s from './sheet.module.css'
 
 // החודשים ברשימה: מינואר בשנה שעברה ועד החודש הנוכחי (החדש למעלה)
@@ -42,9 +42,6 @@ export default function Home({ month, setMonth, thisMonth, go, userName }) {
         </div>
       </div>
 
-      {isCurrent && <SafeCard cf={cf.data} />}
-      {isCurrent && <BalanceNudge cf={cf.data} />}
-
       {isCurrent && new Date().getDate() <= 7 && (
         <button type="button" className={`${s.banner} ${s.rowBtn}`} onClick={() => go('summary')}>
           <div className={s.nameCol}>
@@ -54,7 +51,6 @@ export default function Home({ month, setMonth, thisMonth, go, userName }) {
           <ChevronLeft size={18} aria-hidden="true" />
         </button>
       )}
-      <h2 className={s.h2} style={{ marginTop: 8 }}>החודש בפירוט</h2>
       <div className={s.monthBar}>
         <button type="button" className={s.iconBtn} aria-label="חודש קודם" disabled={month <= options[options.length - 1]} onClick={() => setMonth(shiftMonth(month, -1))}>
           <ChevronRight size={18} aria-hidden="true" />
@@ -80,6 +76,7 @@ export default function Home({ month, setMonth, thisMonth, go, userName }) {
       {isCurrent && cf.data?.cardNext && data && (
         <p className={s.small}>חיוב {cf.data.cardNext.card} הבא: {money(cf.data.cardNext.amount)} ב-{ddmm(cf.data.cardNext.date)}</p>
       )}
+      {isCurrent && data && <BalanceNudge cf={cf.data} />}
       <Status loading={m.loading} error={m.error} hasData={!!data} retry={m.reload} />
     </div>
   )
@@ -109,11 +106,14 @@ function MonthBody({ data, prev, isCurrent, go }) {
   const balance = t.income.actual - t.expenses.actual - t.savings.actual
   const planned = t.income.budget - t.expenses.budget - t.savings.budget
 
+  // "נשאר להוציא": כל תקציב ההוצאות של החודש (קבועות + משתנות) פחות מה שכבר יצא
+  const expLeft = t.expenses.budget - t.expenses.actual
+
   let perDay = null
   if (isCurrent) {
     const now = new Date()
     const daysLeft = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate() - now.getDate() + 1
-    perDay = { daysLeft, amount: Math.max(0, left) / daysLeft }
+    perDay = { daysLeft, amount: Math.max(0, expLeft) / daysLeft }
   }
 
   const cats = data.rows
@@ -135,6 +135,16 @@ function MonthBody({ data, prev, isCurrent, go }) {
           const pb = pt.income.actual - pt.expenses.actual - pt.savings.actual
           return <span className={s.heroSub}>בחודש הקודם: {pb >= 0 ? 'עודף' : 'גירעון'} של {money(Math.abs(pb))}</span>
         })()}
+      </section>
+
+      <section className={s.hero} aria-label="נשאר להוציא החודש">
+        <span className={s.heroLabel}>{expLeft >= 0 ? (isCurrent ? 'נשאר להוציא החודש' : 'נשאר בתקציב') : 'חרגתם מתקציב ההוצאות'}</span>
+        <span className={`${s.heroNum} ${expLeft < 0 ? s.warnText : s.pos}`}>{money(Math.abs(expLeft))}</span>
+        <Bar pct={t.expenses.budget ? t.expenses.actual / t.expenses.budget : 0} tone={expLeft < 0 ? 'warn' : 'ok'} />
+        <div className={s.spread}>
+          <span className={s.small}>יצא {money(t.expenses.actual)} מתוך תקציב של {money(t.expenses.budget)}</span>
+          {perDay && expLeft > 0 && <span className={s.small}>{money(perDay.amount)} ליום · {perDay.daysLeft} ימים</span>}
+        </div>
       </section>
 
       <section className={s.rows} aria-label="תכנון מול בפועל">

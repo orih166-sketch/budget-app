@@ -4,7 +4,8 @@ export function money(n, { cents = false } = {}) {
   const s = cents && abs % 1
     ? abs.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
     : Math.round(abs).toLocaleString('en-US')
-  return (v < 0 ? '-₪' : '₪') + s
+  // סכום שלילי עטוף בכיוון משמאל לימין, אחרת המינוס קופץ לצד השני בטקסט עברי
+  return v < 0 ? '⁦-₪' + s + '⁩' : '₪' + s
 }
 
 export const ymd = d =>
