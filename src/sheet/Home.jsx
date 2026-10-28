@@ -127,13 +127,13 @@ function MonthBody({ data, prev, isCurrent, go }) {
 
   return (
     <>
-      <section className={s.hero} aria-label="מאזן החודש">
-        <span className={s.heroLabel}>{balance >= 0 ? (isCurrent ? 'עודף עד עכשיו' : 'עודף בחודש') : (isCurrent ? 'גירעון עד עכשיו' : 'גירעון בחודש')}</span>
-        <span className={`${s.heroNum} ${balance < 0 ? s.warnText : ''}`}>{money(Math.abs(balance))}</span>
-        <span className={s.heroSub}>הכנסות פחות הוצאות וחיסכון</span>
+      <section className={`${s.safe} ${balance < 0 ? s.safeWarn : ''}`} aria-label="מאזן החודש">
+        <span className={s.safeLabel}>{balance >= 0 ? (isCurrent ? 'עודף עד עכשיו' : 'עודף בחודש') : (isCurrent ? 'גירעון עד עכשיו' : 'גירעון בחודש')}</span>
+        <span className={s.safeNum}>{money(Math.abs(balance))}</span>
+        <span className={s.safeSub}>הכנסות פחות הוצאות וחיסכון</span>
         {pt && (() => {
           const pb = pt.income.actual - pt.expenses.actual - pt.savings.actual
-          return <span className={s.heroSub}>בחודש הקודם: {pb >= 0 ? 'עודף' : 'גירעון'} של {money(Math.abs(pb))}</span>
+          return <span className={s.safeSub}>בחודש הקודם: {pb >= 0 ? 'עודף' : 'גירעון'} של {money(Math.abs(pb))}</span>
         })()}
       </section>
 
