@@ -1,4 +1,5 @@
 import { tokenMatches } from './_applepay-token.js'
+import { callGas } from './_gas.js'
 
 // נקרא מהקיצור באייפון (אוטומציה "ארנק" → "קבלת תוכן מ-URL") אחרי תשלום ב-Apple Pay.
 // הכתובת כוללת ?u=<מייל>&t=<טוקן אישי>; הגוף: {amount, merchant, card}.
@@ -12,18 +13,16 @@ export default async function handler(req, res) {
   const email = String(req.query.u || '').toLowerCase()
   if (!allowedEmails().includes(email) || !tokenMatches(email, req.query.t)) return res.status(401).json({ ok: false, error: 'unauthorized' })
 
-  const b = req.body || {}
+  let b = req.body || {}
+  if (typeof b === 'string') { try { b = JSON.parse(b) } catch { b = {} } }
   const params = { email, amount: b.amount ?? b['סכום'], merchant: b.merchant ?? b['סוחר'] ?? b.name, card: b.card ?? b['כרטיס'] }
   try {
-    const r = await fetch(process.env.GAS_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ key: process.env.GAS_KEY, action: 'applePay', params }),
-    })
-    const out = JSON.parse(await r.text())
-    if (!out.ok) return res.status(200).json({ ok: false, error: out.error })
+    // תשלום נרשם פעם אחת בלבד: אין ניסיון חוזר, כדי שלא תיווצר שורה כפולה אם הגיליון כבר רשם ורק התשובה התעכבה
+    const out = await callGas('applePay', params, { tries: 1 })
+    if (!out.ok) { console.log('applepay rejected:', out.error); return res.status(200).json({ ok: false, error: out.error }) }
     return res.status(200).json({ ok: true, category: out.data.category })
-  } catch {
+  } catch (e) {
+    console.log('applepay failed:', e.message)
     return res.status(502).json({ ok: false, error: 'אין חיבור לגיליון' })
   }
 }

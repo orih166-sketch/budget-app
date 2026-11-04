@@ -1,5 +1,8 @@
 import { createClient } from '@supabase/supabase-js'
 import { applePayToken } from './_applepay-token.js'
+import { callGas } from './_gas.js'
+
+const READS = new Set(['bootstrap', 'transactions', 'month', 'cashflow', 'savings', 'savingsPending', 'budgetPlan', 'pushGet', 'pasteAnalyze'])
 
 // גשר בין האפליקציה לגיליון "תכנון מקצועי 2026" (Apps Script, Api.gs).
 // המפתח של הגיליון נשאר רק כאן בשרת; הדפדפן שולח רק את טוקן ההתחברות של Supabase.
@@ -45,16 +48,10 @@ export default async function handler(req, res) {
   const sent = PER_USER.has(action) ? { ...(params || {}), email } : (params || {})
 
   try {
-    const r = await fetch(process.env.GAS_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ key: process.env.GAS_KEY, action, params: sent }),
-    })
-    const text = await r.text()
-    let out
-    try { out = JSON.parse(text) } catch { out = { ok: false, error: 'הגיליון לא ענה כמו שצריך' } }
+    // קריאה בלבד → אפשר לנסות שוב אם נתקע; פעולה שכותבת נשלחת פעם אחת כדי שלא תירשם פעמיים
+    const out = await callGas(action, sent, { tries: READS.has(action) ? 3 : 1 })
     return res.status(200).json(out)
   } catch (e) {
-    return res.status(502).json({ ok: false, error: 'אין חיבור לגיליון' })
+    return res.status(502).json({ ok: false, error: e instanceof SyntaxError ? 'הגיליון לא ענה כמו שצריך' : 'אין חיבור לגיליון, נסה שוב' })
   }
 }
