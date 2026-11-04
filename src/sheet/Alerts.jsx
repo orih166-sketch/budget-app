@@ -118,7 +118,7 @@ export default function Alerts({ back }) {
           <div key={a.name} className={s.rowItem}>
             <span className={s.dot} style={{ background: a.over ? 'var(--warn)' : 'var(--near)' }} aria-hidden="true" />
             <div className={s.nameCol}>
-              <span className={s.name}>{a.over ? `חריגה ב${a.name}` : `${a.name} ב-${Math.round(a.pct * 100)}%`}</span>
+              <span className={s.name}>{a.over ? `חריגה ב${a.name}` : a.reached ? `הגעתם לתקציב ב${a.name}` : `${a.name} ב-${Math.round(a.pct * 100)}%`}</span>
               <span className={s.small}>{money(a.used)} מתוך {money(a.base)}</span>
             </div>
           </div>
@@ -139,7 +139,11 @@ function alertsNow(data) {
     const base = annual ? r.budget * monthIdx : r.budget
     const used = annual ? r.ytd : r.actual
     const pct = used / base
-    if (pct >= 1) return [{ name: r.name, over: true, pct, used, base }]
+    if (pct >= 1) {
+      if (r.nature !== 'משתנה' && used <= base * 1.02) return []      // חיוב קבוע ששולם כמתוכנן
+      const reached = Math.round(used) <= Math.round(base)
+      return [{ name: r.name, over: !reached, reached, pct, used, base }]
+    }
     if (r.nature !== 'קבועה' && pct >= r.thr) return [{ name: r.name, over: false, pct, used, base }]
     return []
   }).sort((a, b) => Number(b.over) - Number(a.over) || b.pct - a.pct)

@@ -210,7 +210,9 @@ function MonthBody({ data, prev, isCurrent, go }) {
                 <div className={s.nameCol}>
                   <span className={s.name}>{c.name}</span>
                   <span className={`${s.small} ${c.over ? s.warnText : ''}`}>
-                    {c.over ? `חריגה של ${money(c.actual - c.budget)}` : `נשארו ${money(Math.max(0, c.budget - c.actual))}`}
+                    {c.over ? `חריגה של ${money(c.actual - c.budget)}`
+                      : c.budget > 0 && Math.round(c.actual) === Math.round(c.budget) ? 'הגעתם לתקציב'
+                      : `נשארו ${money(Math.max(0, c.budget - c.actual))}`}
                   </span>
                 </div>
               </div>
