@@ -16,13 +16,17 @@ export default async function handler(req, res) {
   let b = req.body || {}
   if (typeof b === 'string') { try { b = JSON.parse(b) } catch { b = {} } }
   const params = { email, amount: b.amount ?? b['סכום'], merchant: b.merchant ?? b['סוחר'] ?? b.name, card: b.card ?? b['כרטיס'] }
+  // התשובה היא טקסט קריא, כדי שהקיצור יוכל להציג אותה כהודעה על המסך ("הצגת הודעה" עם תוכן ה-URL)
+  const say = text => { res.setHeader('Content-Type', 'text/plain; charset=utf-8'); return res.status(200).send(text) }
+  const amount = Number(String(params.amount ?? '').replace(/[^\d.]/g, ''))
+  const what = [amount ? '₪' + amount.toLocaleString('en-US', { maximumFractionDigits: 2 }) : '', params.merchant].filter(Boolean).join(' · ')
   try {
     // תשלום נרשם פעם אחת בלבד: אין ניסיון חוזר, כדי שלא תיווצר שורה כפולה אם הגיליון כבר רשם ורק התשובה התעכבה
     const out = await callGas('applePay', params, { tries: 1 })
-    if (!out.ok) { console.log('applepay rejected:', out.error); return res.status(200).json({ ok: false, error: out.error }) }
-    return res.status(200).json({ ok: true, category: out.data.category })
+    if (!out.ok) { console.log('applepay rejected:', out.error); return say(`לא נרשם: ${out.error}`) }
+    return say(`נרשם ביומן: ${what} · ${out.data.category}`)
   } catch (e) {
     console.log('applepay failed:', e.message)
-    return res.status(502).json({ ok: false, error: 'אין חיבור לגיליון' })
+    return say(`לא נרשם (אין חיבור לגיליון): ${what}. כדאי להזין ידנית באפליקציה.`)
   }
 }
