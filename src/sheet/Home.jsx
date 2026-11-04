@@ -106,8 +106,10 @@ function MonthBody({ data, prev, isCurrent, go }) {
   const balance = t.income.actual - t.expenses.actual - t.savings.actual
   const planned = t.income.budget - t.expenses.budget - t.savings.budget
 
-  // "נשאר להוציא": כל תקציב ההוצאות של החודש (קבועות + משתנות) פחות מה שכבר יצא
-  const expLeft = t.expenses.budget - t.expenses.actual
+  // "נשאר להוציא": תקציב ההוצאות פחות מה שכבר יצא — כשהקבועות (משכנתא, ביטוחים) עוד לא ירדו,
+  // סופרים אותן לפי הצפי (projected = הגבוה מבין התקציב לבין מה שירד), כדי שלא ייראה שיש יותר כסף ממה שיש
+  const expLeft = t.expenses.budget - (t.fixed.projected + t.annual.projected + t.variable.actual)
+  const pendingFixed = (t.fixed.projected + t.annual.projected) - (t.fixed.actual + t.annual.actual)
 
   let perDay = null
   if (isCurrent) {
@@ -131,6 +133,11 @@ function MonthBody({ data, prev, isCurrent, go }) {
         <span className={s.safeLabel}>{balance >= 0 ? (isCurrent ? 'עודף עד עכשיו' : 'עודף בחודש') : (isCurrent ? 'גירעון עד עכשיו' : 'גירעון בחודש')}</span>
         <span className={s.safeNum}>{money(Math.abs(balance))}</span>
         <span className={s.safeSub}>הכנסות פחות הוצאות וחיסכון</span>
+        {isCurrent && t.income.budget > 0 && t.income.actual < t.income.budget * 0.5 && (
+          <span className={s.safeSub}>
+            שימו לב: נרשמו רק {money(t.income.actual)} הכנסות מתוך {money(t.income.budget)} שמתוכננות — כנראה המשכורות עוד לא נכנסו או לא יובאו מהבנק.
+          </span>
+        )}
         {pt && (() => {
           const pb = pt.income.actual - pt.expenses.actual - pt.savings.actual
           return <span className={s.safeSub}>בחודש הקודם: {pb >= 0 ? 'עודף' : 'גירעון'} של {money(Math.abs(pb))}</span>
@@ -140,9 +147,12 @@ function MonthBody({ data, prev, isCurrent, go }) {
       <section className={s.hero} aria-label="נשאר להוציא החודש">
         <span className={s.heroLabel}>{expLeft >= 0 ? (isCurrent ? 'נשאר להוציא החודש' : 'נשאר בתקציב') : 'חרגתם מתקציב ההוצאות'}</span>
         <span className={`${s.heroNum} ${expLeft < 0 ? s.warnText : s.pos}`}>{money(Math.abs(expLeft))}</span>
-        <Bar pct={t.expenses.budget ? t.expenses.actual / t.expenses.budget : 0} tone={expLeft < 0 ? 'warn' : 'ok'} />
+        <Bar pct={t.expenses.budget ? (t.expenses.budget - expLeft) / t.expenses.budget : 0} tone={expLeft < 0 ? 'warn' : 'ok'} />
         <div className={s.spread}>
-          <span className={s.small}>יצא {money(t.expenses.actual)} מתוך תקציב של {money(t.expenses.budget)}</span>
+          <span className={s.small}>
+            יצא {money(t.expenses.actual)} מתוך תקציב של {money(t.expenses.budget)}
+            {pendingFixed > 1 ? `, ועוד ${money(pendingFixed)} קבועות שעוד לא ירדו` : ''}
+          </span>
           {perDay && expLeft > 0 && <span className={s.small}>{money(perDay.amount)} ליום · {perDay.daysLeft} ימים</span>}
         </div>
       </section>
